@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Sharetribe Capacitor</string>
+    <string name="title_activity_main">Sharetribe Capacitor</string>
+    <string name="package_name">com.sharetribecapacitor.app</string>
+    <string name="custom_url_scheme">com.sharetribecapacitor.app</string>
+</resources>

@@ -5,6 +5,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@babel/runtime": "^7.17.9",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
     "@loadable/component": "^5.15.2",
     "@loadable/server": "^5.15.2",
     "@mapbox/polyline": "^1.1.1",
@@ -69,6 +71,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
