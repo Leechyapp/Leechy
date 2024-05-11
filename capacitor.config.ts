@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 let serverConfig: CapacitorConfig['server'];
 
-const ENV_MOBILE: string = 'prod';
+const ENV_MOBILE: string = 'staging';
 
 switch (ENV_MOBILE) {
   case 'dev':
@@ -13,8 +13,10 @@ switch (ENV_MOBILE) {
     break;
   case 'staging':
     serverConfig = {
-      url: 'https://staging.example.com',
-      allowNavigation: ['staging.example.com']
+      // url: 'https://staging.example.com',
+      // allowNavigation: ['staging.example.com']
+      url: 'https://www.cymarketplaces.com',
+      allowNavigation: ['www.cymarketplaces.com']
     };
     break;
   case 'prod':
