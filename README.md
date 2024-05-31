@@ -84,3 +84,19 @@ experience from the [Expert Network](https://www.sharetribe.com/experts/).
 This project is licensed under the terms of the Apache-2.0 license.
 
 See [LICENSE](LICENSE)
+
+## Cacapitor
+
+### Android
+
+```
+npx cap sync android
+npx cap open android
+```
+
+### IOS
+
+```
+npx cap sync ios
+npx cap open ios
+```

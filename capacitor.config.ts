@@ -15,8 +15,8 @@ switch (ENV_MOBILE) {
     serverConfig = {
       // url: 'https://staging.example.com',
       // allowNavigation: ['staging.example.com']
-      url: 'https://www.cymarketplaces.com',
-      allowNavigation: ['www.cymarketplaces.com']
+      url: 'https://leechy-p52lea.mysharetribe-test.com',
+      allowNavigation: ['leechy-p52lea.mysharetribe-test.com']
     };
     break;
   case 'prod':
