@@ -1,4 +1,5 @@
 import { CapacitorConfig } from '@capacitor/cli';
+import { CapcaitorEnv } from './capacitor.env';
 
 let serverConfig: CapacitorConfig['server'];
 
@@ -15,14 +16,16 @@ switch (ENV_MOBILE) {
     serverConfig = {
       // url: 'https://staging.example.com',
       // allowNavigation: ['staging.example.com']
-      url: 'https://leechy-p52lea.mysharetribe-test.com',
-      allowNavigation: ['leechy-p52lea.mysharetribe-test.com']
+      url: CapcaitorEnv.REACT_CAPACITOR_STAGING_WEB_URL,
+      allowNavigation: [CapcaitorEnv.REACT_CAPACITOR_STAGING_ALLOW_NAV_URL]
     };
     break;
   case 'prod':
     serverConfig = {
-      url: 'https://example.com',
-      allowNavigation: ['example.com']
+      // url: 'https://example.com',
+      // allowNavigation: ['example.com']
+      url: CapcaitorEnv.REACT_CAPACITOR_PROD_WEB_URL,
+      allowNavigation: [CapcaitorEnv.REACT_CAPACITOR_PROD_ALLOW_NAV_URL]
     };
     break;
   default:
@@ -31,8 +34,8 @@ switch (ENV_MOBILE) {
 }
 
 const config: CapacitorConfig = {
-  appId: 'com.sharetribecapacitor.app',
-  appName: 'Sharetribe Capacitor',
+  appId: `com.${CapcaitorEnv.REACT_CAPACITOR_APP_ID}.app`,
+  appName: CapcaitorEnv.REACT_CAPACITOR_APP_NAME,
   webDir: 'www',
   bundledWebRuntime: false,
   server: serverConfig
