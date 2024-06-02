@@ -1827,7 +1827,7 @@
 
 "@capacitor/core@^6.0.0":
   version "6.0.0"
-  resolved "https://registry.npmjs.org/@capacitor/core/-/core-6.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-6.0.0.tgz#abfaf1013cec686cf9743cf4fdc445d10e2f13ea"
   integrity sha512-NvxIQsJcMiIV+Le1DilR2GGyQQbDInfXK1UywGROQ5mycdFlW5XoAPZ+MKnFGB123RoEgE3uhDGgwTXUmSlX9A==
   dependencies:
     tslib "^2.1.0"
