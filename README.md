@@ -89,12 +89,63 @@ See [LICENSE](LICENSE)
 
 ### Android
 
+#### Sync and run in Android Studio
+
 ```
 npx cap sync android
 npx cap open android
 ```
 
+Once the android folder has been synced "npx cap sync android" and Android has been opened, push the
+play button on Android Studio (which should download the .apk and launch the app in your device)
+
+#### Port forwarding
+
+Navigate to chrome://inspect/#devices
+
+- Click "Port forwarding..."
+- Set port 3020 and localhost:3020
+
+#### Changing Asset Images (Icons)
+
+Documentation: https://developer.android.com/studio/write/create-app-icons#access
+
+Run Image Asset Studio To start Image Asset Studio, follow these steps:
+
+1. In the Project window, select the Android view.
+2. Right-click the res folder and select New > Image Asset.
+
+#### Generating Assets with @capacitor/assets
+
+Documentation: https://capacitorjs.com/docs/guides/splash-screens-and-icons
+
+```
+npm install @capacitor/assets --save-dev
+-- or --
+yarn add @capacitor/assets -D
+```
+
+Provide icon and splash screen source images using this folder/filename structure:
+
+```
+assets/
+├── icon-only.png
+├── icon-foreground.png
+├── icon-background.png
+├── splash.png
+└── splash-dark.png
+```
+
+- Icon files should be at least 1024px x 1024px.
+- Splash screen files should be at least 2732px x 2732px.
+- The format can be jpg or png.
+
 ### IOS
+
+Enviornment
+
+- Xcode version 15+
+- IOS 17+
 
 ```
 npx cap sync ios
