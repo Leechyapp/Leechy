@@ -27,6 +27,7 @@ import TopbarMobileMenu from './TopbarMobileMenu/TopbarMobileMenu';
 import TopbarDesktop from './TopbarDesktop/TopbarDesktop';
 
 import css from './Topbar.module.css';
+import { Capacitor } from '@capacitor/core';
 
 const MAX_MOBILE_SCREEN_WIDTH = 1024;
 
@@ -272,7 +273,7 @@ class TopbarComponent extends Component {
     };
     const initialSearchFormValues = topbarSearcInitialValues();
 
-    const classes = classNames(rootClassName || css.root, className);
+    const classes = Capacitor.getPlatform() === 'ios' ?  classNames(rootClassName || css.root, className, css.iosMarginTop) : classNames(rootClassName || css.root, className);
 
     return (
       <div className={classes}>
