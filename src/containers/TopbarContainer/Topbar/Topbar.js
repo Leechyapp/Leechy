@@ -27,6 +27,7 @@ import TopbarMobileMenu from './TopbarMobileMenu/TopbarMobileMenu';
 import TopbarDesktop from './TopbarDesktop/TopbarDesktop';
 
 import css from './Topbar.module.css';
+import { Capacitor } from '@capacitor/core';
 
 const MAX_MOBILE_SCREEN_WIDTH = 1024;
 
@@ -276,6 +277,9 @@ class TopbarComponent extends Component {
 
     return (
       <div className={classes}>
+        {Capacitor.getPlatform() === 'ios' &&
+          <div className={css.iosCushion}></div>
+        }
         <LimitedAccessBanner
           isAuthenticated={isAuthenticated}
           authScopes={authScopes}

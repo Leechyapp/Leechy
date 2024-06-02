@@ -8,6 +8,11 @@
   position: relative;
 }
 
+.iosCushion {
+  height: 50px;
+  background-color: white;
+}
+
 .container {
   /* Size */
   width: 100%;

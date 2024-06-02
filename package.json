@@ -7,12 +7,14 @@
     "@babel/runtime": "^7.17.9",
     "@capacitor/android": "^6.0.0",
     "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
     "@loadable/component": "^5.15.2",
     "@loadable/server": "^5.15.2",
     "@mapbox/polyline": "^1.1.1",
     "@sentry/browser": "^6.19.7",
     "@sentry/node": "^6.19.7",
     "autosize": "^5.0.1",
+    "axios": "^1.7.2",
     "basic-auth": "^2.0.1",
     "body-parser": "^1.20.2",
     "classnames": "^2.5.1",
@@ -81,7 +83,8 @@
     "cross-env": "^7.0.3",
     "inquirer": "^8.2.4",
     "nodemon": "^3.0.3",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "typescript": "^5.4.5"
   },
   "resolutions": {
     "moment": "^2.30.1",
@@ -105,7 +108,7 @@
     "config-check": "node scripts/config.js --check",
     "dev-frontend": "sharetribe-scripts start",
     "dev-backend": "nodemon server/apiServer.js",
-    "dev": "yarn run config-check&&cross-env NODE_ENV=development REACT_APP_DEV_API_SERVER_PORT=3500 concurrently --kill-others \"yarn run dev-frontend\" \"yarn run dev-backend\"",
+    "dev": "yarn run config-check&&cross-env NODE_ENV=development REACT_APP_DEV_API_SERVER_PORT=3520 concurrently --kill-others \"yarn run dev-frontend\" \"yarn run dev-backend\"",
     "build": "yarn build-web&&yarn build-server",
     "build-web": "sharetribe-scripts build",
     "build-server": "sharetribe-scripts build-server",
