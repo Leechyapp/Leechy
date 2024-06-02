@@ -273,10 +273,13 @@ class TopbarComponent extends Component {
     };
     const initialSearchFormValues = topbarSearcInitialValues();
 
-    const classes = Capacitor.getPlatform() === 'ios' ?  classNames(rootClassName || css.root, className, css.iosMarginTop) : classNames(rootClassName || css.root, className);
+    const classes = classNames(rootClassName || css.root, className);
 
     return (
       <div className={classes}>
+        {Capacitor.getPlatform() === 'ios' &&
+          <div className={css.iosCushion}></div>
+        }
         <LimitedAccessBanner
           isAuthenticated={isAuthenticated}
           authScopes={authScopes}

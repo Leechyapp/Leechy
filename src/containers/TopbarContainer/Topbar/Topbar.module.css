@@ -8,8 +8,9 @@
   position: relative;
 }
 
-.iosMarginTop {
-  margin-top: 50px;
+.iosCushion {
+  height: 50px;
+  background-color: white;
 }
 
 .container {
