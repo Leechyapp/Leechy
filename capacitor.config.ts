@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 let serverConfig: CapacitorConfig['server'];
 
-const ENV_MOBILE: string = 'staging';
+const ENV_MOBILE: string = 'dev';
 
 switch (ENV_MOBILE) {
   case 'dev':
