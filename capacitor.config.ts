@@ -3,7 +3,7 @@ import { CapcaitorEnv } from './capacitor.env';
 
 let serverConfig: CapacitorConfig['server'];
 
-const ENV_MOBILE: string = 'dev';
+const ENV_MOBILE: string = 'prod';
 
 switch (ENV_MOBILE) {
   case 'dev':
