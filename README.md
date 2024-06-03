@@ -140,6 +140,10 @@ assets/
 - Splash screen files should be at least 2732px x 2732px.
 - The format can be jpg or png.
 
+```
+npx capacitor-assets generate
+```
+
 ### IOS
 
 Enviornment
