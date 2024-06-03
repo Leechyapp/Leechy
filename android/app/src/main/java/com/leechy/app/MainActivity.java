@@ -1,4 +1,4 @@
-package com.sharetribecapacitor.app;
+package com.leechy.app;
 
 import com.getcapacitor.BridgeActivity;
 
