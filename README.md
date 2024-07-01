@@ -87,7 +87,7 @@ See [LICENSE](LICENSE)
 
 ## Cacapitor
 
-### Android
+## Android
 
 #### Sync and run in Android Studio
 
@@ -144,7 +144,7 @@ assets/
 npx capacitor-assets generate
 ```
 
-### IOS
+## IOS
 
 Enviornment
 
@@ -155,3 +155,31 @@ Enviornment
 npx cap sync ios
 npx cap open ios
 ```
+
+### Distrubution
+#### Step 1:
+Select generic device "Any IOS Device (arm64)"
+
+#### Step 2:
+Create an Archive
+Product > Archive
+
+Errors on Archive
+If you get an error called
+```
+Command PhaseScriptExecution failed with a nonzero exit code
+```
+Then go to:
+ios/App/Pods/Target Support Files/Pods-App/Pods-App-frameworks.sh
+
+and replace the following 
+```
+source="$(readlink "${source}")"
+```
+with
+```
+source="$(readlink -f "${source}")"
+```
+
+#### Step 3:
+Distribute to TestFlight & App Store from the list of Archive(s)
