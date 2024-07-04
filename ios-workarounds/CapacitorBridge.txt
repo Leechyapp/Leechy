@@ -1,0 +1,16 @@
+// https://forums.swift.org/t/if-available-check-failing/64938/2
+
+//        if #available(iOS 16.4, *) {
+//            //self.webView?.isInspectable = isWebDebuggable
+//        }
+        
+        // Enable debug inspection of webview
+        #if compiler(>=5.8) // Xcode 14.3
+        #if os(iOS)
+        #if DEBUG
+        if #available(iOS 16.4, *) {
+            self.isInspectable = true
+        }
+        #endif
+        #endif
+        #endif
