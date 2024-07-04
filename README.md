@@ -142,6 +142,9 @@ assets/
 
 ```
 npx capacitor-assets generate
+-- or --
+npx capacitor-assets generate --android
+npx capacitor-assets generate --ios
 ```
 
 ## IOS
