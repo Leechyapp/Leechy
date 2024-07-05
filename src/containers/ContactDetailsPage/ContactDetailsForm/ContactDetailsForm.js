@@ -88,8 +88,8 @@ class ContactDetailsFormComponent extends Component {
           }
 
           const { email: currentEmail, emailVerified, pendingEmail, profile } = user.attributes;
-
-          // email
+          const { metadata } = profile
+          const metadataEmailVerified = metadata?.emailVerified
 
           // has the email changed
           const emailChanged = currentEmail !== email;
@@ -156,7 +156,7 @@ class ContactDetailsFormComponent extends Component {
                 <FormattedMessage id="ContactDetailsForm.emailVerified" />
               </span>
             );
-          } else if (!emailVerified && !pendingEmail) {
+          } else if (!emailVerified && !pendingEmail && !metadataEmailVerified) {
             // Current email is unverified. This is the email given in sign up form
 
             emailVerifiedInfo = (
@@ -167,7 +167,7 @@ class ContactDetailsFormComponent extends Component {
                 />
               </span>
             );
-          } else if (pendingEmail) {
+          } else if (pendingEmail && !metadataEmailVerified) {
             // Current email has been tried to change, but the new address is not yet verified
 
             const pendingEmailStyled = <span className={css.emailStyle}>{pendingEmail}</span>;
