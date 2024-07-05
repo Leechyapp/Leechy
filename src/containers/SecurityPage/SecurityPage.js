@@ -92,6 +92,7 @@ const SecurityPage = injectIntl(props => {
       >
         <div className={css.rowUnsetMarginLR}>
           <div className={css.col12}>
+            <br />
             <form>
               <h4>Confirm Account Deletion</h4>
               <p>Once your account is deleted, it cannot be undone.</p>
