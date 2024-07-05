@@ -942,6 +942,7 @@
   "TopbarDesktop.LinksMenu.all": "Menu",
   "TopbarDesktop.LinksMenu.more": "More",
   "TopbarDesktop.accountSettingsLink": "Account settings",
+  "TopbarDesktop.securitySettingsLink": "Security settings",
   "TopbarDesktop.createListing": "Post a new listing",
   "TopbarDesktop.inbox": "Inbox",
   "TopbarDesktop.login": "Log in",
