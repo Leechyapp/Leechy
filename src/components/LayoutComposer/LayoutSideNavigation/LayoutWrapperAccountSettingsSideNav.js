@@ -120,6 +120,14 @@ const LayoutWrapperAccountSettingsSideNavComponent = props => {
         name: 'PaymentMethodsPage',
       },
     },
+    {
+      text: <FormattedMessage id="LayoutWrapperAccountSettingsSideNav.securityTabTitle" />,
+      selected: currentPage === 'SecurityPage',
+      id: 'SecurityPageTab',
+      linkProps: {
+        name: 'SecurityPage',
+      },
+    },
   ];
 
   return <TabNav rootClassName={css.tabs} tabRootClassName={css.tab} tabs={tabs} />;
