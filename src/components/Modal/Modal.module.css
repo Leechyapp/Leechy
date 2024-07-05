@@ -104,7 +104,7 @@
 
 .closeIOS {
   composes: marketplaceModalCloseStyles from global;
-  padding: 36px 24px 0 0;
+  padding: 50px 24px 0 0;
 }
 
 .closeText {
