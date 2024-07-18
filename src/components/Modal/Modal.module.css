@@ -102,6 +102,11 @@
   composes: marketplaceModalCloseStyles from global;
 }
 
+.closeIOS {
+  composes: marketplaceModalCloseStyles from global;
+  padding: 50px 24px 0 0;
+}
+
 .closeText {
   composes: marketplaceModalCloseText from global;
 }
