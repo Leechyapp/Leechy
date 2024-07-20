@@ -46,6 +46,6 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow camera because to take photo</string>
+	<string>This will allow you to capture images directly from your camera within the app. You can use the captured image to set your profile picture or when you want to set photos to your listings. The app does not use any of the captured images for any other purpose.</string>
 </dict>
 </plist>
