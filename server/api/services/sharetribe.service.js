@@ -14,6 +14,19 @@ class SharetribeService {
       });
   }
 
+  static async updateCurrentUser(req, res, dataObj) {
+    const sdk = getSdk(req, res);
+    return await sdk.currentUser
+      .updateProfile(dataObj)
+      .then(res => {
+        return res.data;
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
   static async deleteCurrentUser(req, res) {
     const { currentPassword } = req.body;
     const trustedSdk = await getTrustedSdk(req);
@@ -31,6 +44,19 @@ class SharetribeService {
       })
       .catch(error => {
         return error;
+      });
+  }
+
+  static async showUser(req, res, dataObj) {
+    const sdk = getSdk(req, res);
+    return await sdk.users
+      .show(dataObj)
+      .then(res => {
+        return res.data;
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
       });
   }
 }
