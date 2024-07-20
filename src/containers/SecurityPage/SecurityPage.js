@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { bool } from 'prop-types';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl.js';
 import {
@@ -9,13 +9,14 @@ import {
   SecondaryButton,
   Modal,
   H4,
+  NamedLink,
 } from '../../components/index.js';
 import TopbarContainer from '../TopbarContainer/TopbarContainer.js';
 import FooterContainer from '../FooterContainer/FooterContainer.js';
 import css from './SecurityPage.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { isScrollingDisabled, manageDisableScrolling } from '../../ducks/ui.duck.js';
-import { deleteCurrentUser } from '../../util/api.js';
+import { deleteCurrentUser, getBlockedUsersList } from '../../util/api.js';
 import { logout } from '../../ducks/auth.duck.js';
 
 const SecurityPage = injectIntl(props => {
@@ -25,13 +26,25 @@ const SecurityPage = injectIntl(props => {
   const dispatch = useDispatch();
   const title = intl.formatMessage({ id: 'SecurityPage.title' });
 
+  const [currentTab, setCurrentTab] = useState(1);
   const [showAccountDeleteModal, setShowAccountDeleteModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState();
   const [deleteInProgress, setDeleteInProgress] = useState(false);
 
+  const [blockedUsersList, setBlockedUsersList] = useState();
+  const [blockedUsersListLoading, setBlockedUsersListLoading] = useState(false);
+
+  const tabClassActive = [css.tab, css.active].join(' ');
+
   const onManageDisableScrolling = (componentId, disableScrolling) => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
   };
+
+  useEffect(() => {
+    if (currentTab === 2) {
+      onFetchBlockedUsers();
+    }
+  }, [currentTab]);
 
   const onDeleteAccount = () => {
     setDeleteInProgress(true);
@@ -43,6 +56,19 @@ const SecurityPage = injectIntl(props => {
       })
       .catch(error => {
         setDeleteInProgress(false);
+      });
+  };
+
+  const onFetchBlockedUsers = () => {
+    setBlockedUsersList(null);
+    setBlockedUsersListLoading(true);
+    getBlockedUsersList({})
+      .then(res => {
+        setBlockedUsersListLoading(false);
+        setBlockedUsersList(res);
+      })
+      .catch(error => {
+        setBlockedUsersListLoading(false);
       });
   };
 
@@ -68,19 +94,70 @@ const SecurityPage = injectIntl(props => {
             <FormattedMessage id="SecurityPage.heading" />
           </H3>
           <div className={css.rowUnsetMarginLR}>
-            <div className={css.col12}>
-              <h6>Account deletion</h6>
-              <p>
-                <FormattedMessage id="SecurityPage.deleteAccount.message" />
-              </p>
-              <button
-                className={css.deleteAccountButton}
-                onClick={() => setShowAccountDeleteModal(true)}
+            <div className={css.col6}>
+              <div
+                className={currentTab === 1 ? tabClassActive : css.tab}
+                onClick={() => setCurrentTab(1)}
               >
-                <FormattedMessage id="SecurityPage.deleteAccount.button" />
-              </button>
+                Account deletion
+              </div>
+            </div>
+            <div className={css.col6}>
+              <div
+                className={currentTab === 2 ? tabClassActive : css.tab}
+                onClick={() => setCurrentTab(2)}
+              >
+                Blocked users
+              </div>
             </div>
           </div>
+          <br />
+          {currentTab === 1 && (
+            <div className={css.rowUnsetMarginLR}>
+              <div className={css.col12}>
+                <h6>Account deletion</h6>
+                <p>
+                  <FormattedMessage id="SecurityPage.deleteAccount.message" />
+                </p>
+                <button
+                  className={css.deleteAccountButton}
+                  onClick={() => setShowAccountDeleteModal(true)}
+                >
+                  <FormattedMessage id="SecurityPage.deleteAccount.button" />
+                </button>
+              </div>
+            </div>
+          )}
+          {currentTab === 2 && (
+            <div className={css.rowUnsetMarginLR}>
+              <div className={css.col12}>
+                <h6>Blocked users</h6>
+              </div>
+              <div className={css.col12}>
+                {blockedUsersListLoading && <p>Loading...</p>}
+                {blockedUsersList && blockedUsersList?.length === 0 && <p>No results.</p>}
+                {blockedUsersList &&
+                  blockedUsersList.map(user => (
+                    <div className={css.blockedUserRow}>
+                      <div className={css.rowUnsetMarginLR}>
+                        <div className={css.col4}>
+                          <strong>{user.attributes.profile.displayName}</strong>
+                        </div>
+                        <div className={css.col3}>
+                          <NamedLink
+                            className={css.editLinkMobile}
+                            name="ProfilePage"
+                            params={{ id: user.id.uuid }}
+                          >
+                            View profile
+                          </NamedLink>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </LayoutSideNavigation>
       <Modal
