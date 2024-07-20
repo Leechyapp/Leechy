@@ -13,6 +13,7 @@ import { constructQueryParamName, isOriginInUse, isStockInUse } from '../../util
 import { parse } from '../../util/urlHelpers';
 
 import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
+import { fetchCurrentUser } from '../../ducks/user.duck';
 
 // Pagination page size might need to be dynamic on responsive page layouts
 // Current design has max 3 columns 12 is divisible by 2 and 3
@@ -99,6 +100,8 @@ export const searchListingsError = e => ({
 export const searchListings = (searchParams, config) => (dispatch, getState, sdk) => {
   dispatch(searchListingsRequest(searchParams));
 
+  // return dispatch(fetchCurrentUser()).then(resUser => {
+  //   const currentUser = getState().user.currentUser;
   // SearchPage can enforce listing query to only those listings with valid listingType
   // NOTE: this only works if you have set 'enum' type search schema to listing's public data fields
   //       - listingType
@@ -252,6 +255,21 @@ export const searchListings = (searchParams, config) => (dispatch, getState, sdk
       const listingFields = config?.listing?.listingFields;
       const sanitizeConfig = { listingFields };
 
+      // if (currentUser) {
+      //   const listings = response.data.data;
+      //   const blockedUsers = currentUser?.attributes?.profile?.protectedData?.blockedUsers;
+      //   if (blockedUsers) {
+      //     for (let i = 0; i < listings.length; i++) {
+      //       const authorUUID = listings[i]?.relationships?.author?.data.id?.uuid;
+      //       const listingBlocked = blockedUsers?.[authorUUID];
+      //       console.log(`listingBlocked`, listingBlocked);
+      //       if (listingBlocked) {
+      //         response.data.data.splice(i, 1);
+      //       }
+      //     }
+      //   }
+      // }
+
       dispatch(addMarketplaceEntities(response, sanitizeConfig));
       dispatch(searchListingsSuccess(response));
       return response;
@@ -260,6 +278,7 @@ export const searchListings = (searchParams, config) => (dispatch, getState, sdk
       dispatch(searchListingsError(storableError(e)));
       throw e;
     });
+  // });
 };
 
 export const setActiveListing = listingId => ({
