@@ -1,0 +1,22 @@
+@import '../../../styles/customMediaQueries.css';
+@import '../../../styles/gridDefaults.scss';
+
+.container {
+  margin-bottom: 10px;
+}
+
+.reportLink {
+  color: var(--marketplaceColor);
+  margin-bottom: 8px;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.blockLink {
+  color: var(--marketplaceColor);
+  margin-top: unset;
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { bool, arrayOf, number, shape } from 'prop-types';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 
 import { useConfiguration } from '../../context/configurationContext';
@@ -29,6 +29,7 @@ import {
   Reviews,
   ButtonTabNavHorizontal,
   LayoutSideNavigation,
+  SecondaryButton,
 } from '../../components';
 
 import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
@@ -39,6 +40,9 @@ import css from './ProfilePage.module.css';
 import SectionDetailsMaybe from './SectionDetailsMaybe';
 import SectionTextMaybe from './SectionTextMaybe';
 import SectionMultiEnumMaybe from './SectionMultiEnumMaybe';
+import SectionReportBlockUser from './SectionReportBlockUser/SectionReportBlockUser';
+import { unblockUser } from '../../util/api';
+import { fetchCurrentUser } from '../../ducks/user.duck';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
@@ -153,7 +157,7 @@ export const DesktopReviews = props => {
 };
 
 export const CustomUserFields = props => {
-  const { publicData, metadata, userFieldConfig } = props;
+  const { publicData, metadata, userFieldConfig, isCurrentUser, profileUser } = props;
 
   const shouldPickUserField = fieldConfig => fieldConfig?.showConfig?.displayInProfile !== false;
   const propsForCustomFields =
@@ -162,6 +166,7 @@ export const CustomUserFields = props => {
 
   return (
     <>
+      {!isCurrentUser && <SectionReportBlockUser profileUser={profileUser} />}
       <SectionDetailsMaybe {...props} />
       {propsForCustomFields.map(customFieldProps => {
         const { schemaType, ...fieldProps } = customFieldProps;
@@ -189,6 +194,8 @@ export const MainContent = props => {
     metadata,
     userFieldConfig,
     intl,
+    isCurrentUser,
+    profileUser,
   } = props;
 
   const hasListings = listings.length > 0;
@@ -206,7 +213,39 @@ export const MainContent = props => {
       </p>
     );
   }
-  return (
+
+  const dispatch = useDispatch();
+  const state = useSelector(state => state);
+
+  let profileBlocked = false;
+  const isAuthenticated = state?.auth?.isAuthenticated;
+  if (isAuthenticated) {
+    const currentUser = state?.user?.currentUser;
+    if (currentUser && profileUser) {
+      const blockedUsersObj = currentUser?.attributes?.profile?.protectedData?.blockedUsers;
+      const blockedUsers = blockedUsersObj ? blockedUsersObj : {};
+      if (profileUser) {
+        profileBlocked = blockedUsers?.[profileUser?.id?.uuid];
+      }
+    }
+  }
+
+  const onUnblockUser = () => {
+    unblockUser({ userToUnblockUUID: profileUser.id.uuid })
+      .then(() => {
+        dispatch(fetchCurrentUser());
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  return profileBlocked ? (
+    <div>
+      <h3>User blocked</h3>
+      <SecondaryButton onClick={() => onUnblockUser()}>Unblock User</SecondaryButton>
+    </div>
+  ) : (
     <div>
       <H2 as="h1" className={css.desktopHeading}>
         <FormattedMessage id="ProfilePage.desktopHeading" values={{ name: displayName }} />
@@ -217,6 +256,8 @@ export const MainContent = props => {
         metadata={metadata}
         userFieldConfig={userFieldConfig}
         intl={intl}
+        isCurrentUser={isCurrentUser}
+        profileUser={profileUser}
       />
       {hasListings ? (
         <div className={listingsContainerClasses}>
@@ -283,6 +324,8 @@ export const ProfilePageComponent = props => {
           metadata={metadata}
           userFieldConfig={userFields}
           intl={intl}
+          isCurrentUser={isCurrentUser}
+          profileUser={profileUser}
           {...rest}
         />
       </LayoutSideNavigation>

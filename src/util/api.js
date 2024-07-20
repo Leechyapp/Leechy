@@ -148,3 +148,16 @@ export const createUserWithIdp = body => {
 export const deleteCurrentUser = body => {
   return post('/api/current-user/delete', body);
 };
+export const blockUser = body => {
+  return post('/api/current-user/block-user', body);
+};
+export const unblockUser = body => {
+  return post('/api/current-user/unblock-user', body);
+};
+export const getBlockedUsersList = body => {
+  return post('/api/current-user/get-blocked-users-list', body);
+};
+
+export const sendContactEmail = body => {
+  return post('/api/contact/send-contact-email', body);
+};

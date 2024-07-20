@@ -21,6 +21,7 @@ const createUserWithIdp = require('./api/auth/createUserWithIdp');
 const { authenticateFacebook, authenticateFacebookCallback } = require('./api/auth/facebook');
 const { authenticateGoogle, authenticateGoogleCallback } = require('./api/auth/google');
 const CurrentUserRoute = require('./api/routes/currentuser.route');
+const ContactRoute = require('./api/routes/contact.route');
 
 const router = express.Router();
 
@@ -82,5 +83,6 @@ router.get('/auth/google', authenticateGoogle);
 router.get('/auth/google/callback', authenticateGoogleCallback);
 
 new CurrentUserRoute(router);
+new ContactRoute(router);
 
 module.exports = router;
