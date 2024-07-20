@@ -6,6 +6,7 @@ import { propTypes } from '../../../util/types';
 import { ListingCard, PaginationLinks } from '../../../components';
 
 import css from './SearchResultsPanel.module.css';
+import { useSelector } from 'react-redux';
 
 const SearchResultsPanel = props => {
   const {
@@ -54,18 +55,26 @@ const SearchResultsPanel = props => {
     }
   };
 
+  const state = useSelector(state => state);
+  const currentUser = state?.user?.currentUser;
+  const blockedUsersObj = currentUser?.attributes?.profile?.protectedData?.blockedUsers;
+  const blockedUsers = blockedUsersObj ? blockedUsersObj : {};
+
   return (
     <div className={classes}>
       <div className={isMapVariant ? css.listingCardsMapVariant : css.listingCards}>
-        {listings.map(l => (
-          <ListingCard
-            className={css.listingCard}
-            key={l.id.uuid}
-            listing={l}
-            renderSizes={cardRenderSizes(isMapVariant)}
-            setActiveListing={setActiveListing}
-          />
-        ))}
+        {listings.map(
+          l =>
+            !blockedUsers[(l?.author?.id?.uuid)] && (
+              <ListingCard
+                className={css.listingCard}
+                key={l.id.uuid}
+                listing={l}
+                renderSizes={cardRenderSizes(isMapVariant)}
+                setActiveListing={setActiveListing}
+              />
+            )
+        )}
         {props.children}
       </div>
       {paginationLinks}
