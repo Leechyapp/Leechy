@@ -29,10 +29,11 @@ const MainPanelHeader = props => {
             {searchInProgress ? (
               <FormattedMessage id="MainPanelHeader.loadingResults" />
             ) : (
-              <FormattedMessage
-                id="MainPanelHeader.foundResults"
-                values={{ count: resultsCount }}
-              />
+              // <FormattedMessage
+              //   id="MainPanelHeader.foundResults"
+              //   values={{ count: resultsCount }}
+              // />
+              <></>
             )}
           </span>
         </div>

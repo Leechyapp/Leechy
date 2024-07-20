@@ -84,7 +84,8 @@ class SearchFiltersMobileComponent extends Component {
     const classes = classNames(rootClassName || css.root, className);
 
     const resultsFound = (
-      <FormattedMessage id="SearchFiltersMobile.foundResults" values={{ count: resultsCount }} />
+      // <FormattedMessage id="SearchFiltersMobile.foundResults" values={{ count: resultsCount }} />
+      <></>
     );
     const noResults = <FormattedMessage id="SearchFiltersMobile.noResults" />;
     const loadingResults = <FormattedMessage id="SearchFiltersMobile.loadingResults" />;
