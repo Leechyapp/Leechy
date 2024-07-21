@@ -2,11 +2,22 @@ const SharetribeService = require('../services/sharetribe.service');
 const { types } = require('sharetribe-flex-sdk');
 const { UUID } = types;
 
+const ADMIN_EMAIL = 'contact@leechy.app';
+
 class CurrentUserController {
   static async delete(req, res, next) {
     try {
-      const deleteUser = await SharetribeService.deleteCurrentUser(req, res);
-      res.send(deleteUser);
+      const currentUserRes = await SharetribeService.getCurrentUser(req, res);
+      const currentUser = currentUserRes.data;
+      const { email } = currentUser.attributes;
+      if (email === ADMIN_EMAIL) {
+        res.status(400).send({
+          message: `Deletion of an admin account belonging to ${email} is not permitted on here. You may only delete non-admin accounts from here.`,
+        });
+      } else {
+        const deleteUser = await SharetribeService.deleteCurrentUser(req, res);
+        res.send(deleteUser);
+      }
     } catch (error) {
       next(error);
     }

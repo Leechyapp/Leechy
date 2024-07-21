@@ -30,6 +30,7 @@ const SecurityPage = injectIntl(props => {
   const [showAccountDeleteModal, setShowAccountDeleteModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState();
   const [deleteInProgress, setDeleteInProgress] = useState(false);
+  const [deleteAccountError, setDeleteAccountError] = useState(null);
 
   const [blockedUsersList, setBlockedUsersList] = useState();
   const [blockedUsersListLoading, setBlockedUsersListLoading] = useState(false);
@@ -47,6 +48,7 @@ const SecurityPage = injectIntl(props => {
   }, [currentTab]);
 
   const onDeleteAccount = () => {
+    setDeleteAccountError(null);
     setDeleteInProgress(true);
     deleteCurrentUser({ currentPassword })
       .then(res => {
@@ -55,6 +57,9 @@ const SecurityPage = injectIntl(props => {
         });
       })
       .catch(error => {
+        if (error?.message) {
+          setDeleteAccountError(error.message);
+        }
         setDeleteInProgress(false);
       });
   };
@@ -189,6 +194,7 @@ const SecurityPage = injectIntl(props => {
               >
                 Delete account
               </SecondaryButton>
+              {deleteAccountError && <p className={css.errorMessage}>{deleteAccountError}</p>}
             </form>
           </div>
         </div>
