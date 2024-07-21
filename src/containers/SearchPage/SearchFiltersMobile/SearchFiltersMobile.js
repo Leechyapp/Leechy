@@ -93,7 +93,7 @@ class SearchFiltersMobileComponent extends Component {
     const modalCloseButtonMessage = intl.formatMessage({ id: 'SearchFiltersMobile.cancel' });
 
     const showListingsLabel = intl.formatMessage(
-      { id: 'SearchFiltersMobile.showListings' },
+      { id: 'SearchFiltersMobile.showListingsNoCount' },
       { count: resultsCount }
     );
 
