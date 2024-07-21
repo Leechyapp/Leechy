@@ -82,12 +82,14 @@ const SectionReportBlockUser = props => {
           {reportSubmitted ? (
             <div className={css.col12}>
               <br />
-              <p>You have reported profile, we will review your report within 24 hours.</p>
+              <p className={css.mobileMarginTop}>
+                You have reported profile, we will review your report within 24 hours.
+              </p>
             </div>
           ) : (
             <div className={css.col12}>
               <br />
-              <form>
+              <form className={css.mobileMarginTop}>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(1)}
