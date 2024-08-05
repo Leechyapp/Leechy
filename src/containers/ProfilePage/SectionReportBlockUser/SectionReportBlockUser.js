@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import css from './SectionReportBlockUser.module.scss';
 import { Modal, NamedLink, SecondaryButton } from '../../../components';
