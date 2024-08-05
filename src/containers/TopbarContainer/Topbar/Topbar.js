@@ -241,6 +241,10 @@ class TopbarComponent extends Component {
     const isMobileMenuOpen = isMobileLayout && mobilemenu === 'open';
     const isMobileSearchOpen = isMobileLayout && mobilesearch === 'open';
 
+    const nativeNavigateBack = () => {
+      history.back();
+    };
+
     const mobileMenu = (
       <TopbarMobileMenu
         isAuthenticated={isAuthenticated}
@@ -277,9 +281,7 @@ class TopbarComponent extends Component {
 
     return (
       <div className={classes}>
-        {Capacitor.getPlatform() === 'ios' &&
-          <div className={css.iosCushion}></div>
-        }
+        {Capacitor.getPlatform() === 'ios' && <div className={css.iosCushion}></div>}
         <LimitedAccessBanner
           isAuthenticated={isAuthenticated}
           authScopes={authScopes}
@@ -296,6 +298,7 @@ class TopbarComponent extends Component {
             <MenuIcon className={css.menuIcon} />
             {notificationDot}
           </Button>
+          {/* <button onClick={() => nativeNavigateBack()}>Back</button> */}
           <LinkedLogo
             layout={'mobile'}
             alt={intl.formatMessage({ id: 'Topbar.logoIcon' })}

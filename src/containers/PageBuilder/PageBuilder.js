@@ -10,6 +10,7 @@ import SectionBuilder from './SectionBuilder/SectionBuilder.js';
 import StaticPage from './StaticPage.js';
 
 import css from './PageBuilder.module.css';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 
 const getMetadata = (meta, schemaType, fieldOptions) => {
   const { pageTitle, pageDescription, socialSharing } = meta;
@@ -125,6 +126,7 @@ const PageBuilder = props => {
                 )}
               </Main>
               <Footer>
+                {/* <NativeBottomNavbar /> */}
                 <FooterContainer />
               </Footer>
             </>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { any, string } from 'prop-types';
 import ReactDOMServer from 'react-dom/server';
 
@@ -34,6 +34,8 @@ import Routes from './routing/Routes';
 
 // Sharetribe Web Template uses English translations as default translations.
 import defaultMessages from './translations/en.json';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 
 // If you want to change the language of default (fallback) translations,
 // change the imports to match the wanted locale:
@@ -247,6 +249,21 @@ export const ClientApp = props => {
   }
   // This gives good input for debugging issues on live environments, but with test it's not needed.
   const logLoadDataCalls = appSettings?.env !== 'test';
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      App.addListener('backButton', ({ canGoBack }) => {
+        // if (window.location.pathname === '/') {
+        //   return;
+        // }
+        if (canGoBack) {
+          window.history.back();
+        } else {
+          App.exitApp();
+        }
+      });
+    }
+  }, []);
 
   return (
     <Configurations appConfig={appConfig}>
