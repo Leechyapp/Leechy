@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Leechy</string>
+    <string name="title_activity_main">Leechy</string>
+    <string name="package_name">com.leechy.app</string>
+    <string name="custom_url_scheme">com.leechy.app</string>
+</resources>

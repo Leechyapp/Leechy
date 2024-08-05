@@ -1,0 +1,67 @@
+$flexColDefault: 0 0 auto;
+
+:root {
+  --bs-gutter-x: 1.5rem;
+  --bs-gutter-y: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: calc(-1 * var(--bs-gutter-y));
+  margin-right: calc(-0.5 * var(--bs-gutter-x));
+  margin-left: calc(-0.5 * var(--bs-gutter-x));
+}
+
+.rowUnsetMarginLR {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: calc(-1 * var(--bs-gutter-y));
+  margin-right: unset;
+  margin-left: unset;
+}
+
+.col12 {
+  flex: $flexColDefault;
+  width: 100%;
+}
+
+.col10 {
+  flex: $flexColDefault;
+  width: 83.33%;
+}
+
+.col9 {
+  flex: $flexColDefault;
+  width: 75%;
+}
+
+.col8 {
+  flex: $flexColDefault;
+  width: 66%;
+}
+
+.col6 {
+  flex: $flexColDefault;
+  width: 50%;
+}
+
+.col4 {
+  flex: $flexColDefault;
+  width: 33.33%;
+}
+
+.col3 {
+  flex: $flexColDefault;
+  width: 25%;
+}
+
+.col2 {
+  flex: $flexColDefault;
+  width: 16.67%;
+}
+
+.col1 {
+  flex: $flexColDefault;
+  width: 10%;
+}
