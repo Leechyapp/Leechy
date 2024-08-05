@@ -106,6 +106,20 @@ Navigate to chrome://inspect/#devices
 - Click "Port forwarding..."
 - Set port 3020 and localhost:3020
 
+#### Unable to connect (port forwarding)
+
+If you're unable to connect via port forwarding, try the following
+
+```
+cd into "C:\Users\[username]\AppData\Local\Android\sdk\platform-tools"
+
+adb kill-server
+adb start-server
+adb reverse tcp:8081  tcp:8081
+
+On Windows, add "./" in from of adb, so "./adb".
+```
+
 #### Changing Asset Images (Icons)
 
 Documentation: https://developer.android.com/studio/write/create-app-icons#access
@@ -160,29 +174,35 @@ npx cap open ios
 ```
 
 ### Distrubution
+
 #### Step 1:
+
 Select generic device "Any IOS Device (arm64)"
 
 #### Step 2:
-Create an Archive
-Product > Archive
 
-Errors on Archive
-If you get an error called
+Create an Archive Product > Archive
+
+Errors on Archive If you get an error called
+
 ```
 Command PhaseScriptExecution failed with a nonzero exit code
 ```
-Then go to:
-ios/App/Pods/Target Support Files/Pods-App/Pods-App-frameworks.sh
 
-and replace the following 
+Then go to: ios/App/Pods/Target Support Files/Pods-App/Pods-App-frameworks.sh
+
+and replace the following
+
 ```
 source="$(readlink "${source}")"
 ```
+
 with
+
 ```
 source="$(readlink -f "${source}")"
 ```
 
 #### Step 3:
+
 Distribute to TestFlight & App Store from the list of Archive(s)
