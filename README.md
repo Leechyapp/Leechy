@@ -205,3 +205,12 @@ source="$(readlink -f "${source}")"
 
 #### Step 3:
 Distribute to TestFlight & App Store from the list of Archive(s)
+
+## Merge upstream repo
+
+```
+git remote -v
+git fetch upstream
+git merge upstream/main
+
+```
