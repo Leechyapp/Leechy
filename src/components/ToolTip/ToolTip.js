@@ -9,7 +9,11 @@ const ToolTip = props => {
       <span className={css.toolTip} style={style}>
         <FontAwesomeIcon data-tooltip-id="info-tooltip" icon={'fa-solid fa-circle-question'} />
       </span>
-      <ReactTooltip id="info-tooltip" place="bottom" content={content} />
+      <ReactTooltip
+        id="info-tooltip"
+        place="bottom"
+        content={<div className={css.tooltipContentContainer}>{content}</div>}
+      />
     </>
   );
 };
