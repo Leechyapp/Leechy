@@ -1,5 +1,5 @@
 const ContactController = require('../controllers/contact.controller');
-const { authMiddleware } = require('../middleware/auth.middleware');
+const { authMiddleware } = require('../middlewares/auth.middleware');
 const BaseRoute = require('./base.route');
 
 class ContactRoute extends BaseRoute {

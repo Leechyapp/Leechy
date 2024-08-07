@@ -1,5 +1,5 @@
 const CurrentUserController = require('../controllers/current-user.controller');
-const { authMiddleware } = require('../middleware/auth.middleware');
+const { authMiddleware } = require('../middlewares/auth.middleware');
 const BaseRoute = require('./base.route');
 
 class CurrentUserRoute extends BaseRoute {
