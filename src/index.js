@@ -50,6 +50,13 @@ import routeConfiguration from './routing/routeConfiguration';
 // App it self
 import { ClientApp, renderApp } from './app';
 
+// FontAwesome Icons
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fab } from '@fortawesome/free-brands-svg-icons';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { far } from '@fortawesome/free-regular-svg-icons';
+library.add(fab, fas, far);
+
 const render = (store, shouldHydrate) => {
   // If the server already loaded the auth information, render the app
   // immediately. Otherwise wait for the flag to be loaded and render
