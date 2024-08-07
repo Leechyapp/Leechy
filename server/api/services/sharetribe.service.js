@@ -14,6 +14,45 @@ class SharetribeService {
       });
   }
 
+  static async getCurrentUserFull(req, res, params = {}) {
+    const sdk = getSdk(req, res);
+    return await sdk.currentUser
+      .show(params)
+      .then(res => {
+        return res;
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
+  static async showTransaction(req, res, transactionId) {
+    const sdk = getSdk(req, res);
+    return await sdk.transactions
+      .show({ id: new UUID(transactionId) })
+      .then(res => {
+        return res.data;
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
+  static async getUserStripeAccountId(req, res) {
+    const sdk = getSdk(req, res);
+    return sdk.stripeAccount
+      .fetch()
+      .then(res => {
+        return res.data.data.attributes.stripeAccountId;
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
   static async updateCurrentUser(req, res, dataObj) {
     const sdk = getSdk(req, res);
     return await sdk.currentUser
