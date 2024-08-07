@@ -6,6 +6,7 @@ import { types as sdkTypes } from '../../util/sdkLoader';
 import { LINE_ITEM_CUSTOMER_COMMISSION, propTypes } from '../../util/types';
 
 import css from './OrderBreakdown.module.css';
+import ToolTip from '../ToolTip/ToolTip';
 
 const { Money } = sdkTypes;
 
@@ -46,6 +47,7 @@ const LineItemCustomerCommissionMaybe = props => {
             id="OrderBreakdown.commission"
             values={{ marketplaceName, role: 'customer' }}
           />
+          <ToolTip content={<FormattedMessage id="OrderBreakdown.commissionFeeNote" />} />
         </span>
         <span className={css.itemValue}>{formattedCommission}</span>
       </div>
