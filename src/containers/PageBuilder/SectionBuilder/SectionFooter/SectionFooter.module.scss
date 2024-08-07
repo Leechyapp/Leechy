@@ -1,4 +1,5 @@
 @import '../../../../styles/customMediaQueries.css';
+@import '../../../../styles/gridDefaults.scss';
 
 .root {
   border-top: 1px solid var(--colorGrey100);
@@ -205,5 +206,31 @@
 
   .gridCol4 {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.appIcons {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.storeBadgeContainer {
+  width: 125px;
+  margin-top: 5px;
+
+  .storeImg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .appStoreBadge {
+    margin: 0;
+    width: 80%;
+  }
+
+  .googlePlayStoreBadge {
+    margin: -20px;
+    float: left;
   }
 }

@@ -7,7 +7,11 @@ import Field from '../../Field';
 import BlockBuilder from '../../BlockBuilder';
 
 import SectionContainer from '../SectionContainer';
-import css from './SectionFooter.module.css';
+import css from './SectionFooter.module.scss';
+
+import { default as appStoreBadge } from '../../../../assets/mobile-app-store-badges/Download_on_the_App_Store_Badge.svg';
+import { default as googlePlayStoreBadge } from '../../../../assets/mobile-app-store-badges/google-play-badge.png';
+import { FormattedMessage } from 'react-intl';
 
 // The number of columns (numberOfColumns) affects styling
 
@@ -67,6 +71,45 @@ const SectionFooter = props => {
 
   // use block builder instead of mapping blocks manually
 
+  const redirectToAppStore = () => {
+    window.open('https://apps.apple.com/us/app/leechy/id6505043207', '_blank');
+  };
+
+  const redirectToGooglePlayStore = () => {
+    window.open('https://play.google.com/store/apps/details?id=com.leechy.app', '_blank');
+  };
+
+  const leechyAppButtons = (
+    <>
+      <div className={css.rowUnsetMarginLR}>
+        <div className={css.appIcons}>
+          <div className={css.col5}>
+            <a onClick={() => redirectToAppStore()}>
+              <div className={css.storeBadgeContainer}>
+                <img
+                  className={[css.storeImg, css.appStoreBadge].join(' ')}
+                  src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1276560000&h=7e7b68fad19738b5649a1bfb78ff46e9"
+                  alt="Download on the App Store"
+                />
+              </div>
+            </a>
+          </div>
+          <div className={css.col5}>
+            <div className={css.storeBadgeContainer}>
+              <a onClick={() => redirectToGooglePlayStore()}>
+                <img
+                  className={[css.storeImg, css.googlePlayStoreBadge].join(' ')}
+                  src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png"
+                  alt="GET IT ON Google Play"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <SectionContainer
       as="footer"
@@ -99,6 +142,7 @@ const SectionFooter = props => {
                 <BlockBuilder blocks={linksWithBlockId} sectionId={sectionId} options={options} />
               </div>
             ) : null}
+            {leechyAppButtons}
             <Field data={copyright} className={css.copyright} />
           </div>
           <div className={classNames(css.grid, getGridCss(numberOfColumns))}>
