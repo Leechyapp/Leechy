@@ -7,7 +7,6 @@ const ToolTip = props => {
   return (
     <>
       <span className={css.toolTip}>
-        <span className={css.spacing}></span>
         <FontAwesomeIcon data-tooltip-id="info-tooltip" icon={'fa-solid fa-circle-question'} />
       </span>
       <ReactTooltip id="info-tooltip" place="bottom" content={content} />
