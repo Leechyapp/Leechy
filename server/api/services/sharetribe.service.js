@@ -1,4 +1,6 @@
 const { getSdk, getTrustedSdk } = require('../../api-util/sdk');
+const { types } = require('sharetribe-flex-sdk');
+const { UUID } = types;
 
 class SharetribeService {
   static async getCurrentUser(req, res) {
