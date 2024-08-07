@@ -161,3 +161,13 @@ export const getBlockedUsersList = body => {
 export const sendContactEmail = body => {
   return post('/api/contact/send-contact-email', body);
 };
+
+export const chargeSecurityDeposit = body => {
+  return post('/api/security-deposit/charge', body);
+};
+export const saveSecurityDepositData = body => {
+  return post('/api/security-deposit/save', body);
+};
+export const refundSecurityDeposit = body => {
+  return post('/api/security-deposit/refund', body);
+};
