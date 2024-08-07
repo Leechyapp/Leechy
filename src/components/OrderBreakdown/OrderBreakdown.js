@@ -26,6 +26,7 @@ import LineItemProviderCommissionRefundMaybe from './LineItemProviderCommissionR
 import LineItemRefundMaybe from './LineItemRefundMaybe';
 import LineItemTotalPrice from './LineItemTotalPrice';
 import LineItemUnknownItemsMaybe from './LineItemUnknownItemsMaybe';
+import LineItemSecurityDepositMaybe from './LineItemSecurityDepositMaybe';
 
 import css from './OrderBreakdown.module.css';
 
@@ -41,6 +42,7 @@ export const OrderBreakdownComponent = props => {
     timeZone,
     currency,
     marketplaceName,
+    listing,
   } = props;
 
   const isCustomer = userRole === 'customer';
@@ -149,11 +151,18 @@ export const OrderBreakdownComponent = props => {
 
       <LineItemTotalPrice transaction={transaction} isProvider={isProvider} intl={intl} />
 
-      {hasCommissionLineItem ? (
+      {/* {hasCommissionLineItem ? (
         <span className={css.feeInfo}>
           <FormattedMessage id="OrderBreakdown.commissionFeeNote" />
         </span>
-      ) : null}
+      ) : null} */}
+
+      <LineItemSecurityDepositMaybe
+        transaction={transaction}
+        isProvider={isProvider}
+        intl={intl}
+        listing={listing}
+      />
     </div>
   );
 };
@@ -163,6 +172,7 @@ OrderBreakdownComponent.defaultProps = {
   className: null,
   booking: null,
   dateType: null,
+  listing: null,
 };
 
 OrderBreakdownComponent.propTypes = {
@@ -177,6 +187,7 @@ OrderBreakdownComponent.propTypes = {
 
   // from injectIntl
   intl: intlShape.isRequired,
+  listing: propTypes.listing,
 };
 
 const OrderBreakdown = injectIntl(OrderBreakdownComponent);

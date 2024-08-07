@@ -438,6 +438,7 @@ export const BookingDatesFormComponent = props => {
     dayCountAvailableForBooking,
     marketplaceName,
     payoutDetailsWarning,
+    listing,
     ...rest
   } = props;
   const classes = classNames(rootClassName || css.root, className);
@@ -624,6 +625,7 @@ export const BookingDatesFormComponent = props => {
                   currency={unitPrice.currency}
                   marketplaceName={marketplaceName}
                   processName={BOOKING_PROCESS_NAME}
+                  listing={listing}
                 />
               </div>
             ) : null}
@@ -668,6 +670,7 @@ BookingDatesFormComponent.defaultProps = {
   lineItems: null,
   fetchLineItemsError: null,
   monthlyTimeSlots: null,
+  listing: null,
 };
 
 BookingDatesFormComponent.propTypes = {
@@ -693,6 +696,8 @@ BookingDatesFormComponent.propTypes = {
   startDatePlaceholder: string,
   endDatePlaceholder: string,
   dayCountAvailableForBooking: number.isRequired,
+
+  listing: propTypes.listing,
 };
 
 const BookingDatesForm = compose(injectIntl)(BookingDatesFormComponent);

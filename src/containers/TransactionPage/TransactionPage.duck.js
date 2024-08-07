@@ -5,7 +5,7 @@ import isEmpty from 'lodash/isEmpty';
 import { types as sdkTypes, createImageVariantConfig } from '../../util/sdkLoader';
 import { findNextBoundary, getStartOf, monthIdString } from '../../util/dates';
 import { isTransactionsTransitionInvalidTransition, storableError } from '../../util/errors';
-import { transactionLineItems } from '../../util/api';
+import { chargeSecurityDeposit, transactionLineItems } from '../../util/api';
 import * as log from '../../util/log';
 import {
   updatedEntities,
@@ -496,6 +496,21 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
       refreshTransactionEntity(sdk, txId, dispatch);
 
       return response;
+    })
+    .then(response => {
+      if (transitionName === 'transition/accept') {
+        return chargeSecurityDeposit({ transactionId: txId })
+          .then(() => {
+            refreshTransactionEntity(sdk, txId, dispatch);
+            return response;
+          })
+          .catch(e => {
+            log.error(storableError(e), 'charge-security-deposit-failed');
+            return response;
+          });
+      } else {
+        return response;
+      }
     })
     .catch(e => {
       dispatch(transitionError(storableError(e)));

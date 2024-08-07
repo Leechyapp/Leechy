@@ -501,6 +501,7 @@
   "OrderBreakdown.bookingStart": "Booking start",
   "OrderBreakdown.commission": "{role, select, customer {{marketplaceName} fee *} provider {{marketplaceName} fee *} other {}}",
   "OrderBreakdown.commissionFeeNote": "* The fee helps us run this platform and provide the best possible service to you!",
+  "OrderBreakdown.securityDepositNote": "* The security deposit will be refunded, as long as there is no loss or damage to the rental item.",
   "OrderBreakdown.pickupFee": "Pickup",
   "OrderBreakdown.providerTotalDefault": "You'll make",
   "OrderBreakdown.providerTotalReceived": "You made",
@@ -1100,5 +1101,12 @@
   "SecurityPage.title": "Security settings",
   "SecurityPage.heading": "Security settings",
   "SecurityPage.deleteAccount.message": "You may delete your account by clicking the button below.",
-  "SecurityPage.deleteAccount.button": "Delete account"
+  "SecurityPage.deleteAccount.button": "Delete account",
+  "RefundSecurityDepositButtonMaybe.title": "Refund Security Deposit",
+  "RefundSecurityDepositButtonMaybe.confirmMessage": "Click \"Refund Deposit\" below to confirm refund of the Security Deposit",
+  "RefundSecurityDepositButtonMaybe.confirmRefundDepositButton": "Refund Deposit",
+  "RefundSecurityDepositButtonMaybe.claimDepositButton": "Claim Loss or Damage",
+  "LineItemSecurityDepositMaybe.securityDepositLineItem": "Security deposit ({securityDepositPercentageValue}%)",
+  "LineItemSecurityDepositMaybe.bookingTotalPlusSecurityDepositLineItem": "Total",
+  "LineItemSecurityDepositMaybe.securityDepositStatusLineItem": "Security deposit status"
 }

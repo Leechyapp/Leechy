@@ -4,6 +4,7 @@ import { ensureStripeCustomer, ensureTransaction } from '../../util/data';
 import { minutesBetween } from '../../util/dates';
 import { formatMoney } from '../../util/currency';
 import { storeData } from './CheckoutPageSessionHelpers';
+import { saveSecurityDepositData } from '../../util/api';
 
 /**
  * Extract relevant transaction type data from listing type
@@ -327,6 +328,26 @@ export const processCheckoutWithPayment = (orderParams, extraPaymentParams) => {
     }
   };
 
+  //////////////////////////////////////////////////////////
+  // Step 6: Save security deposit data //
+  //////////////////////////////////////////////////////////
+  const fnSecurityDepositData = async fnParams => {
+    const orderId = fnParams?.orderId?.uuid;
+    const failedResponseObject = { ...fnParams, securityDepositDataSaved: false };
+    if (orderId) {
+      const response = await saveSecurityDepositData({ transactionId: orderId })
+        .then(result => {
+          return { ...fnParams };
+        })
+        .catch(error => {
+          return failedResponseObject;
+        });
+      return Promise.resolve(response);
+    } else {
+      return Promise.resolve(failedResponseObject);
+    }
+  };
+
   // Here we create promise calls in sequence
   // This is pretty much the same as:
   // fnRequestPayment({...initialParams})
@@ -339,7 +360,8 @@ export const processCheckoutWithPayment = (orderParams, extraPaymentParams) => {
     fnConfirmCardPayment,
     fnConfirmPayment,
     fnSendMessage,
-    fnSavePaymentMethod
+    fnSavePaymentMethod,
+    fnSecurityDepositData
   );
 
   return handlePaymentIntentCreation(orderParams);

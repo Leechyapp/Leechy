@@ -332,6 +332,7 @@ const OrderPanel = props => {
             marketplaceCurrency={marketplaceCurrency}
             dayCountAvailableForBooking={dayCountAvailableForBooking}
             listingId={listing.id}
+            listing={listing}
             isOwnListing={isOwnListing}
             monthlyTimeSlots={monthlyTimeSlots}
             onFetchTimeSlots={onFetchTimeSlots}
@@ -476,7 +477,4 @@ OrderPanel.propTypes = {
   intl: intlShape.isRequired,
 };
 
-export default compose(
-  withRouter,
-  injectIntl
-)(OrderPanel);
+export default compose(withRouter, injectIntl)(OrderPanel);

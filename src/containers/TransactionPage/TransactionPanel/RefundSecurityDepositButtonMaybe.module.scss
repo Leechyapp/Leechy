@@ -1,0 +1,18 @@
+@import '../../../styles/gridDefaults.scss';
+
+.refundSecurityContainer {
+  margin: 0 48px 0 48px;
+
+  @media (--viewportLarge) {
+    margin: 0 48px 20px 48px;
+  }
+}
+
+.refundSecurityDepositButton {
+  float: right;
+  margin: auto;
+  padding: 5px;
+  min-width: 100%;
+  font-size: 14px;
+  margin-bottom: 10px;
+}

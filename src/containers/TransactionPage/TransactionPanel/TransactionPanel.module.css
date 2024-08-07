@@ -583,3 +583,12 @@
     margin-top: 16px;
   }
 }
+
+.mobileRefundSecurityDepositBtn {
+  margin-top: 50px;
+  margin-right: 0;
+
+  @media (--viewportLarge) {
+    display: none;
+  }
+}

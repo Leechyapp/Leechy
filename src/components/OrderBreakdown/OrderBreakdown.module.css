@@ -138,3 +138,14 @@
     padding-bottom: 21px;
   }
 }
+
+.securityDepositStatusBadge {
+  border: 1px solid var(--colorGrey500);
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 5px;
+}
+
+.marginTop {
+  margin-top: 35px;
+}

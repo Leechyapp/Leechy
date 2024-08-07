@@ -34,6 +34,7 @@ import MobileListingImage from './MobileListingImage';
 import MobileOrderBreakdown from './MobileOrderBreakdown';
 
 import css from './CheckoutPage.module.css';
+import { isNumeric } from '../../util/isNumeric.js';
 
 // Stripe PaymentIntent statuses, where user actions are already completed
 // https://stripe.com/docs/payments/payment-intents/status
@@ -72,12 +73,19 @@ const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config
   const deliveryMethod = pageData.orderData?.deliveryMethod;
   const deliveryMethodMaybe = deliveryMethod ? { deliveryMethod } : {};
 
+  const security_deposit = pageData?.listing?.attributes?.publicData?.security_deposit;
+  const securityDepositPercentageValue = isNumeric(security_deposit)
+    ? parseInt(security_deposit)
+    : null;
+  const securityDepositMaybe = security_deposit ? { securityDepositPercentageValue } : {};
+
   const { listingType, unitType } = pageData?.listing?.attributes?.publicData || {};
   const protectedDataMaybe = {
     protectedData: {
       ...getTransactionTypeData(listingType, unitType, config),
       ...deliveryMethodMaybe,
       ...shippingDetails,
+      ...securityDepositMaybe,
     },
   };
 

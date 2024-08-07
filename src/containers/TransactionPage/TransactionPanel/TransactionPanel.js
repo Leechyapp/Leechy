@@ -27,6 +27,7 @@ import DiminishedActionButtonMaybe from './DiminishedActionButtonMaybe';
 import PanelHeading from './PanelHeading';
 
 import css from './TransactionPanel.module.css';
+import RefundSecurityDepositButtonMaybe from './RefundSecurityDepositButtonMaybe';
 
 // Helper function to get display names for different roles
 const displayNames = (currentUser, provider, customer, intl) => {
@@ -126,6 +127,7 @@ export class TransactionPanelComponent extends Component {
       provider,
       hasTransitions,
       protectedData,
+      metadata,
       messages,
       initialMessageFailed,
       savePaymentMethodFailed,
@@ -141,6 +143,7 @@ export class TransactionPanelComponent extends Component {
       orderBreakdown,
       orderPanel,
       config,
+      transactionId,
     } = this.props;
 
     const isCustomer = transactionRole === 'customer';
@@ -187,6 +190,14 @@ export class TransactionPanelComponent extends Component {
     const deliveryMethod = protectedData?.deliveryMethod || 'none';
 
     const classes = classNames(rootClassName || css.root, className);
+
+    const refundSecurityDepositButton = (
+      <RefundSecurityDepositButtonMaybe
+        transactionId={transactionId}
+        isProvider={isProvider}
+        securityDepositStatus={metadata?.securityDepositStatus}
+      />
+    );
 
     return (
       <div className={classes}>
@@ -272,6 +283,12 @@ export class TransactionPanelComponent extends Component {
               </div>
             ) : null}
 
+            {refundSecurityDepositButton && (
+              <div className={css.mobileRefundSecurityDepositBtn}>
+                {refundSecurityDepositButton}
+              </div>
+            )}
+
             <FeedSection
               rootClassName={css.feedContainer}
               hasMessages={messages.length > 0}
@@ -349,6 +366,7 @@ export class TransactionPanelComponent extends Component {
                 {stateData.showActionButtons ? (
                   <div className={css.desktopActionButtons}>{actionButtons}</div>
                 ) : null}
+                <div className={css.desktopActionButtons}>{refundSecurityDepositButton}</div>
               </div>
               <DiminishedActionButtonMaybe
                 showDispute={stateData.showDispute}
