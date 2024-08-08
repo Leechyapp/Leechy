@@ -67,6 +67,31 @@ guide in Developer Docs for more information.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
+### Heroku (Manual Deployment)
+
+If you have auto-deployment enabled on your Heroku server, then simplying committing your latest
+code via Github should trigger a deployment. Below are the instructions for manual deployments to
+your Heroku server.
+
+```
+# Firstly, ensure that heroku cli is installed on your machine
+npm install -g heroku
+heroku -v
+
+# Check if heroku is pointed to desired server
+git remote -v
+
+# Switch remote (e.g. switch between staging/production server)
+heroku git:remote -a yourapp-staging
+-- or ---
+heroku git:remote -a yourapp-prod
+
+# Deploy web app to heroku (you should deploy from your ideal branch)
+git push heroku staging:main
+-- or --
+git push heroku main
+```
+
 ## Documentation
 
 See the Sharetribe Developer Docs: [sharetribe.com/docs/](https://www.sharetribe.com/docs/)
@@ -204,6 +229,7 @@ source="$(readlink -f "${source}")"
 ```
 
 #### Step 3:
+
 Distribute to TestFlight & App Store from the list of Archive(s)
 
 ## Merge upstream repo
