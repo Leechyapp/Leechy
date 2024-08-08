@@ -268,6 +268,8 @@
   "EditListingPricingAndStockPanel.title": "Pricing & stock of {listingTitle}",
   "EditListingPricingForm.priceInputPlaceholder": "Add a price…",
   "EditListingPricingForm.pricePerProduct": "Price {unitType, select, day {per day} night {per night} hour {per hour} other {}}",
+  "EditListingPricingForm.shippingFee.label": "Shipping fee",
+  "EditListingPricingForm.shippingFee.placeholder": "Enter a shipping fee",
   "EditListingPricingForm.priceRequired": "You need to add a valid price.",
   "EditListingPricingForm.priceTooLow": "Price should be at least {minPrice}.",
   "EditListingPricingForm.showListingFailed": "Fetching listing data failed.",
