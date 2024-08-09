@@ -80,22 +80,25 @@ const getHourQuantityAndLineItems = orderData => {
  */
 const getDateRangeQuantityAndLineItems = (orderData, code, publicData, currency) => {
   // bookingStart & bookingend are used with day-based bookings (how many days / nights)
-  const { bookingStart, bookingEnd } = orderData || {};
-  const shippingFeeValue = publicData?.shippingFee;
-  const shippingFee = shippingFeeValue ? new Money(shippingFeeValue, currency) : null;
+  const { bookingStart, bookingEnd, deliveryMethod } = orderData || {};
   const quantity =
     bookingStart && bookingEnd ? calculateQuantityFromDates(bookingStart, bookingEnd, code) : null;
 
-  const deliveryLineItem = !!shippingFee
-    ? [
+  let deliveryLineItem = [];
+  if (deliveryMethod === 'shipping') {
+    const shippingFeeValue = publicData?.shippingFee;
+    const shippingFee = shippingFeeValue ? new Money(shippingFeeValue, currency) : null;
+    if (shippingFee) {
+      deliveryLineItem = [
         {
           code: 'line-item/shipping-fee',
           unitPrice: shippingFee,
           quantity: 1,
           includeFor: ['customer', 'provider'],
         },
-      ]
-    : [];
+      ];
+    }
+  }
 
   return { quantity, extraLineItems: deliveryLineItem };
 };
