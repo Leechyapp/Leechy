@@ -22,7 +22,15 @@ import {
 import { LINE_ITEM_DAY, LINE_ITEM_NIGHT, TIME_SLOT_TIME, propTypes } from '../../../util/types';
 import { BOOKING_PROCESS_NAME } from '../../../transactions/transaction';
 
-import { Form, IconArrowHead, PrimaryButton, FieldDateRangeInput, H6 } from '../../../components';
+import {
+  Form,
+  IconArrowHead,
+  PrimaryButton,
+  FieldDateRangeInput,
+  H6,
+  FieldSelect,
+  FieldTextInput,
+} from '../../../components';
 
 import EstimatedCustomerBreakdownMaybe from '../EstimatedCustomerBreakdownMaybe';
 
@@ -373,12 +381,14 @@ const handleFormSpyChange = (
 ) => formValues => {
   const { startDate, endDate } =
     formValues.values && formValues.values.bookingDates ? formValues.values.bookingDates : {};
+  const { deliveryMethod } = formValues.values;
 
   if (startDate && endDate && !fetchLineItemsInProgress) {
     onFetchTransactionLineItems({
       orderData: {
         bookingStart: startDate,
         bookingEnd: endDate,
+        deliveryMethod,
       },
       listingId,
       isOwnListing,
@@ -412,6 +422,37 @@ const Prev = props => {
   const currentMonthDate = getStartOf(TODAY, 'month', timeZone);
 
   return isDateSameOrAfter(prevMonthDate, currentMonthDate) ? <PrevIcon /> : null;
+};
+
+const DeliveryMethodMaybe = props => {
+  const { deliveryMethod, hasShippingFee, formId, intl } = props;
+  return hasShippingFee ? (
+    <FieldSelect
+      id={`${formId}.deliveryMethod`}
+      className={css.deliveryField}
+      name="deliveryMethod"
+      label={intl.formatMessage({ id: 'ProductOrderForm.deliveryMethodLabel' })}
+      validate={required(intl.formatMessage({ id: 'ProductOrderForm.deliveryMethodRequired' }))}
+      value={deliveryMethod}
+    >
+      <option disabled value="">
+        {intl.formatMessage({ id: 'ProductOrderForm.selectDeliveryMethodOption' })}
+      </option>
+      <option value={'pickup'}>
+        {intl.formatMessage({ id: 'ProductOrderForm.pickupOption' })}
+      </option>
+      <option value={'shipping'}>
+        {intl.formatMessage({ id: 'ProductOrderForm.shippingOption' })}
+      </option>
+    </FieldSelect>
+  ) : (
+    <FieldTextInput
+      id={`${formId}.deliveryMethod`}
+      className={css.deliveryField}
+      name="deliveryMethod"
+      type="hidden"
+    />
+  );
 };
 
 export const BookingDatesFormComponent = props => {
@@ -456,6 +497,7 @@ export const BookingDatesFormComponent = props => {
       {...rest}
       unitPrice={unitPrice}
       onSubmit={onFormSubmit}
+      initialValues={{ deliveryMethod: 'pickup' }}
       render={fieldRenderProps => {
         const {
           endDatePlaceholder,
@@ -610,6 +652,13 @@ export const BookingDatesFormComponent = props => {
               onClose={event =>
                 setCurrentMonth(getStartOf(event?.startDate ?? startOfToday, 'month', timeZone))
               }
+            />
+
+            <DeliveryMethodMaybe
+              deliveryMethod={values?.deliveryMethod ? values.deliveryMethod : 'pickup'}
+              hasShippingFee={listing?.attributes?.publicData?.shippingFee}
+              formId={formId}
+              intl={intl}
             />
 
             {showEstimatedBreakdown ? (

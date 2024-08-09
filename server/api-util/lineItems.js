@@ -78,13 +78,29 @@ const getHourQuantityAndLineItems = orderData => {
  * @param {*} orderData should contain bookingDates
  * @param {*} code should be either 'line-item/day' or 'line-item/night'
  */
-const getDateRangeQuantityAndLineItems = (orderData, code) => {
+const getDateRangeQuantityAndLineItems = (orderData, code, publicData, currency) => {
   // bookingStart & bookingend are used with day-based bookings (how many days / nights)
-  const { bookingStart, bookingEnd } = orderData || {};
+  const { bookingStart, bookingEnd, deliveryMethod } = orderData || {};
   const quantity =
     bookingStart && bookingEnd ? calculateQuantityFromDates(bookingStart, bookingEnd, code) : null;
 
-  return { quantity, extraLineItems: [] };
+  let deliveryLineItem = [];
+  if (deliveryMethod === 'shipping') {
+    const shippingFeeValue = publicData?.shippingFee;
+    const shippingFee = shippingFeeValue ? new Money(shippingFeeValue, currency) : null;
+    if (shippingFee) {
+      deliveryLineItem = [
+        {
+          code: 'line-item/shipping-fee',
+          unitPrice: shippingFee,
+          quantity: 1,
+          includeFor: ['customer', 'provider'],
+        },
+      ];
+    }
+  }
+
+  return { quantity, extraLineItems: deliveryLineItem };
 };
 
 /**
@@ -143,7 +159,7 @@ exports.transactionLineItems = (listing, orderData, providerCommission, customer
       : unitType === 'hour'
       ? getHourQuantityAndLineItems(orderData)
       : ['day', 'night'].includes(unitType)
-      ? getDateRangeQuantityAndLineItems(orderData, code)
+      ? getDateRangeQuantityAndLineItems(orderData, code, publicData, currency)
       : {};
 
   const { quantity, extraLineItems } = quantityAndExtraLineItems;

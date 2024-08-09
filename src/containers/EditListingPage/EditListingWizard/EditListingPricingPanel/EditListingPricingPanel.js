@@ -17,10 +17,11 @@ import css from './EditListingPricingPanel.module.css';
 const { Money } = sdkTypes;
 
 const getInitialValues = params => {
-  const { listing } = params;
-  const { price } = listing?.attributes || {};
+  const { listing, marketplaceCurrency } = params;
+  const { price, publicData } = listing?.attributes || {};
+  const { shippingFee } = publicData;
 
-  return { price };
+  return { price, shippingFee: shippingFee ? new Money(shippingFee, marketplaceCurrency) : null };
 };
 
 const EditListingPricingPanel = props => {
@@ -68,11 +69,14 @@ const EditListingPricingPanel = props => {
           className={css.form}
           initialValues={initialValues}
           onSubmit={values => {
-            const { price } = values;
+            const { price, shippingFee } = values;
 
             // New values for listing attributes
             const updateValues = {
               price,
+              publicData: {
+                shippingFee: shippingFee ? shippingFee.amount : null,
+              },
             };
             onSubmit(updateValues);
           }}
