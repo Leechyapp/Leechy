@@ -1108,6 +1108,7 @@
   "RefundSecurityDepositButtonMaybe.confirmMessage": "Click \"Refund Deposit\" below to confirm refund of the Security Deposit",
   "RefundSecurityDepositButtonMaybe.confirmRefundDepositButton": "Refund Deposit",
   "RefundSecurityDepositButtonMaybe.claimDepositButton": "Claim Loss or Damage",
+  "RefundSecurityDepositButtonMaybe.claimDepositButton.link": "mailto:contact@leechy.app?subject=Security Deposit Claim (Transaction ID: {transactionId})",
   "LineItemSecurityDepositMaybe.securityDepositLineItem": "Security deposit ({securityDepositPercentageValue}%)",
   "LineItemSecurityDepositMaybe.bookingTotalPlusSecurityDepositLineItem": "Total",
   "LineItemSecurityDepositMaybe.securityDepositStatusLineItem": "Security deposit status"
