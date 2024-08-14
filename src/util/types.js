@@ -621,3 +621,7 @@ export const DATE_TYPE_DATETIME = 'datetime';
 propTypes.dateType = oneOf([DATE_TYPE_DATE, DATE_TYPE_TIME, DATE_TYPE_DATETIME]);
 
 export { propTypes };
+
+// Mime type
+export const MIME_TYPE_JPG = 'image/jpeg';
+export const MIME_TYPE_PNG = 'image/png';
