@@ -171,3 +171,10 @@ export const saveSecurityDepositData = body => {
 export const refundSecurityDeposit = body => {
   return post('/api/security-deposit/refund', body);
 };
+
+export const fetchMessageFiles = body => {
+  return post('/api/message/fetch-files', body);
+};
+export const saveMessageFiles = body => {
+  return post('/api/message/save-files', body);
+};
