@@ -35,6 +35,7 @@ import {
 import EstimatedCustomerBreakdownMaybe from '../EstimatedCustomerBreakdownMaybe';
 
 import css from './BookingDatesForm.module.css';
+import InsuranceMethodMaybe from '../InsuranceMethodMaybe/InsuranceMethodMaybe';
 
 const TODAY = new Date();
 
@@ -381,7 +382,7 @@ const handleFormSpyChange = (
 ) => formValues => {
   const { startDate, endDate } =
     formValues.values && formValues.values.bookingDates ? formValues.values.bookingDates : {};
-  const { deliveryMethod } = formValues.values;
+  const { deliveryMethod, insuranceMethod } = formValues.values;
 
   if (startDate && endDate && !fetchLineItemsInProgress) {
     onFetchTransactionLineItems({
@@ -389,6 +390,7 @@ const handleFormSpyChange = (
         bookingStart: startDate,
         bookingEnd: endDate,
         deliveryMethod,
+        insuranceMethod,
       },
       listingId,
       isOwnListing,
@@ -497,7 +499,7 @@ export const BookingDatesFormComponent = props => {
       {...rest}
       unitPrice={unitPrice}
       onSubmit={onFormSubmit}
-      initialValues={{ deliveryMethod: 'pickup' }}
+      initialValues={{ deliveryMethod: 'pickup', insuranceMethod: 'insurance' }}
       render={fieldRenderProps => {
         const {
           endDatePlaceholder,
@@ -653,14 +655,22 @@ export const BookingDatesFormComponent = props => {
                 setCurrentMonth(getStartOf(event?.startDate ?? startOfToday, 'month', timeZone))
               }
             />
-
-            <DeliveryMethodMaybe
-              deliveryMethod={values?.deliveryMethod ? values.deliveryMethod : 'pickup'}
-              hasShippingFee={listing?.attributes?.publicData?.shippingFee}
-              formId={formId}
-              intl={intl}
-            />
-
+            {startDate && (
+              <>
+                <DeliveryMethodMaybe
+                  deliveryMethod={values?.deliveryMethod ? values.deliveryMethod : 'pickup'}
+                  hasShippingFee={listing?.attributes?.publicData?.shippingFee}
+                  formId={formId}
+                  intl={intl}
+                />
+                <InsuranceMethodMaybe
+                  insuranceMethod={values?.insuranceMethod ? values.insuranceMethod : 'insurance'}
+                  hasSecurityDeposit={listing?.attributes?.publicData?.security_deposit}
+                  formId={formId}
+                  intl={intl}
+                />
+              </>
+            )}
             {showEstimatedBreakdown ? (
               <div className={css.priceBreakdownContainer}>
                 <H6 as="h3" className={css.bookingBreakdownTitle}>

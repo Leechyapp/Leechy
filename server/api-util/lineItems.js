@@ -8,6 +8,8 @@ const {
 const { types } = require('sharetribe-flex-sdk');
 const { Money } = types;
 
+const INSURANCE_FEE_PERCENTAGE = 10;
+
 /**
  * Get quantity and add extra line-items that are related to delivery method
  *
@@ -229,6 +231,19 @@ exports.transactionLineItems = (listing, orderData, providerCommission, customer
       ]
     : [];
 
+  const insuranceMethod = orderData && orderData.insuranceMethod;
+  let insuranceMaybe = [];
+  if (insuranceMethod === 'insurance') {
+    insuranceMaybe = [
+      {
+        code: 'line-item/insurance',
+        unitPrice: calculateTotalFromLineItems([order]),
+        percentage: INSURANCE_FEE_PERCENTAGE,
+        includeFor: ['customer', 'provider'],
+      },
+    ];
+  }
+
   // Let's keep the base price (order) as first line item and provider and customer commissions as last.
   // Note: the order matters only if OrderBreakdown component doesn't recognize line-item.
   const lineItems = [
@@ -236,6 +251,7 @@ exports.transactionLineItems = (listing, orderData, providerCommission, customer
     ...extraLineItems,
     ...providerCommissionMaybe,
     ...customerCommissionMaybe,
+    ...insuranceMaybe,
   ];
 
   return lineItems;

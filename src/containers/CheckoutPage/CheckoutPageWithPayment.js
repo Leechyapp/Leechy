@@ -73,6 +73,9 @@ const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config
   const deliveryMethod = pageData.orderData?.deliveryMethod;
   const deliveryMethodMaybe = deliveryMethod ? { deliveryMethod } : {};
 
+  const insuranceMethod = pageData.orderData?.insuranceMethod;
+  const insuranceMethodMaybe = insuranceMethod ? { insuranceMethod } : {};
+
   const security_deposit = pageData?.listing?.attributes?.publicData?.security_deposit;
   const securityDepositPercentageValue = isNumeric(security_deposit)
     ? parseInt(security_deposit)
@@ -86,6 +89,7 @@ const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config
       ...deliveryMethodMaybe,
       ...shippingDetails,
       ...securityDepositMaybe,
+      ...insuranceMethodMaybe,
     },
   };
 
@@ -98,6 +102,7 @@ const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config
     ...bookingDatesMaybe(pageData.orderData?.bookingDates),
     ...protectedDataMaybe,
     ...optionalPaymentParams,
+    ...insuranceMethodMaybe,
   };
   return orderParams;
 };
