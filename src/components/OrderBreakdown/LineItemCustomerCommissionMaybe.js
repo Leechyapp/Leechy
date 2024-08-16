@@ -47,7 +47,10 @@ const LineItemCustomerCommissionMaybe = props => {
             id="OrderBreakdown.commission"
             values={{ marketplaceName, role: 'customer' }}
           />
-          <ToolTip content={<FormattedMessage id="OrderBreakdown.commissionFeeNote" />} />
+          <ToolTip
+            id="customer-commission"
+            content={<FormattedMessage id="OrderBreakdown.commissionFeeNote" />}
+          />
         </span>
         <span className={css.itemValue}>{formattedCommission}</span>
       </div>
