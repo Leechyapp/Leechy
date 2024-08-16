@@ -1,16 +1,20 @@
+import React from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import css from './ToolTip.module.scss';
 
 const ToolTip = props => {
-  const { content, style } = props;
+  const { id, content, style } = props;
+
+  const toopTipId = `${id}-info-tooltip`;
+
   return (
     <>
       <span className={css.toolTip} style={style}>
-        <FontAwesomeIcon data-tooltip-id="info-tooltip" icon={'fa-solid fa-circle-question'} />
+        <FontAwesomeIcon data-tooltip-id={toopTipId} icon={'fa-solid fa-circle-question'} />
       </span>
       <ReactTooltip
-        id="info-tooltip"
+        id={toopTipId}
         place="bottom"
         content={<div className={css.tooltipContentContainer}>{content}</div>}
       />
