@@ -1113,10 +1113,10 @@
   "LineItemSecurityDepositMaybe.securityDepositLineItem": "Security deposit ({securityDepositPercentageValue}%)",
   "LineItemSecurityDepositMaybe.bookingTotalPlusSecurityDepositLineItem": "Total",
   "LineItemSecurityDepositMaybe.securityDepositStatusLineItem": "Security deposit status",
-  "LineItemInsuranceMaybe.insuranceFeeNote": "Leechy insurance will be included with this rental.",
-  "InsuranceMethodMaybe.insuranceMethod.label": "Insurance method",
-  "InsuranceMethodMaybe.insuranceMethod.required": "Insurance method required",
-  "InsuranceMethodMaybe.insuranceMethod.placeholder": "Select an insurance method",
-  "InsuranceMethodMaybe.insuranceMethod.insurance.option": "Leechy Insurance",
+  "LineItemInsuranceMaybe.insuranceFeeNote": "Leechy rental protection will be included with this rental.",
+  "InsuranceMethodMaybe.insuranceMethod.label": "Rental protection method",
+  "InsuranceMethodMaybe.insuranceMethod.required": "Rental protection required",
+  "InsuranceMethodMaybe.insuranceMethod.placeholder": "Select rental protection",
+  "InsuranceMethodMaybe.insuranceMethod.insurance.option": "Leechy rental protection",
   "InsuranceMethodMaybe.insuranceMethod.securityDeposit.option": "Security Deposit (refundable)"
 }
