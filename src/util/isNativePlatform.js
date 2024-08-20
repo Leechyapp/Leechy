@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
 
-const IsNativePlatform = Capacitor.isNativePlatform();
+const isNativePlatform = Capacitor.isNativePlatform();
 
-export default IsNativePlatform;
+export default isNativePlatform;
