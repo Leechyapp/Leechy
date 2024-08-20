@@ -28,6 +28,8 @@ import PanelHeading from './PanelHeading';
 
 import css from './TransactionPanel.module.css';
 import RefundSecurityDepositButtonMaybe from './RefundSecurityDepositButtonMaybe';
+import ShippingFunctionButtonsMaybe from './ShippingFunctionButtonsMaybe/ShippingFunctionButtonsMaybe';
+import { DeliveryMethodEnum } from '../../../enums/delivery-method-enum';
 
 // Helper function to get display names for different roles
 const displayNames = (currentUser, provider, customer, intl) => {
@@ -188,6 +190,7 @@ export class TransactionPanelComponent extends Component {
       !isCustomerBanned && !isCustomerDeleted && !isProviderBanned && !isProviderDeleted;
 
     const deliveryMethod = protectedData?.deliveryMethod || 'none';
+    const shippingStatus = protectedData?.shippingStatus;
 
     const classes = classNames(rootClassName || css.root, className);
 
@@ -198,6 +201,14 @@ export class TransactionPanelComponent extends Component {
         securityDepositStatus={metadata?.securityDepositStatus}
       />
     );
+    const shippingFunctionButton =
+      deliveryMethod === DeliveryMethodEnum.Shipping ? (
+        <ShippingFunctionButtonsMaybe
+          transactionId={transactionId}
+          isProvider={isProvider}
+          shippingStatus={shippingStatus}
+        />
+      ) : null;
 
     return (
       <div className={classes}>
@@ -286,6 +297,7 @@ export class TransactionPanelComponent extends Component {
             {refundSecurityDepositButton && (
               <div className={css.mobileRefundSecurityDepositBtn}>
                 {refundSecurityDepositButton}
+                {shippingFunctionButton}
               </div>
             )}
 
