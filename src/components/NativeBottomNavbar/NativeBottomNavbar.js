@@ -8,28 +8,28 @@ const NativeBottomNavbar = () => {
   return (
     <nav className={css.mobileNav}>
       <NamedLink name="LandingPage" className={css.blocIcon}>
-        <FontAwesomeIcon icon={'fas fa-home'} />
-        <p className="text">Home</p>
+        <FontAwesomeIcon className={css.icon} icon={'fas fa-home'} />
+        <p className={css.text}>Home</p>
       </NamedLink>
       <NamedLink name="SearchPage" className={css.blocIcon}>
-        <FontAwesomeIcon icon={'fas fa-search'} />
-        <p className="text">Search</p>
+        <FontAwesomeIcon className={css.icon} icon={'fas fa-search'} />
+        <p className={css.text}>Search</p>
       </NamedLink>
       <NamedLink
         name="InboxPage"
         params={{ tab: currentUserHasListings ? 'sales' : 'orders' }}
         className={css.blocIcon}
       >
-        <FontAwesomeIcon icon={'fa fa-fw fa-envelope-open'} />
-        <p className="text">Inbox</p>
+        <FontAwesomeIcon className={css.icon} icon={'fa fa-fw fa-envelope-open'} />
+        <p className={css.text}>Inbox</p>
       </NamedLink>
       <NamedLink
         name="ProfileSettingsPage"
         params={{ tab: currentUserHasListings ? 'sales' : 'orders' }}
         className={css.blocIcon}
       >
-        <FontAwesomeIcon icon={'fas fa-user-circle'} />
-        <p className="text">Profile</p>
+        <FontAwesomeIcon className={css.icon} icon={'fas fa-user-circle'} />
+        <p className={css.text}>Profile</p>
       </NamedLink>
     </nav>
   );

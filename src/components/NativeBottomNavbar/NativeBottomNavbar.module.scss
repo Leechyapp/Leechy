@@ -6,24 +6,25 @@
   width: 100%;
   display: flex;
   justify-content: space-around;
-  border-top: 1px solid var(--colorGrey400);
+  border-top: 1px solid var(--colorGrey200);
   z-index: 1000;
 }
 
 .blocIcon {
   width: 20px;
-  // display: flex;
   display: table;
   justify-content: center;
   text-align: center;
   align-items: center;
-  font-size: 20px;
-  margin-top: 7px;
+  padding: 10px 0;
+
+  .icon {
+    font-size: 22px;
+  }
 
   .text {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
-    margin-top: -7px;
   }
 
   //   .notif {
