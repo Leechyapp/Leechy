@@ -47,6 +47,7 @@ import NotFoundPage from '../../containers/NotFoundPage/NotFoundPage';
 
 import { stateDataShape, getStateData } from './InboxPage.stateData';
 import css from './InboxPage.module.css';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 // Check if the transaction line-items use booking-related units
 const getUnitLineItem = lineItems => {
@@ -339,6 +340,7 @@ export const InboxPageComponent = props => {
           />
         ) : null}
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 };
@@ -383,9 +385,6 @@ const mapStateToProps = state => {
   };
 };
 
-const InboxPage = compose(
-  connect(mapStateToProps),
-  injectIntl
-)(InboxPageComponent);
+const InboxPage = compose(connect(mapStateToProps), injectIntl)(InboxPageComponent);
 
 export default InboxPage;

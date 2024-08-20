@@ -31,6 +31,7 @@ import FooterContainer from '../../containers/FooterContainer/FooterContainer';
 import { savePayoutDetails } from './StripePayoutPage.duck';
 
 import css from './StripePayoutPage.module.css';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 const STRIPE_ONBOARDING_RETURN_URL_SUCCESS = 'success';
 const STRIPE_ONBOARDING_RETURN_URL_FAILURE = 'failure';
@@ -213,6 +214,7 @@ export const StripePayoutPageComponent = props => {
           )}
         </div>
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 };
@@ -288,10 +290,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const StripePayoutPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   injectIntl
 )(StripePayoutPageComponent);
 

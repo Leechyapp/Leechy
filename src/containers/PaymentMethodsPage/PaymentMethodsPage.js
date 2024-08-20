@@ -20,6 +20,7 @@ import PaymentMethodsForm from './PaymentMethodsForm/PaymentMethodsForm';
 import { createStripeSetupIntent, stripeCustomer } from './PaymentMethodsPage.duck.js';
 
 import css from './PaymentMethodsPage.module.css';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 
 const PaymentMethodsPageComponent = props => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -191,6 +192,7 @@ const PaymentMethodsPageComponent = props => {
           )}
         </div>
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 };
@@ -257,10 +259,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const PaymentMethodsPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   injectIntl
 )(PaymentMethodsPageComponent);
 

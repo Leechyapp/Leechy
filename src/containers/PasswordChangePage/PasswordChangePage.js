@@ -16,6 +16,7 @@ import PasswordChangeForm from './PasswordChangeForm/PasswordChangeForm';
 
 import { changePassword, changePasswordClear, resetPassword } from './PasswordChangePage.duck';
 import css from './PasswordChangePage.module.css';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 export const PasswordChangePageComponent = props => {
   const {
@@ -74,6 +75,7 @@ export const PasswordChangePageComponent = props => {
           {changePasswordForm}
         </div>
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 };
@@ -130,10 +132,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const PasswordChangePage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   injectIntl
 )(PasswordChangePageComponent);
 
