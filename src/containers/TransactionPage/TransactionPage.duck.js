@@ -5,7 +5,7 @@ import isEmpty from 'lodash/isEmpty';
 import { types as sdkTypes, createImageVariantConfig } from '../../util/sdkLoader';
 import { findNextBoundary, getStartOf, monthIdString } from '../../util/dates';
 import { isTransactionsTransitionInvalidTransition, storableError } from '../../util/errors';
-import { chargeSecurityDeposit, transactionLineItems } from '../../util/api';
+import { chargeSecurityDeposit, fetchMessageFiles, transactionLineItems } from '../../util/api';
 import * as log from '../../util/log';
 import {
   updatedEntities,
@@ -61,6 +61,9 @@ export const FETCH_TIME_SLOTS_ERROR = 'app/TransactionPage/FETCH_TIME_SLOTS_ERRO
 export const FETCH_LINE_ITEMS_REQUEST = 'app/TransactionPage/FETCH_LINE_ITEMS_REQUEST';
 export const FETCH_LINE_ITEMS_SUCCESS = 'app/TransactionPage/FETCH_LINE_ITEMS_SUCCESS';
 export const FETCH_LINE_ITEMS_ERROR = 'app/TransactionPage/FETCH_LINE_ITEMS_ERROR';
+
+export const FETCH_FILES_SUCCESS = 'app/TransactionPage/FETCH_FILES_SUCCESS';
+export const UPDATE_FILES_SUCCESS = 'app/TransactionPage/UPDATE_FILES_SUCCESS';
 
 // ================ Reducer ================ //
 
@@ -226,6 +229,17 @@ export default function transactionPageReducer(state = initialState, action = {}
     case FETCH_LINE_ITEMS_ERROR:
       return { ...state, fetchLineItemsInProgress: false, fetchLineItemsError: payload };
 
+    case FETCH_FILES_SUCCESS:
+      return { ...state, files: payload };
+    case UPDATE_FILES_SUCCESS:
+      return {
+        ...state,
+        files: {
+          ...state.files,
+          ...payload.file,
+        },
+      };
+
     default:
       return state;
   }
@@ -299,6 +313,15 @@ export const fetchLineItemsError = error => ({
   type: FETCH_LINE_ITEMS_ERROR,
   error: true,
   payload: error,
+});
+
+export const fetchFilesSuccess = files => ({
+  type: FETCH_FILES_SUCCESS,
+  payload: files,
+});
+export const updateFilesSuccess = uploadedFile => ({
+  type: UPDATE_FILES_SUCCESS,
+  payload: uploadedFile,
 });
 
 // ================ Thunks ================ //
@@ -458,6 +481,19 @@ const refreshTx = (sdk, txId) => sdk.transactions.show({ id: txId }, { expand: t
 const refreshTransactionEntity = (sdk, txId, dispatch) => {
   delay(3000)
     .then(() => refreshTx(sdk, txId))
+    .then(response => {
+      dispatch(addMarketplaceEntities(response));
+      const transactionId = response.data.data.id.uuid;
+      fetchMessageFiles({ transactionId })
+        .then(files => {
+          dispatch(fetchFilesSuccess(files));
+          return response;
+        })
+        .catch(err => {
+          console.error(err);
+          return response;
+        });
+    })
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       const lastTransition = response?.data?.data?.attributes?.lastTransition;
@@ -701,6 +737,11 @@ export const fetchTransactionLineItems = ({ orderData, listingId, isOwnListing }
         orderData,
       });
     });
+};
+
+export const loadFilesAndMessages = params => dispatch => {
+  const { uploadedFile } = params;
+  return Promise.all([dispatch(updateFilesSuccess({ file: uploadedFile }))]);
 };
 
 // loadData is a collection of async calls that need to be made
