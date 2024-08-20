@@ -1110,5 +1110,13 @@
   "RefundSecurityDepositButtonMaybe.claimDepositButton": "Claim Loss or Damage",
   "LineItemSecurityDepositMaybe.securityDepositLineItem": "Security deposit ({securityDepositPercentageValue}%)",
   "LineItemSecurityDepositMaybe.bookingTotalPlusSecurityDepositLineItem": "Total",
-  "LineItemSecurityDepositMaybe.securityDepositStatusLineItem": "Security deposit status"
+  "LineItemSecurityDepositMaybe.securityDepositStatusLineItem": "Security deposit status",
+  "ShippingFunctionButtonsMaybe.shippingFunctionModalButton.markItemShipped": "Mark shipped",
+  "ShippingFunctionButtonsMaybe.shippingFunctionModalButton.markItemReceived": "Mark received",
+  "ShippingFunctionButtonsMaybe.shippingFunctionModalButton.markItemReturnShipped": "Mark item return shipped",
+  "ShippingFunctionButtonsMaybe.shippingFunctionModalButton.markItemReceivedShipped": "Mark item return received",
+  "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemShipped": "Remember to mark shipped once you shipped the item.",
+  "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemReceived": "Remember to mark received once you received the item.",
+  "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemReturnShipped": "Remember to mark shipped once you shipped the item.",
+  "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemReceivedShipped": "Remember to mark received once you received the item."
 }
