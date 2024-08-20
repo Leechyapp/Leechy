@@ -27,8 +27,8 @@ import TopbarMobileMenu from './TopbarMobileMenu/TopbarMobileMenu';
 import TopbarDesktop from './TopbarDesktop/TopbarDesktop';
 
 import css from './Topbar.module.css';
-import { Capacitor } from '@capacitor/core';
 import IOSBackButton from './IOSBackButton/IOSBackButton';
+import isIOSPlatform from '../../../util/isIOSPlatform';
 
 const MAX_MOBILE_SCREEN_WIDTH = 1024;
 
@@ -281,7 +281,7 @@ class TopbarComponent extends Component {
     const classes = classNames(rootClassName || css.root, className);
 
     const handleMenuOrBackButtonClick = () => {
-      if (Capacitor.getPlatform() === 'ios') {
+      if (isIOSPlatform) {
         nativeNavigateBack();
       } else {
         this.handleMobileMenuOpen();
@@ -290,7 +290,7 @@ class TopbarComponent extends Component {
 
     return (
       <div className={classes}>
-        {Capacitor.getPlatform() === 'ios' && <div className={css.iosCushion}></div>}
+        {isIOSPlatform && <div className={css.iosCushion}></div>}
         <LimitedAccessBanner
           isAuthenticated={isAuthenticated}
           authScopes={authScopes}
@@ -304,7 +304,7 @@ class TopbarComponent extends Component {
             onClick={() => handleMenuOrBackButtonClick()}
             title={intl.formatMessage({ id: 'Topbar.menuIcon' })}
           >
-            {Capacitor.getPlatform() === 'ios' ? (
+            {isIOSPlatform ? (
               <IOSBackButton />
             ) : (
               <>
