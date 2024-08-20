@@ -23,6 +23,7 @@ const { authenticateGoogle, authenticateGoogleCallback } = require('./api/auth/g
 const CurrentUserRoute = require('./api/routes/currentuser.route');
 const ContactRoute = require('./api/routes/contact.route');
 const SecurityDepositRoute = require('./api/routes/security-deposit.route');
+const MessageRoute = require('./api/routes/message.route');
 
 const router = express.Router();
 
@@ -86,5 +87,6 @@ router.get('/auth/google/callback', authenticateGoogleCallback);
 new CurrentUserRoute(router);
 new ContactRoute(router);
 new SecurityDepositRoute(router);
+new MessageRoute(router);
 
 module.exports = router;
