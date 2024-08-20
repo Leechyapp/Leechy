@@ -2,8 +2,13 @@ import React from 'react';
 import NamedLink from '../NamedLink/NamedLink';
 import css from './NativeBottomNavbar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import IsNativePlatform from '../../util/isNativePlatform';
 
 const NativeBottomNavbar = () => {
+  if (!IsNativePlatform) {
+    return null;
+  }
+
   const currentUserHasListings = true;
   return (
     <nav className={css.mobileNav}>
