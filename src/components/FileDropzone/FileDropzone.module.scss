@@ -1,0 +1,79 @@
+.dropZone {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-height: 250px;
+  max-height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0;
+  margin-bottom: 15px;
+
+  background-color: var(--colorWhite);
+
+  @media (--viewportLarge) {
+    background-color: var(--colorGrey100);
+  }
+
+  @media (--viewportSmall) {
+    padding: 100px;
+  }
+
+  @media (--viewportMaxSmall) {
+    padding: 60px;
+  }
+
+  @media (max-width: 375px) {
+    padding: 40px;
+  }
+
+  border-style: dashed;
+  border-color: var(--colorGrey100);
+  border-width: 2px;
+  border-radius: 12px;
+
+  /* Behaviour */
+  cursor: pointer;
+  transition: var(--transitionStyleButton);
+
+  &:hover {
+    border-color: var(--colorGrey300);
+  }
+}
+
+.chooseFilesText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chooseFile {
+  composes: h5 from global;
+  color: var(--colorGrey600);
+  font-weight: var(--fontWeightSemiBold);
+
+  margin-top: 0;
+  margin-bottom: 0;
+
+  @media (--viewportLarge) {
+    font-weight: var(--fontWeightSemiBold);
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+.fileTypes {
+  composes: marketplaceTinyFontStyles from global;
+  color: var(--colorGrey300);
+
+  margin-top: 0;
+  margin-bottom: 0;
+
+  @media (--viewportLarge) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
