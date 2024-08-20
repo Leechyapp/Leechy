@@ -23,10 +23,14 @@ const NativeBottomNavbar = () => {
         <FontAwesomeIcon icon={'fa fa-fw fa-envelope-open'} />
         <p className="text">Inbox</p>
       </NamedLink>
-      <a href="native-platform-menu" className={css.blocIcon}>
+      <NamedLink
+        name="ProfileSettingsPage"
+        params={{ tab: currentUserHasListings ? 'sales' : 'orders' }}
+        className={css.blocIcon}
+      >
         <FontAwesomeIcon icon={'fas fa-user-circle'} />
         <p className="text">Profile</p>
-      </a>
+      </NamedLink>
     </nav>
   );
 };
