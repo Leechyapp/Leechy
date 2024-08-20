@@ -1,0 +1,25 @@
+@import '../../../../styles/gridDefaults.scss';
+
+.shippingFunctionContainer {
+  margin: 0 48px 0 48px;
+
+  @media (--viewportLarge) {
+    margin: 0 48px 20px 48px;
+  }
+}
+
+.shippingFunctionButton {
+  float: right;
+  margin: auto;
+  padding: 5px;
+  min-width: 100%;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.shippingFunctionNote {
+  font-size: 14px;
+  span {
+    margin-left: 3px;
+  }
+}
