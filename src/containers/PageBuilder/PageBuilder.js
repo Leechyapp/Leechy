@@ -126,7 +126,7 @@ const PageBuilder = props => {
                 )}
               </Main>
               <Footer>
-                {/* <NativeBottomNavbar /> */}
+                <NativeBottomNavbar />
                 <FooterContainer />
               </Footer>
             </>
