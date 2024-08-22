@@ -16,7 +16,7 @@ const LineItemInsuranceMaybe = props => {
   return insuranceLineItem ? (
     <div className={css.lineItem}>
       <span className={css.itemLabel}>
-        <FormattedMessage id="OrderBreakdown.insurance" />
+        <FormattedMessage id="LineItemInsuranceMaybe.label" />
         <ToolTip
           id="insurance"
           content={<FormattedMessage id="LineItemInsuranceMaybe.insuranceFeeNote" />}
