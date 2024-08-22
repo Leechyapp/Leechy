@@ -225,9 +225,9 @@ class TopbarComponent extends Component {
       includeAndroid,
     } = this.props;
 
-    // if (isAndroidPlatform && !includeAndroid) {
-    //   return null;
-    // }
+    if (isAndroidPlatform && !includeAndroid) {
+      return null;
+    }
 
     const { mobilemenu, mobilesearch, keywords, address, origin, bounds } = parse(location.search, {
       latlng: ['origin'],
