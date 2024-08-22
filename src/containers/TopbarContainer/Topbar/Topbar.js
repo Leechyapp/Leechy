@@ -39,7 +39,7 @@ const redirectToURLWithModalState = (props, modalStateParam) => {
   history.push(`${pathname}${searchString}`, state);
 };
 
-const redirectToURLWithoutModalState = (props, modalStateParam) => {
+export const redirectToURLWithoutModalState = (props, modalStateParam) => {
   const { history, location } = props;
   const { pathname, search, state } = location;
   const queryParams = pickBy(parse(search), (v, k) => {
@@ -59,13 +59,13 @@ const compareGroups = (a, b) => {
   return isAHigherGroupThanB ? -1 : isALesserGroupThanB ? 1 : 0;
 };
 // Returns links in order where primary links are returned first
-const sortCustomLinks = customLinks => {
+export const sortCustomLinks = customLinks => {
   const links = Array.isArray(customLinks) ? customLinks : [];
   return links.sort(compareGroups);
 };
 
 // Resolves in-app links against route configuration
-const getResolvedCustomLinks = (customLinks, routeConfiguration) => {
+export const getResolvedCustomLinks = (customLinks, routeConfiguration) => {
   const links = Array.isArray(customLinks) ? customLinks : [];
   return links.map(linkConfig => {
     const { type, href } = linkConfig;
@@ -97,7 +97,7 @@ const isInboxPage = found =>
   found.route?.name === 'InboxPage' ? `InboxPage:${found.params?.tab}` : null;
 // Find the name of the current route/pathname.
 // It's used as handle for currentPage check.
-const getResolvedCurrentPage = (location, routeConfiguration) => {
+export const getResolvedCurrentPage = (location, routeConfiguration) => {
   const matchedRoutes = matchPathname(location.pathname, routeConfiguration);
   if (matchedRoutes.length > 0) {
     const found = matchedRoutes[0];
