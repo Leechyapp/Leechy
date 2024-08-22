@@ -288,7 +288,7 @@ class TopbarComponent extends Component {
     const classes = classNames(rootClassName || css.root, className);
 
     const handleMenuOrBackButtonClick = () => {
-      if (isIOSPlatform) {
+      if (isNativePlatform) {
         nativeNavigateBack();
       } else {
         this.handleMobileMenuOpen();
