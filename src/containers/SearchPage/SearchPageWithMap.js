@@ -418,11 +418,7 @@ export class SearchPageComponent extends Component {
         title={title}
         schema={schema}
       >
-        <TopbarContainer
-          rootClassName={topbarClasses}
-          currentSearchParams={validQueryParams}
-          includeAndroid={true}
-        />
+        <TopbarContainer rootClassName={topbarClasses} currentSearchParams={validQueryParams} />
         <div className={css.container}>
           <div className={css.searchResultContainer}>
             <SearchFiltersMobile
@@ -678,6 +674,11 @@ const mapDispatchToProps = dispatch => ({
 // lifecycle hook.
 //
 // See: https://github.com/ReactTraining/react-router/issues/4671
-const SearchPage = compose(connect(mapStateToProps, mapDispatchToProps))(EnhancedSearchPage);
+const SearchPage = compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
+)(EnhancedSearchPage);
 
 export default SearchPage;
