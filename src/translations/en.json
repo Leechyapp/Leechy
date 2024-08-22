@@ -1118,5 +1118,10 @@
   "InsuranceMethodMaybe.insuranceMethod.required": "Rental protection required",
   "InsuranceMethodMaybe.insuranceMethod.placeholder": "Select rental protection",
   "InsuranceMethodMaybe.insuranceMethod.insurance.option": "Leechy rental protection",
-  "InsuranceMethodMaybe.insuranceMethod.securityDeposit.option": "Security Deposit (refundable)"
+  "InsuranceMethodMaybe.insuranceMethod.securityDeposit.option": "Security Deposit (refundable)",
+  "NativeBottomNavbar.menuItem.home": "Home",
+  "NativeBottomNavbar.menuItem.search": "Search",
+  "NativeBottomNavbar.menuItem.inbox": "Inbox",
+  "NativeBottomNavbar.menuItem.profile": "Profile",
+  "NativeBottomNavbar.menuItem.more": "More"
 }

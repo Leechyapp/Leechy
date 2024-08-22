@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IsNativePlatform from '../../util/isNativePlatform';
 import MenuIcon from '../../containers/TopbarContainer/Topbar/MenuIcon';
 import { useDispatch, useSelector } from 'react-redux';
-import { injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import Modal from '../Modal/Modal';
 import TopbarMobileMenu from '../../containers/TopbarContainer/Topbar/TopbarMobileMenu/TopbarMobileMenu';
 import { authenticationInProgress, logout } from '../../ducks/auth.duck';
@@ -97,11 +97,15 @@ const NativeBottomNavbar = injectIntl(props => {
     <nav className={css.mobileNav}>
       <NamedLink name="LandingPage" className={css.blocIcon}>
         <FontAwesomeIcon className={css.icon} icon={'fas fa-home'} />
-        <p className={css.text}>Home</p>
+        <p className={css.text}>
+          <FormattedMessage id="NativeBottomNavbar.menuItem.home" />
+        </p>
       </NamedLink>
       <NamedLink name="SearchPage" className={css.blocIcon}>
         <FontAwesomeIcon className={css.icon} icon={'fas fa-search'} />
-        <p className={css.text}>Search</p>
+        <p className={css.text}>
+          <FormattedMessage id="NativeBottomNavbar.menuItem.search" />
+        </p>
       </NamedLink>
       <NamedLink
         name="InboxPage"
@@ -109,7 +113,9 @@ const NativeBottomNavbar = injectIntl(props => {
         className={css.blocIcon}
       >
         <FontAwesomeIcon className={css.icon} icon={'fa fa-fw fa-envelope-open'} />
-        <p className={css.text}>Inbox</p>
+        <p className={css.text}>
+          <FormattedMessage id="NativeBottomNavbar.menuItem.inbox" />
+        </p>
       </NamedLink>
       <NamedLink
         name="ProfileSettingsPage"
@@ -117,7 +123,9 @@ const NativeBottomNavbar = injectIntl(props => {
         className={css.blocIcon}
       >
         <FontAwesomeIcon className={css.icon} icon={'fas fa-user-circle'} />
-        <p className={css.text}>Profile</p>
+        <p className={css.text}>
+          <FormattedMessage id="NativeBottomNavbar.menuItem.profile" />
+        </p>
       </NamedLink>
       <a onClick={() => setIsMobileMenuOpen(true)} className={css.blocIcon}>
         {/* <MenuIcon className={css.menuIcon} /> */}
