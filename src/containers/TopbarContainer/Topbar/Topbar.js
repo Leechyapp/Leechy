@@ -30,6 +30,7 @@ import css from './Topbar.module.css';
 import IOSBackButton from './IOSBackButton/IOSBackButton';
 import isIOSPlatform from '../../../util/isIOSPlatform';
 import isAndroidPlatform from '../../../util/isAndroidPlatform';
+import isNativePlatform from '../../../util/isNativePlatform';
 
 const MAX_MOBILE_SCREEN_WIDTH = 1024;
 
@@ -310,7 +311,7 @@ class TopbarComponent extends Component {
             onClick={() => handleMenuOrBackButtonClick()}
             title={intl.formatMessage({ id: 'Topbar.menuIcon' })}
           >
-            {isIOSPlatform ? (
+            {isNativePlatform ? (
               <IOSBackButton />
             ) : (
               <>
