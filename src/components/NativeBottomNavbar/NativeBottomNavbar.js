@@ -30,11 +30,8 @@ const NativeBottomNavbar = injectIntl(props => {
   const { intl, currentPage = 'LandingPage' } = props;
 
   const state = useSelector(state => state);
-  const {
-    isAuthenticated,
-    currentUser,
-    currentUserNotificationCount: notificationCount,
-  } = state.user;
+  const { currentUser, currentUserNotificationCount: notificationCount } = state.user;
+  const { isAuthenticated } = state.auth;
 
   const authInProgress = authenticationInProgress(state);
   const config = useConfiguration();
