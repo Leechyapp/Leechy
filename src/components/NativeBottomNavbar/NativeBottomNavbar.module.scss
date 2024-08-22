@@ -1,8 +1,7 @@
-.mobileNav {
+.baseMobileNav {
   background: white;
   position: fixed;
   bottom: 0;
-  height: 50px;
   width: 100%;
   display: flex;
   justify-content: space-around;
@@ -10,13 +9,22 @@
   z-index: 1000;
 }
 
+.mobileNav {
+  @extend .baseMobileNav;
+  height: 50px;
+}
+
+.mobileNavIOS {
+  @extend .baseMobileNav;
+  height: 65px;
+}
+
 .blocIcon {
-  width: 20px;
   display: table;
   justify-content: center;
   text-align: center;
   align-items: center;
-  padding: 8px 0 0 0;
+  padding: 10px 0 0 0;
 
   .icon {
     font-size: 18px;

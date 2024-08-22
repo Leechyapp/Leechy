@@ -21,6 +21,7 @@ import { propTypes } from '../../util/types';
 import { manageDisableScrolling } from '../../ducks/ui.duck';
 import { intlShape } from '../../util/reactIntl';
 import { useConfiguration } from '../../context/configurationContext';
+import isIOSPlatform from '../../util/isIOSPlatform';
 
 const NativeBottomNavbar = injectIntl(props => {
   if (!IsNativePlatform) {
@@ -88,8 +89,10 @@ const NativeBottomNavbar = injectIntl(props => {
     />
   );
 
+  const rootClasses = isIOSPlatform ? css.mobileNavIOS : css.mobileNav;
+
   return (
-    <nav className={css.mobileNav}>
+    <nav className={rootClasses}>
       <NamedLink name="LandingPage" className={css.blocIcon}>
         <FontAwesomeIcon className={css.icon} icon={'fas fa-home'} />
         <p className={css.text}>
