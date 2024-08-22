@@ -3,7 +3,6 @@ import NamedLink from '../NamedLink/NamedLink';
 import css from './NativeBottomNavbar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IsNativePlatform from '../../util/isNativePlatform';
-import MenuIcon from '../../containers/TopbarContainer/Topbar/MenuIcon';
 import { useDispatch, useSelector } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import Modal from '../Modal/Modal';
@@ -31,7 +30,6 @@ const NativeBottomNavbar = injectIntl(props => {
   const { intl, currentPage = 'LandingPage' } = props;
 
   const state = useSelector(state => state);
-  console.log(`state`, state);
   const {
     isAuthenticated,
     currentUser,
@@ -116,6 +114,7 @@ const NativeBottomNavbar = injectIntl(props => {
         <p className={css.text}>
           <FormattedMessage id="NativeBottomNavbar.menuItem.inbox" />
         </p>
+        {notificationDot}
       </NamedLink>
       <NamedLink
         name="ProfileSettingsPage"
@@ -128,10 +127,10 @@ const NativeBottomNavbar = injectIntl(props => {
         </p>
       </NamedLink>
       <a onClick={() => setIsMobileMenuOpen(true)} className={css.blocIcon}>
-        {/* <MenuIcon className={css.menuIcon} /> */}
         <FontAwesomeIcon className={css.icon} icon="fa-solid fa-bars" />
-        {notificationDot}
-        <p className={css.text}>More</p>
+        <p className={css.text}>
+          <FormattedMessage id="NativeBottomNavbar.menuItem.more" />
+        </p>
       </a>
 
       <Modal

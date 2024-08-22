@@ -29,53 +29,20 @@
     display: block;
   }
 
-  //   .notif {
-  //     background-color: var(--colorFail);
-  //     color: var(--colorWhite);
-  //     font-size: 11px;
-  //     border-radius: 50%;
-  //     height: 10px;
-  //     width: 10px;
-  //     position: absolute;
-  //     top: 7px;
-  //     margin-left: 16px;
-  //     text-align: center;
-  //   }
+  .notificationDot {
+    background-color: var(--colorFail);
+    color: var(--colorWhite);
+    font-size: 11px;
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    top: 8px;
+    margin-left: 13px;
+    text-align: center;
+  }
 }
 
 p {
   margin: unset;
-}
-
-.menuIcon {
-  margin-bottom: 5px;
-}
-
-.notificationDot {
-  /* Dimensions */
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-
-  /* Position */
-  position: absolute;
-  top: 17px;
-  right: 17px;
-
-  /* Style: red dot with white border */
-  background-color: var(--colorFail);
-  border: 2px solid var(--colorWhite);
-
-  animation-name: notificationPop;
-  animation-duration: 0.1s;
-  animation-delay: 0.1s;
-  animation-fill-mode: forwards;
-
-  animation-timing-function: ease-in;
-  opacity: 0;
-  transform: scale(0);
-
-  @media (--viewportMedium) {
-    top: 23px;
-  }
 }
