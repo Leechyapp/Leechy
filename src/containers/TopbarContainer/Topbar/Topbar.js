@@ -29,6 +29,7 @@ import TopbarDesktop from './TopbarDesktop/TopbarDesktop';
 import css from './Topbar.module.css';
 import IOSBackButton from './IOSBackButton/IOSBackButton';
 import isIOSPlatform from '../../../util/isIOSPlatform';
+import isAndroidPlatform from '../../../util/isAndroidPlatform';
 
 const MAX_MOBILE_SCREEN_WIDTH = 1024;
 
@@ -221,7 +222,12 @@ class TopbarComponent extends Component {
       showGenericError,
       config,
       routeConfiguration,
+      includeAndroid,
     } = this.props;
+
+    // if (isAndroidPlatform && !includeAndroid) {
+    //   return null;
+    // }
 
     const { mobilemenu, mobilesearch, keywords, address, origin, bounds } = parse(location.search, {
       latlng: ['origin'],
@@ -403,6 +409,7 @@ TopbarComponent.defaultProps = {
   currentPage: null,
   sendVerificationEmailError: null,
   authScopes: [],
+  includeAndroid: false,
 };
 
 TopbarComponent.propTypes = {
@@ -425,6 +432,7 @@ TopbarComponent.propTypes = {
   sendVerificationEmailInProgress: bool.isRequired,
   sendVerificationEmailError: propTypes.error,
   showGenericError: bool.isRequired,
+  includeAndroid: bool,
 
   // These are passed from Page to keep Topbar rendering aware of location changes
   history: shape({
