@@ -24,6 +24,7 @@ const CurrentUserRoute = require('./api/routes/currentuser.route');
 const ContactRoute = require('./api/routes/contact.route');
 const SecurityDepositRoute = require('./api/routes/security-deposit.route');
 const MessageRoute = require('./api/routes/message.route');
+const ShippingRoute = require('./api/routes/shipping.route');
 
 const router = express.Router();
 
@@ -88,5 +89,6 @@ new CurrentUserRoute(router);
 new ContactRoute(router);
 new SecurityDepositRoute(router);
 new MessageRoute(router);
+new ShippingRoute(router);
 
 module.exports = router;

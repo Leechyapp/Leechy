@@ -178,3 +178,7 @@ export const fetchMessageFiles = body => {
 export const saveMessageFiles = body => {
   return post('/api/message/save-files', body);
 };
+
+export const updateShippingStatus = body => {
+  return post('/api/shipping/update-shipping-status', body);
+};
