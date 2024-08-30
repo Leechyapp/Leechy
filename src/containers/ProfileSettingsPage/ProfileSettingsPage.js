@@ -19,6 +19,7 @@ import ProfileSettingsForm from './ProfileSettingsForm/ProfileSettingsForm';
 import { updateProfile, uploadImage } from './ProfileSettingsPage.duck';
 import css from './ProfileSettingsPage.module.css';
 import { initialValuesForUserFields, pickUserFieldsData } from '../../util/userHelpers';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 const onImageUploadHandler = (values, fn) => {
   const { id, imageId, file } = values;
@@ -145,6 +146,7 @@ export const ProfileSettingsPageComponent = props => {
           {profileSettingsForm}
         </div>
       </LayoutSingleColumn>
+      <NativeBottomNavbar />
     </Page>
   );
 };
@@ -206,10 +208,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const ProfileSettingsPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   injectIntl
 )(ProfileSettingsPageComponent);
 

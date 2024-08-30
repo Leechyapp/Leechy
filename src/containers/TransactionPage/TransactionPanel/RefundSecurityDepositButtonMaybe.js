@@ -8,7 +8,11 @@ import { manageDisableScrolling } from '../../../ducks/ui.duck';
 import { useDispatch } from 'react-redux';
 
 const RefundSecurityDepositButtonMaybe = props => {
-  const { transactionId, isProvider, securityDepositStatus } = props;
+  const { transactionId, isProvider, securityDepositStatus, intl } = props;
+
+  if (!isProvider) {
+    return null;
+  }
 
   if (securityDepositStatus !== SecurityDepositEnum.Paid) {
     return null;
@@ -37,7 +41,10 @@ const RefundSecurityDepositButtonMaybe = props => {
   };
 
   const onClaimDeposit = () => {
-    window.location.href = `mailto:contact@leechy.app?subject=Security Deposit Claim (Transaction ID: ${transactionId.uuid})`;
+    window.location.href = intl.formatMessage(
+      { id: 'RefundSecurityDepositButtonMaybe.claimDepositButton.link' },
+      { transactionId: transactionId.uuid }
+    );
   };
 
   return (

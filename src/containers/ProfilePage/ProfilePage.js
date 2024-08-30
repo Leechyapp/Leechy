@@ -43,6 +43,7 @@ import SectionMultiEnumMaybe from './SectionMultiEnumMaybe';
 import SectionReportBlockUser from './SectionReportBlockUser/SectionReportBlockUser';
 import { unblockUser } from '../../util/api';
 import { fetchCurrentUser } from '../../ducks/user.duck';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
@@ -329,6 +330,7 @@ export const ProfilePageComponent = props => {
           {...rest}
         />
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 };

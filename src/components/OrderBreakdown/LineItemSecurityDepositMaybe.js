@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { bool } from 'prop-types';
 import { FormattedMessage, intlShape } from '../../util/reactIntl';
 import { formatMoney } from '../../util/currency';
-import { propTypes } from '../../util/types';
+import { LINE_ITEM_INSURANCE, propTypes } from '../../util/types';
 import css from './OrderBreakdown.module.css';
 import { isNumeric } from '../../util/isNumeric';
 import { SecurityDepositEnum } from '../../enums/security-deposit-status.enum';
@@ -11,11 +11,17 @@ const { types } = require('sharetribe-flex-sdk');
 const { Money } = types;
 
 const LineItemSecurityDepositMaybe = props => {
-  const { transaction, isProvider, intl, listing } = props;
+  const { transaction, lineItems, isProvider, intl, listing } = props;
   console.log(`transaction`, transaction);
   console.log(`listing`, listing);
 
   if (!transaction) return null;
+
+  const insuranceLineItem = lineItems.find(item => item.code === LINE_ITEM_INSURANCE);
+  const hasInsurance = insuranceLineItem ? true : false;
+  if (hasInsurance) {
+    return null;
+  }
 
   const securityDepositStatus = transaction?.attributes?.metadata?.securityDepositStatus;
 

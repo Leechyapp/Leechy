@@ -18,6 +18,8 @@ import { Button, Form, FieldCurrencyInput, FieldTextInput } from '../../../../co
 // Import modules from this directory
 import css from './EditListingPricingForm.module.css';
 
+const MIN_SHIPPING_FEE = 500;
+
 const { Money } = sdkTypes;
 
 const getPriceValidators = (listingMinimumPriceSubUnits, marketplaceCurrency, intl) => {
@@ -37,6 +39,20 @@ const getPriceValidators = (listingMinimumPriceSubUnits, marketplaceCurrency, in
   return listingMinimumPriceSubUnits
     ? validators.composeValidators(priceRequired, minPriceRequired)
     : priceRequired;
+};
+
+const getShippingFeeValidators = (marketplaceCurrency, intl) => {
+  const priceRequiredMsgId = { id: 'EditListingPricingForm.priceRequired' };
+  const priceRequiredMsg = intl.formatMessage(priceRequiredMsgId);
+  const priceRequired = validators.required(priceRequiredMsg);
+
+  const minPriceRaw = new Money(MIN_SHIPPING_FEE, marketplaceCurrency);
+  const minPrice = formatMoney(intl, minPriceRaw);
+  const priceTooLowMsgId = { id: 'EditListingPricingForm.priceTooLow' };
+  const priceTooLowMsg = intl.formatMessage(priceTooLowMsgId, { minPrice });
+  const minPriceRequired = validators.moneyShippingFeeAtLeast(priceTooLowMsg, MIN_SHIPPING_FEE);
+
+  return MIN_SHIPPING_FEE ? validators.composeValidators(minPriceRequired) : priceRequired;
 };
 
 export const EditListingPricingFormComponent = props => (
@@ -67,6 +83,8 @@ export const EditListingPricingFormComponent = props => (
         marketplaceCurrency,
         intl
       );
+
+      const shippingFeeValidators = getShippingFeeValidators(marketplaceCurrency, intl);
 
       const classes = classNames(css.root, className);
       const submitReady = (updated && pristine) || ready;
@@ -113,7 +131,7 @@ export const EditListingPricingFormComponent = props => (
               id: 'EditListingPricingForm.shippingFee.placeholder',
             })}
             currencyConfig={appSettings.getCurrencyFormatting(marketplaceCurrency)}
-            validate={priceValidators}
+            validate={shippingFeeValidators}
           />
 
           <Button

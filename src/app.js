@@ -34,8 +34,8 @@ import Routes from './routing/Routes';
 
 // Sharetribe Web Template uses English translations as default translations.
 import defaultMessages from './translations/en.json';
-import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+import isNativePlatform from './util/isNativePlatform';
 
 // If you want to change the language of default (fallback) translations,
 // change the imports to match the wanted locale:
@@ -251,7 +251,7 @@ export const ClientApp = props => {
   const logLoadDataCalls = appSettings?.env !== 'test';
 
   useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
+    if (isNativePlatform) {
       App.addListener('backButton', ({ canGoBack }) => {
         // if (window.location.pathname === '/') {
         //   return;

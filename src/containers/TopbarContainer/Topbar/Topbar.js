@@ -27,7 +27,10 @@ import TopbarMobileMenu from './TopbarMobileMenu/TopbarMobileMenu';
 import TopbarDesktop from './TopbarDesktop/TopbarDesktop';
 
 import css from './Topbar.module.css';
-import { Capacitor } from '@capacitor/core';
+import IOSBackButton from './IOSBackButton/IOSBackButton';
+import isIOSPlatform from '../../../util/isIOSPlatform';
+import isAndroidPlatform from '../../../util/isAndroidPlatform';
+import isNativePlatform from '../../../util/isNativePlatform';
 
 const MAX_MOBILE_SCREEN_WIDTH = 1024;
 
@@ -38,7 +41,7 @@ const redirectToURLWithModalState = (props, modalStateParam) => {
   history.push(`${pathname}${searchString}`, state);
 };
 
-const redirectToURLWithoutModalState = (props, modalStateParam) => {
+export const redirectToURLWithoutModalState = (props, modalStateParam) => {
   const { history, location } = props;
   const { pathname, search, state } = location;
   const queryParams = pickBy(parse(search), (v, k) => {
@@ -58,13 +61,13 @@ const compareGroups = (a, b) => {
   return isAHigherGroupThanB ? -1 : isALesserGroupThanB ? 1 : 0;
 };
 // Returns links in order where primary links are returned first
-const sortCustomLinks = customLinks => {
+export const sortCustomLinks = customLinks => {
   const links = Array.isArray(customLinks) ? customLinks : [];
   return links.sort(compareGroups);
 };
 
 // Resolves in-app links against route configuration
-const getResolvedCustomLinks = (customLinks, routeConfiguration) => {
+export const getResolvedCustomLinks = (customLinks, routeConfiguration) => {
   const links = Array.isArray(customLinks) ? customLinks : [];
   return links.map(linkConfig => {
     const { type, href } = linkConfig;
@@ -96,7 +99,7 @@ const isInboxPage = found =>
   found.route?.name === 'InboxPage' ? `InboxPage:${found.params?.tab}` : null;
 // Find the name of the current route/pathname.
 // It's used as handle for currentPage check.
-const getResolvedCurrentPage = (location, routeConfiguration) => {
+export const getResolvedCurrentPage = (location, routeConfiguration) => {
   const matchedRoutes = matchPathname(location.pathname, routeConfiguration);
   if (matchedRoutes.length > 0) {
     const found = matchedRoutes[0];
@@ -220,7 +223,12 @@ class TopbarComponent extends Component {
       showGenericError,
       config,
       routeConfiguration,
+      includeAndroid,
     } = this.props;
+
+    // if (isAndroidPlatform && !includeAndroid) {
+    //   return null;
+    // }
 
     const { mobilemenu, mobilesearch, keywords, address, origin, bounds } = parse(location.search, {
       latlng: ['origin'],
@@ -279,9 +287,17 @@ class TopbarComponent extends Component {
 
     const classes = classNames(rootClassName || css.root, className);
 
+    const handleMenuOrBackButtonClick = () => {
+      if (isNativePlatform) {
+        nativeNavigateBack();
+      } else {
+        this.handleMobileMenuOpen();
+      }
+    };
+
     return (
       <div className={classes}>
-        {Capacitor.getPlatform() === 'ios' && <div className={css.iosCushion}></div>}
+        {isIOSPlatform && <div className={css.iosCushion}></div>}
         <LimitedAccessBanner
           isAuthenticated={isAuthenticated}
           authScopes={authScopes}
@@ -292,13 +308,18 @@ class TopbarComponent extends Component {
         <div className={classNames(mobileRootClassName || css.container, mobileClassName)}>
           <Button
             rootClassName={css.menu}
-            onClick={this.handleMobileMenuOpen}
+            onClick={() => handleMenuOrBackButtonClick()}
             title={intl.formatMessage({ id: 'Topbar.menuIcon' })}
           >
-            <MenuIcon className={css.menuIcon} />
-            {notificationDot}
+            {isNativePlatform ? (
+              <IOSBackButton />
+            ) : (
+              <>
+                <MenuIcon className={css.menuIcon} />
+                {notificationDot}
+              </>
+            )}
           </Button>
-          {/* <button onClick={() => nativeNavigateBack()}>Back</button> */}
           <LinkedLogo
             layout={'mobile'}
             alt={intl.formatMessage({ id: 'Topbar.logoIcon' })}
@@ -389,6 +410,7 @@ TopbarComponent.defaultProps = {
   currentPage: null,
   sendVerificationEmailError: null,
   authScopes: [],
+  includeAndroid: false,
 };
 
 TopbarComponent.propTypes = {
@@ -411,6 +433,7 @@ TopbarComponent.propTypes = {
   sendVerificationEmailInProgress: bool.isRequired,
   sendVerificationEmailError: propTypes.error,
   showGenericError: bool.isRequired,
+  includeAndroid: bool,
 
   // These are passed from Page to keep Topbar rendering aware of location changes
   history: shape({

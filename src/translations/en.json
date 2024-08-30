@@ -1108,6 +1108,7 @@
   "RefundSecurityDepositButtonMaybe.confirmMessage": "Click \"Refund Deposit\" below to confirm refund of the Security Deposit",
   "RefundSecurityDepositButtonMaybe.confirmRefundDepositButton": "Refund Deposit",
   "RefundSecurityDepositButtonMaybe.claimDepositButton": "Claim Loss or Damage",
+  "RefundSecurityDepositButtonMaybe.claimDepositButton.link": "mailto:contact@leechy.app?subject=Security Deposit Claim (Transaction ID: {transactionId})",
   "LineItemSecurityDepositMaybe.securityDepositLineItem": "Security deposit ({securityDepositPercentageValue}%)",
   "LineItemSecurityDepositMaybe.bookingTotalPlusSecurityDepositLineItem": "Total",
   "LineItemSecurityDepositMaybe.securityDepositStatusLineItem": "Security deposit status",
@@ -1118,5 +1119,17 @@
   "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemShipped": "Remember to mark shipped once you shipped the item.",
   "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemReceived": "Remember to mark received once you received the item.",
   "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemReturnShipped": "Remember to mark shipped once you shipped the item.",
-  "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemReceivedShipped": "Remember to mark received once you received the item."
+  "ShippingFunctionButtonsMaybe.shippingFunctionNote.markItemReceivedShipped": "Remember to mark received once you received the item.",
+  "LineItemInsuranceMaybe.label": "Rental protection",
+  "LineItemInsuranceMaybe.insuranceFeeNote": "Leechy rental protection will be included with this rental.",
+  "InsuranceMethodMaybe.insuranceMethod.label": "Rental protection method",
+  "InsuranceMethodMaybe.insuranceMethod.required": "Rental protection required",
+  "InsuranceMethodMaybe.insuranceMethod.placeholder": "Select rental protection",
+  "InsuranceMethodMaybe.insuranceMethod.insurance.option": "Leechy rental protection",
+  "InsuranceMethodMaybe.insuranceMethod.securityDeposit.option": "Security Deposit (refundable)",
+  "NativeBottomNavbar.menuItem.home": "Home",
+  "NativeBottomNavbar.menuItem.search": "Search",
+  "NativeBottomNavbar.menuItem.inbox": "Inbox",
+  "NativeBottomNavbar.menuItem.profile": "Profile",
+  "NativeBottomNavbar.menuItem.more": "More"
 }

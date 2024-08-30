@@ -29,6 +29,7 @@ import {
   clearPasswordRecoveryError,
 } from './PasswordRecoveryPage.duck';
 import css from './PasswordRecoveryPage.module.css';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 const PasswordRecovery = props => {
   const { initialEmail, onChange, onSubmitEmail, recoveryInProgress, recoveryError } = props;
@@ -186,6 +187,7 @@ export const PasswordRecoveryPageComponent = props => {
           )}
         </ResponsiveBackgroundImageContainer>
       </LayoutSingleColumn>
+      <NativeBottomNavbar />
     </Page>
   );
 };
@@ -239,10 +241,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const PasswordRecoveryPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   injectIntl
 )(PasswordRecoveryPageComponent);
 

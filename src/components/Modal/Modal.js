@@ -16,7 +16,7 @@ import { FormattedMessage, intlShape, injectIntl } from '../../util/reactIntl';
 import { Button, IconClose } from '../../components';
 
 import css from './Modal.module.css';
-import { Capacitor } from '@capacitor/core';
+import isIOSPlatform from '../../util/isIOSPlatform';
 
 const KEY_CODE_ESCAPE = 27;
 
@@ -133,7 +133,7 @@ export class ModalComponent extends Component {
     } = this.props;
 
     const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
-    const closeClass = Capacitor.getPlatform() === 'ios' ? css.closeIOS : css.close;
+    const closeClass = isIOSPlatform ? css.closeIOS : css.close;
     const closeButtonClasses = classNames(closeClass, {
       [css.closeLight]: lightCloseButton,
     });

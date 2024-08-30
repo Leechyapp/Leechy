@@ -23,6 +23,7 @@ import ManageListingCard from './ManageListingCard/ManageListingCard';
 
 import { closeListing, openListing, getOwnListingsById } from './ManageListingsPage.duck';
 import css from './ManageListingsPage.module.css';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 export class ManageListingsPageComponent extends Component {
   constructor(props) {
@@ -158,6 +159,7 @@ export class ManageListingsPageComponent extends Component {
             {paginationLinks}
           </div>
         </LayoutSingleColumn>
+        <NativeBottomNavbar />
       </Page>
     );
   }
@@ -234,10 +236,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const ManageListingsPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   injectIntl
 )(ManageListingsPageComponent);
 

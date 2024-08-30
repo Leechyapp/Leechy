@@ -199,6 +199,7 @@ export class TransactionPanelComponent extends Component {
         transactionId={transactionId}
         isProvider={isProvider}
         securityDepositStatus={metadata?.securityDepositStatus}
+        intl={intl}
       />
     );
     const shippingFunctionButton =

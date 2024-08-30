@@ -48,6 +48,7 @@ const LineItemProviderCommissionMaybe = props => {
             values={{ marketplaceName, role: 'provider' }}
           />
           <ToolTip
+            id="provider-commission"
             content={<FormattedMessage id="OrderBreakdown.commissionFeeNote" />}
             style={{ top: '1px' }}
           />

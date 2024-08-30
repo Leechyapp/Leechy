@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isScrollingDisabled, manageDisableScrolling } from '../../ducks/ui.duck.js';
 import { deleteCurrentUser, getBlockedUsersList } from '../../util/api.js';
 import { logout } from '../../ducks/auth.duck.js';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 
 const SecurityPage = injectIntl(props => {
   const { intl } = props;
@@ -199,6 +200,7 @@ const SecurityPage = injectIntl(props => {
           </div>
         </div>
       </Modal>
+      <NativeBottomNavbar />
     </Page>
   );
 });
