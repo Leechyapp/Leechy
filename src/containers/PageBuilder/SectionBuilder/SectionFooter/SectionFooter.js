@@ -12,6 +12,7 @@ import css from './SectionFooter.module.scss';
 import { default as appStoreBadge } from '../../../../assets/mobile-app-store-badges/Download_on_the_App_Store_Badge.svg';
 import { default as googlePlayStoreBadge } from '../../../../assets/mobile-app-store-badges/google-play-badge.png';
 import { FormattedMessage } from 'react-intl';
+import isNativePlatform from '../../../../util/isNativePlatform';
 
 // The number of columns (numberOfColumns) affects styling
 
@@ -150,6 +151,7 @@ const SectionFooter = props => {
           </div>
         </div>
       </div>
+      {isNativePlatform && <div className={css.nativeFooterCushion}></div>}
     </SectionContainer>
   );
 };
