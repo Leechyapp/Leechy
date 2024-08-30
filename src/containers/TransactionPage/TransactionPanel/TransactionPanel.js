@@ -192,6 +192,9 @@ export class TransactionPanelComponent extends Component {
     const deliveryMethod = protectedData?.deliveryMethod || 'none';
     const shippingStatus = protectedData?.shippingStatus;
 
+    console.log(`deliveryMethod`, deliveryMethod);
+    console.log(`shippingStatus`, shippingStatus);
+
     const classes = classNames(rootClassName || css.root, className);
 
     const refundSecurityDepositButton = (
@@ -296,10 +299,10 @@ export class TransactionPanelComponent extends Component {
             ) : null}
 
             {refundSecurityDepositButton && (
-              <div className={css.mobileRefundSecurityDepositBtn}>
-                {refundSecurityDepositButton}
-                {shippingFunctionButton}
-              </div>
+              <div className={css.mobileActionButtons}>{refundSecurityDepositButton}</div>
+            )}
+            {shippingFunctionButton && (
+              <div className={css.mobileActionButtons}>{shippingFunctionButton}</div>
             )}
 
             <FeedSection
@@ -379,7 +382,12 @@ export class TransactionPanelComponent extends Component {
                 {stateData.showActionButtons ? (
                   <div className={css.desktopActionButtons}>{actionButtons}</div>
                 ) : null}
-                <div className={css.desktopActionButtons}>{refundSecurityDepositButton}</div>
+                {refundSecurityDepositButton && (
+                  <div className={css.desktopActionButtons}>{refundSecurityDepositButton}</div>
+                )}
+                {shippingFunctionButton && (
+                  <div className={css.desktopActionButtons}>{shippingFunctionButton}</div>
+                )}
               </div>
               <DiminishedActionButtonMaybe
                 showDispute={stateData.showDispute}
