@@ -11,7 +11,6 @@ class SharetribeIntegrationService {
         expand: true,
       })
       .then(res => {
-        // res.data contains the response data
         return res;
       })
       .catch(error => {
