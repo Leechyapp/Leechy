@@ -100,5 +100,26 @@ class SharetribeService {
         return null;
       });
   }
+
+  static async sendMessage(req, res, transactionId, message) {
+    const sdk = getSdk(req, res);
+    return await sdk.messages
+      .send(
+        {
+          transactionId: new UUID(transactionId),
+          content: message,
+        },
+        {
+          expand: true,
+        }
+      )
+      .then(res => {
+        return res.data;
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
 }
 module.exports = SharetribeService;
