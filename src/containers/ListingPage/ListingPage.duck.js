@@ -35,6 +35,9 @@ export const FETCH_LINE_ITEMS_REQUEST = 'app/ListingPage/FETCH_LINE_ITEMS_REQUES
 export const FETCH_LINE_ITEMS_SUCCESS = 'app/ListingPage/FETCH_LINE_ITEMS_SUCCESS';
 export const FETCH_LINE_ITEMS_ERROR = 'app/ListingPage/FETCH_LINE_ITEMS_ERROR';
 
+export const FETCH_ESTIMATED_PROTECTED_DATA_SUCCESS =
+  'app/ListingPage/FETCH_ESTIMATED_PROTECTED_DATA_SUCCESS';
+
 export const SEND_INQUIRY_REQUEST = 'app/ListingPage/SEND_INQUIRY_REQUEST';
 export const SEND_INQUIRY_SUCCESS = 'app/ListingPage/SEND_INQUIRY_SUCCESS';
 export const SEND_INQUIRY_ERROR = 'app/ListingPage/SEND_INQUIRY_ERROR';
@@ -54,6 +57,7 @@ const initialState = {
     // },
   },
   lineItems: null,
+  estimatedTrxProtectedData: null,
   fetchLineItemsInProgress: false,
   fetchLineItemsError: null,
   sendInquiryInProgress: false,
@@ -122,6 +126,9 @@ const listingPageReducer = (state = initialState, action = {}) => {
     case FETCH_LINE_ITEMS_ERROR:
       return { ...state, fetchLineItemsInProgress: false, fetchLineItemsError: payload };
 
+    case FETCH_ESTIMATED_PROTECTED_DATA_SUCCESS:
+      return { ...state, fetchLineItemsInProgress: false, estimatedTrxProtectedData: payload };
+
     case SEND_INQUIRY_REQUEST:
       return { ...state, sendInquiryInProgress: true, sendInquiryError: null };
     case SEND_INQUIRY_SUCCESS:
@@ -185,6 +192,11 @@ export const fetchLineItemsError = error => ({
   type: FETCH_LINE_ITEMS_ERROR,
   error: true,
   payload: error,
+});
+
+export const fetchEstimatedProtectedDataSuccess = estimatedTrxProtectedData => ({
+  type: FETCH_ESTIMATED_PROTECTED_DATA_SUCCESS,
+  payload: estimatedTrxProtectedData,
 });
 
 export const sendInquiryRequest = () => ({ type: SEND_INQUIRY_REQUEST });
@@ -362,8 +374,9 @@ export const fetchTransactionLineItems = ({ orderData, listingId, isOwnListing }
   dispatch(fetchLineItemsRequest());
   transactionLineItems({ orderData, listingId, isOwnListing })
     .then(response => {
-      const lineItems = response.data;
+      const { lineItems, estimatedTrxProtectedData } = response;
       dispatch(fetchLineItemsSuccess(lineItems));
+      dispatch(fetchEstimatedProtectedDataSuccess(estimatedTrxProtectedData));
     })
     .catch(e => {
       dispatch(fetchLineItemsError(storableError(e)));
