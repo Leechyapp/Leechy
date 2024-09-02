@@ -1,21 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { bool } from 'prop-types';
 import { FormattedMessage, intlShape } from '../../util/reactIntl';
 import { formatMoney } from '../../util/currency';
 import { LINE_ITEM_INSURANCE, propTypes } from '../../util/types';
 import css from './OrderBreakdown.module.css';
-import { isNumeric } from '../../util/isNumeric';
 import { SecurityDepositEnum } from '../../enums/security-deposit-status.enum';
 
 const { types } = require('sharetribe-flex-sdk');
 const { Money } = types;
 
 const LineItemSecurityDepositMaybe = props => {
-  const { transaction, lineItems, isProvider, intl, listing } = props;
-  console.log(`transaction`, transaction);
-  console.log(`listing`, listing);
+  const { transaction, lineItems, isProvider, intl } = props;
+  console.log(`LineItemSecurityDepositMaybe transaction`, transaction);
 
   if (!transaction) return null;
+
+  const trxProtectedData = transaction?.attributes?.protectedData;
+
+  const {
+    securityDepositPercentageValue,
+    securityDepositAmount,
+    totalPlusSecurityDepositPrice,
+  } = trxProtectedData;
 
   const insuranceLineItem = lineItems.find(item => item.code === LINE_ITEM_INSURANCE);
   const hasInsurance = insuranceLineItem ? true : false;
@@ -23,53 +29,19 @@ const LineItemSecurityDepositMaybe = props => {
     return null;
   }
 
+  const trxPayinTotalAmount = transaction?.attributes?.payinTotal?.amount;
+  const trxPayinTotalCurrency = transaction?.attributes?.payinTotal?.currency;
+  if (!trxPayinTotalAmount) {
+    return null;
+  }
   const securityDepositStatus = transaction?.attributes?.metadata?.securityDepositStatus;
 
-  const [securityDepositPercentageValue, setSecurityDepositPercentageValue] = useState(null);
-
-  useEffect(() => {
-    if (transaction) {
-      const trxSecurityDepositPercentageValue =
-        transaction?.attributes?.protectedData?.securityDepositPercentageValue;
-      if (trxSecurityDepositPercentageValue) {
-        setSecurityDepositPercentageValue(trxSecurityDepositPercentageValue);
-      } else {
-        if (listing) {
-          const security_deposit = listing?.attributes?.publicData?.security_deposit;
-          const listingSecurityDepositPercentageValue = isNumeric(security_deposit)
-            ? parseInt(security_deposit)
-            : null;
-          console.log(
-            `listingSecurityDepositPercentageValue`,
-            listingSecurityDepositPercentageValue
-          );
-          if (listingSecurityDepositPercentageValue) {
-            setSecurityDepositPercentageValue(listingSecurityDepositPercentageValue);
-          }
-        }
-      }
-    }
-  }, [transaction]);
-
-  const totalSecurityDepositPrice = securityDepositPercentageValue
-    ? new Money(
-        transaction.attributes.payinTotal.amount * (securityDepositPercentageValue / 100),
-        'USD'
-      )
-    : null;
-  const formattedSecurityDepositTotalPrice = totalSecurityDepositPrice
-    ? formatMoney(intl, totalSecurityDepositPrice)
+  const formattedSecurityDepositTotalPrice = securityDepositAmount
+    ? formatMoney(intl, new Money(securityDepositAmount, trxPayinTotalCurrency))
     : null;
 
-  console.log(`transaction.attributes.payinTotal.amount`, transaction.attributes.payinTotal.amount);
-  console.log(`totalSecurityDepositPrice`, totalSecurityDepositPrice);
-
-  const bookingTotalPlusSecurityDepositPrice =
-    transaction.attributes.payinTotal.amount + totalSecurityDepositPrice?.amount;
-
-  console.log(`bookingTotalPlusSecurityDepositPrice`, bookingTotalPlusSecurityDepositPrice);
-  const formattedBookingTotalPlusSecurityDepositPrice = bookingTotalPlusSecurityDepositPrice
-    ? formatMoney(intl, new Money(bookingTotalPlusSecurityDepositPrice, 'USD'))
+  const formattedBookingTotalPlusSecurityDepositPrice = totalPlusSecurityDepositPrice
+    ? formatMoney(intl, new Money(totalPlusSecurityDepositPrice, trxPayinTotalCurrency))
     : null;
 
   const classes = isProvider ? [css.totalDivider, css.marginTop].join(' ') : css.totalDivider;
