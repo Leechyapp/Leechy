@@ -11,7 +11,7 @@ import { updateShippingStatus } from '../../../../util/api';
 import { TransactionRoleEnum } from '../../../../enums/transaction-role.enum';
 
 const ShippingFunctionButtonsMaybe = props => {
-  const { transactionId, isProvider, shippingStatus: currentShippingStatus } = props;
+  const { transactionId, isProvider, isCustomer, shippingStatus: currentShippingStatus } = props;
 
   console.log(`currentShippingStatus`, currentShippingStatus);
   if (currentShippingStatus === ShippingStatusEnum.TransactionCompleted) {
@@ -85,7 +85,7 @@ const ShippingFunctionButtonsMaybe = props => {
     return null;
   }
 
-  if (!isProvider && shippingFunctionRole !== TransactionRoleEnum.Customer) {
+  if (isCustomer && shippingFunctionRole !== TransactionRoleEnum.Customer) {
     return null;
   }
 
@@ -125,15 +125,22 @@ const ShippingFunctionButtonsMaybe = props => {
           onManageDisableScrolling={onManageDisableScrolling}
         >
           <h4>
-            <FormattedMessage id="ShippingFunctionButtonsMaybe.confirmMessage" />
+            <FormattedMessage
+              id={`ShippingFunctionButtonsMaybe.shippingFunctionModal.title.${nextTransitionButton}`}
+            />
           </h4>
+          <p>
+            <FormattedMessage
+              id={`ShippingFunctionButtonsMaybe.shippingFunctionModal.message.${nextTransitionButton}`}
+            />
+          </p>
+          <br />
           <PrimaryButton
-            className={css.shippingFunctionButton}
             inProgress={shippingFunctionInProgress}
             onClick={() => onShippingFunctionTransition()}
             type="button"
           >
-            <FormattedMessage id="ShippingFunctionButtonsMaybe.confirmShippingFunctionButton" />
+            <FormattedMessage id="ShippingFunctionButtonsMaybe.shippingFunctionModal.submit" />
           </PrimaryButton>
         </Modal>
       </div>
