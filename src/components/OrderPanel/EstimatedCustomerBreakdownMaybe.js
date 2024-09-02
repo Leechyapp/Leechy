@@ -44,6 +44,7 @@ import { getProcess, TX_TRANSITION_ACTOR_CUSTOMER } from '../../transactions/tra
 import { OrderBreakdown } from '../../components';
 
 import css from './OrderPanel.module.css';
+import ClientAccountingUtil from '../../util/client-accounting.util';
 
 const { Money, UUID } = sdkTypes;
 
@@ -90,7 +91,8 @@ const estimatedCustomerTransaction = (
   timeZone,
   process,
   processName,
-  marketplaceCurrency
+  marketplaceCurrency,
+  estimatedTrxProtectedData
 ) => {
   const transitions = process?.transitions;
   const now = new Date();
@@ -103,6 +105,19 @@ const estimatedCustomerTransaction = (
     bookingStart && bookingEnd
       ? { booking: estimatedBooking(bookingStart, bookingEnd, lineItemUnitType, timeZone) }
       : {};
+
+  let protectedData = {};
+  const securityDepositPercentageValue = estimatedTrxProtectedData?.securityDepositPercentageValue;
+  if (securityDepositPercentageValue) {
+    const securityDepositAmounts = ClientAccountingUtil.calculateSecurityDeposit({
+      securityDepositPercentageValue,
+      payinTotal,
+    });
+    protectedData = {
+      ...estimatedTrxProtectedData,
+      ...securityDepositAmounts,
+    };
+  }
 
   return {
     id: new UUID('estimated-transaction'),
@@ -122,6 +137,7 @@ const estimatedCustomerTransaction = (
           transition: transitions.REQUEST_PAYMENT,
         },
       ],
+      protectedData,
     },
     ...bookingMaybe,
   };
@@ -131,6 +147,7 @@ const EstimatedCustomerBreakdownMaybe = props => {
   const {
     breakdownData = {},
     lineItems,
+    estimatedTrxProtectedData,
     timeZone,
     currency,
     marketplaceName,
@@ -168,7 +185,8 @@ const EstimatedCustomerBreakdownMaybe = props => {
           timeZone,
           process,
           processName,
-          currency
+          currency,
+          estimatedTrxProtectedData
         )
       : null;
 
