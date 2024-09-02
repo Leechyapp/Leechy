@@ -479,8 +479,8 @@ export const fetchTransaction = (id, txRole, config) => (dispatch, getState, sdk
 
 const delay = ms => new Promise(resolve => window.setTimeout(resolve, ms));
 const refreshTx = (sdk, txId) => sdk.transactions.show({ id: txId }, { expand: true });
-const refreshTransactionEntity = (sdk, txId, dispatch, delay = 3000) => {
-  delay(delay)
+const refreshTransactionEntity = (sdk, txId, dispatch, delayValue = 3000) => {
+  delay(delayValue)
     .then(() => refreshTx(sdk, txId))
     .then(response => {
       dispatch(addMarketplaceEntities(response));
