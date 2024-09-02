@@ -2,10 +2,8 @@ const SharetribeIntegrationService = require('../services/sharetribe-integration
 const SharetribeService = require('../services/sharetribe.service');
 const { types } = require('sharetribe-flex-sdk');
 const StripeService = require('../services/stripe.service');
-const AccountingUtil = require('../utils/accounting.util');
+const InsuranceMethodEnum = require('../enums/insurance-method.enum');
 const { UUID } = types;
-
-const SECURITY_DEPOSIT_COMMISSION = 0.9;
 
 class SecurityDepositController {
   static chargeSecurityDeposit = async (req, res, next) => {
@@ -16,36 +14,40 @@ class SecurityDepositController {
       const transactionRes = await SharetribeService.showTransaction(req, res, transactionId.uuid);
       const transaction = await transactionRes.data;
       console.log(`transaction`, transaction);
-      const payinTotalAmount = transaction.attributes.payinTotal.amount;
 
-      const securityDepositPercentageValue = await transaction?.attributes?.protectedData
-        ?.securityDepositPercentageValue;
-      const stripeCustomerId = await transaction?.attributes?.metadata?.stripeCustomerId;
-      const stripePaymentMethodId = await transaction?.attributes?.metadata?.stripePaymentMethodId;
+      const insuranceMethod = transaction?.attributes?.protectedData?.insuranceMethod;
+      if (insuranceMethod !== InsuranceMethodEnum.SecurityDeposit) {
+        return res.send('Security deposit was not selected as a rental protection method.');
+      }
 
-      if (securityDepositPercentageValue && stripeCustomerId && stripePaymentMethodId) {
-        const depositAmountUnformatted = payinTotalAmount * (securityDepositPercentageValue / 100);
-        console.log(`depositAmountUnformatted`, depositAmountUnformatted);
-        const depositAmount2Decimals = AccountingUtil.convertToDecimalAmount(
-          depositAmountUnformatted
-        );
-        console.log(`depositAmount2Decimals`, depositAmount2Decimals);
-        const depositAmount = AccountingUtil.roundToStripeInteger(depositAmount2Decimals);
-        console.log(`depositAmount`, depositAmount);
-        const depositTransferAmount = AccountingUtil.roundToStripeInteger(
-          depositAmount * SECURITY_DEPOSIT_COMMISSION
-        );
-        console.log(`depositTransferAmount`, depositTransferAmount);
+      const payinTotal = transaction.attributes.payinTotal;
+      const payinTotalCurrency = payinTotal.currency;
 
+      const securityDepositPercentageValue =
+        transaction?.attributes?.protectedData?.securityDepositPercentageValue;
+      const securityDepositAmount = transaction?.attributes?.protectedData?.securityDepositAmount;
+      const securityDepositTransferAmount =
+        transaction?.attributes?.protectedData?.securityDepositTransferAmount;
+
+      const stripeCustomerId = transaction?.attributes?.metadata?.stripeCustomerId;
+      const stripePaymentMethodId = transaction?.attributes?.metadata?.stripePaymentMethodId;
+
+      if (
+        securityDepositPercentageValue &&
+        securityDepositAmount &&
+        securityDepositTransferAmount &&
+        stripeCustomerId &&
+        stripePaymentMethodId
+      ) {
         const paymentIntentObject = {
-          amount: depositAmount,
-          currency: 'usd',
+          amount: securityDepositAmount,
+          currency: payinTotalCurrency,
           payment_method_types: ['card'],
           customer: stripeCustomerId,
           payment_method: stripePaymentMethodId,
           description: `Security Deposit`,
           transfer_data: {
-            amount: depositTransferAmount,
+            amount: securityDepositTransferAmount,
             destination: stripeAccountId,
           },
           metadata: {
@@ -63,6 +65,8 @@ class SecurityDepositController {
             stripePaymentIntentId: paymentIntent.id,
             stripeChargeId: paymentIntent.latest_charge,
             securityDepositStatus: 'paid',
+            securityDepositAmount,
+            securityDepositTransferAmount,
           },
         });
         console.log(`updatedTransaction`, updatedTransaction);
