@@ -30,6 +30,7 @@ import css from './TransactionPanel.module.css';
 import RefundSecurityDepositButtonMaybe from './RefundSecurityDepositButtonMaybe';
 import ShippingFunctionButtonsMaybe from './ShippingFunctionButtonsMaybe/ShippingFunctionButtonsMaybe';
 import { DeliveryMethodEnum } from '../../../enums/delivery-method-enum';
+import { states } from '../../../transactions/transactionProcessBooking';
 
 // Helper function to get display names for different roles
 const displayNames = (currentUser, provider, customer, intl) => {
@@ -124,6 +125,7 @@ export class TransactionPanelComponent extends Component {
       className,
       currentUser,
       transactionRole,
+      booking,
       listing,
       customer,
       provider,
@@ -147,6 +149,8 @@ export class TransactionPanelComponent extends Component {
       config,
       transactionId,
     } = this.props;
+
+    console.log(`TransactionPanel protectedData`, protectedData);
 
     const isCustomer = transactionRole === 'customer';
     const isProvider = transactionRole === 'provider';
@@ -189,27 +193,33 @@ export class TransactionPanelComponent extends Component {
     const showSendMessageForm =
       !isCustomerBanned && !isCustomerDeleted && !isProviderBanned && !isProviderDeleted;
 
+    const bookingState = booking?.attributes?.state;
     const deliveryMethod = protectedData?.deliveryMethod || 'none';
-    const shippingStatus = protectedData?.shippingStatus;
+    const shippingStatus = metadata?.shippingStatus;
+    const securityDepositStatus = metadata?.securityDepositStatus;
 
+    console.log(`bookingState`, bookingState);
     console.log(`deliveryMethod`, deliveryMethod);
     console.log(`shippingStatus`, shippingStatus);
+    console.log(`securityDepositStatus`, securityDepositStatus);
 
     const classes = classNames(rootClassName || css.root, className);
 
-    const refundSecurityDepositButton = (
+    const refundSecurityDepositButton = securityDepositStatus && (
       <RefundSecurityDepositButtonMaybe
         transactionId={transactionId}
         isProvider={isProvider}
-        securityDepositStatus={metadata?.securityDepositStatus}
+        securityDepositStatus={securityDepositStatus}
         intl={intl}
       />
     );
     const shippingFunctionButton =
-      deliveryMethod === DeliveryMethodEnum.Shipping ? (
+      deliveryMethod === DeliveryMethodEnum.Shipping &&
+      (bookingState === states.ACCEPTED || bookingState === states.DELIVERED) ? (
         <ShippingFunctionButtonsMaybe
           transactionId={transactionId}
           isProvider={isProvider}
+          isCustomer={isCustomer}
           shippingStatus={shippingStatus}
         />
       ) : null;
@@ -405,6 +415,7 @@ TransactionPanelComponent.defaultProps = {
   rootClassName: null,
   className: null,
   currentUser: null,
+  booking: null,
   listing: null,
   customer: null,
   provider: null,
@@ -427,6 +438,7 @@ TransactionPanelComponent.propTypes = {
 
   currentUser: propTypes.currentUser,
   transactionRole: oneOf(['customer', 'provider']).isRequired,
+  booking: propTypes.booking,
   listing: propTypes.listing,
   customer: propTypes.user,
   provider: propTypes.user,
