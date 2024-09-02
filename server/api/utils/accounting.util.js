@@ -1,3 +1,5 @@
+const SECURITY_DEPOSIT_COMMISSION = 0.9;
+
 class AccountingUtil {
   static convertStripeIntegerToMoney(amount) {
     return parseFloat((amount / 100).toFixed(2));
@@ -31,6 +33,27 @@ class AccountingUtil {
     } else {
       return '';
     }
+  }
+
+  static calculateSecurityDeposit(params) {
+    const { securityDepositPercentageValue, payinTotal } = params;
+
+    const payinTotalAmount = payinTotal.amount;
+    const depositAmountUnformatted = payinTotalAmount * (securityDepositPercentageValue / 100);
+    const depositAmount2Decimals = this.convertToDecimalAmount(depositAmountUnformatted);
+    const securityDepositAmount = this.roundToStripeInteger(depositAmount2Decimals);
+    const securityDepositTransferAmount = this.roundToStripeInteger(
+      securityDepositAmount * SECURITY_DEPOSIT_COMMISSION
+    );
+
+    const totalPlusSecurityDepositPrice = payinTotalAmount + securityDepositTransferAmount;
+
+    return {
+      securityDepositPercentageValue,
+      totalPlusSecurityDepositPrice,
+      securityDepositAmount,
+      securityDepositTransferAmount,
+    };
   }
 }
 module.exports = AccountingUtil;
