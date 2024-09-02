@@ -3,6 +3,7 @@ import FieldSelect from '../../FieldSelect/FieldSelect';
 import FieldTextInput from '../../FieldTextInput/FieldTextInput';
 import css from './InsuranceMethodMaybe.module.scss';
 import { required } from '../../../util/validators';
+import { InsuranceMethodEnum } from '../../../enums/insurance-method.enum';
 
 const InsuranceMethodMaybe = props => {
   const { insuranceMethod, hasSecurityDeposit, formId, intl } = props;
@@ -20,10 +21,10 @@ const InsuranceMethodMaybe = props => {
       <option disabled value="">
         {intl.formatMessage({ id: 'InsuranceMethodMaybe.insuranceMethod.placeholder' })}
       </option>
-      <option value={'insurance'}>
+      <option value={InsuranceMethodEnum.Insurance}>
         {intl.formatMessage({ id: 'InsuranceMethodMaybe.insuranceMethod.insurance.option' })}
       </option>
-      <option value={'securityDeposit'}>
+      <option value={InsuranceMethodEnum.SecurityDeposit}>
         {intl.formatMessage({ id: 'InsuranceMethodMaybe.insuranceMethod.securityDeposit.option' })}
       </option>
     </FieldSelect>
