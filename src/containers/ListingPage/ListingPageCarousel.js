@@ -106,6 +106,7 @@ export const ListingPageComponent = props => {
     onFetchTimeSlots,
     onFetchTransactionLineItems,
     lineItems,
+    estimatedTrxProtectedData,
     fetchLineItemsInProgress,
     fetchLineItemsError,
     history,
@@ -198,7 +199,7 @@ export const ListingPageComponent = props => {
   const currentAuthor = authorAvailable ? currentListing.author : null;
   const ensuredAuthor = ensureUser(currentAuthor);
   const noPayoutDetailsSetWithOwnListing =
-    isOwnListing && (processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected);
+    isOwnListing && processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected;
   const payoutDetailsWarning = noPayoutDetailsSetWithOwnListing ? (
     <span className={css.payoutDetailsWarning}>
       <FormattedMessage id="ListingPage.payoutDetailsWarning" values={{ processType }} />
@@ -392,6 +393,7 @@ export const ListingPageComponent = props => {
               onFetchTimeSlots={onFetchTimeSlots}
               onFetchTransactionLineItems={onFetchTransactionLineItems}
               lineItems={lineItems}
+              estimatedTrxProtectedData={estimatedTrxProtectedData}
               fetchLineItemsInProgress={fetchLineItemsInProgress}
               fetchLineItemsError={fetchLineItemsError}
               validListingTypes={config.listing.listingTypes}
@@ -501,6 +503,7 @@ const mapStateToProps = state => {
     sendInquiryInProgress,
     sendInquiryError,
     lineItems,
+    estimatedTrxProtectedData,
     fetchLineItemsInProgress,
     fetchLineItemsError,
     inquiryModalOpenForListingId,
@@ -531,6 +534,7 @@ const mapStateToProps = state => {
     fetchReviewsError,
     monthlyTimeSlots,
     lineItems,
+    estimatedTrxProtectedData,
     fetchLineItemsInProgress,
     fetchLineItemsError,
     sendInquiryInProgress,
@@ -556,11 +560,6 @@ const mapDispatchToProps = dispatch => ({
 // lifecycle hook.
 //
 // See: https://github.com/ReactTraining/react-router/issues/4671
-const ListingPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(EnhancedListingPage);
+const ListingPage = compose(connect(mapStateToProps, mapDispatchToProps))(EnhancedListingPage);
 
 export default ListingPage;
