@@ -34,7 +34,7 @@ import MobileListingImage from './MobileListingImage';
 import MobileOrderBreakdown from './MobileOrderBreakdown';
 
 import css from './CheckoutPage.module.css';
-import { isNumeric } from '../../util/isNumeric.js';
+import { InsuranceMethodEnum } from '../../enums/insurance-method.enum.js';
 
 // Stripe PaymentIntent statuses, where user actions are already completed
 // https://stripe.com/docs/payments/payment-intents/status
@@ -67,7 +67,13 @@ const paymentFlow = (selectedPaymentMethod, saveAfterOnetimePayment) => {
  * @param {Object} config app-wide configs. This contains hosted configs too.
  * @returns orderParams.
  */
-const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config) => {
+const getOrderParams = (
+  pageData,
+  shippingDetails,
+  optionalPaymentParams,
+  config,
+  speculatedTransaction = null
+) => {
   const quantity = pageData.orderData?.quantity;
   const quantityMaybe = quantity ? { quantity } : {};
   const deliveryMethod = pageData.orderData?.deliveryMethod;
@@ -76,11 +82,21 @@ const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config
   const insuranceMethod = pageData.orderData?.insuranceMethod;
   const insuranceMethodMaybe = insuranceMethod ? { insuranceMethod } : {};
 
-  const security_deposit = pageData?.listing?.attributes?.publicData?.security_deposit;
-  const securityDepositPercentageValue = isNumeric(security_deposit)
-    ? parseInt(security_deposit)
-    : null;
-  const securityDepositMaybe = security_deposit ? { securityDepositPercentageValue } : {};
+  let securityDepositMaybe = {};
+  if (speculatedTransaction && insuranceMethod === InsuranceMethodEnum.SecurityDeposit) {
+    const {
+      securityDepositPercentageValue,
+      totalPlusSecurityDepositPrice,
+      securityDepositAmount,
+      securityDepositTransferAmount,
+    } = speculatedTransaction.attributes.protectedData;
+    securityDepositMaybe = {
+      securityDepositPercentageValue,
+      totalPlusSecurityDepositPrice,
+      securityDepositAmount,
+      securityDepositTransferAmount,
+    };
+  }
 
   const { listingType, unitType } = pageData?.listing?.attributes?.publicData || {};
   const protectedDataMaybe = {
@@ -88,8 +104,8 @@ const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config
       ...getTransactionTypeData(listingType, unitType, config),
       ...deliveryMethodMaybe,
       ...shippingDetails,
-      ...securityDepositMaybe,
       ...insuranceMethodMaybe,
+      ...securityDepositMaybe,
     },
   };
 
@@ -103,6 +119,7 @@ const getOrderParams = (pageData, shippingDetails, optionalPaymentParams, config
     ...protectedDataMaybe,
     ...optionalPaymentParams,
     ...insuranceMethodMaybe,
+    ...securityDepositMaybe,
   };
   return orderParams;
 };
@@ -257,7 +274,13 @@ const handleSubmit = (values, process, props, stripe, submitting, setSubmitting)
 
   // These are the order parameters for the first payment-related transition
   // which is either initiate-transition or initiate-transition-after-enquiry
-  const orderParams = getOrderParams(pageData, shippingDetails, optionalPaymentParams, config);
+  const orderParams = getOrderParams(
+    pageData,
+    shippingDetails,
+    optionalPaymentParams,
+    config,
+    speculatedTransaction
+  );
 
   // There are multiple XHR calls that needs to be made against Stripe API and Sharetribe Marketplace API on checkout with payments
   processCheckoutWithPayment(orderParams, requestPaymentParams)
