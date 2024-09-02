@@ -36,6 +36,7 @@ import EstimatedCustomerBreakdownMaybe from '../EstimatedCustomerBreakdownMaybe'
 
 import css from './BookingDatesForm.module.css';
 import InsuranceMethodMaybe from '../InsuranceMethodMaybe/InsuranceMethodMaybe';
+import { InsuranceMethodEnum } from '../../../enums/insurance-method.enum';
 
 const TODAY = new Date();
 
@@ -499,7 +500,7 @@ export const BookingDatesFormComponent = props => {
       {...rest}
       unitPrice={unitPrice}
       onSubmit={onFormSubmit}
-      initialValues={{ deliveryMethod: 'pickup', insuranceMethod: 'insurance' }}
+      initialValues={{ deliveryMethod: 'pickup', insuranceMethod: InsuranceMethodEnum.Insurance }}
       render={fieldRenderProps => {
         const {
           endDatePlaceholder,
@@ -511,6 +512,7 @@ export const BookingDatesFormComponent = props => {
           values,
           monthlyTimeSlots,
           lineItems,
+          estimatedTrxProtectedData,
           fetchLineItemsError,
           onFetchTimeSlots,
         } = fieldRenderProps;
@@ -664,7 +666,9 @@ export const BookingDatesFormComponent = props => {
                   intl={intl}
                 />
                 <InsuranceMethodMaybe
-                  insuranceMethod={values?.insuranceMethod ? values.insuranceMethod : 'insurance'}
+                  insuranceMethod={
+                    values?.insuranceMethod ? values.insuranceMethod : InsuranceMethodEnum.Insurance
+                  }
                   hasSecurityDeposit={listing?.attributes?.publicData?.security_deposit}
                   formId={formId}
                   intl={intl}
@@ -680,6 +684,7 @@ export const BookingDatesFormComponent = props => {
                 <EstimatedCustomerBreakdownMaybe
                   breakdownData={breakdownData}
                   lineItems={lineItems}
+                  estimatedTrxProtectedData={estimatedTrxProtectedData}
                   timeZone={timeZone}
                   currency={unitPrice.currency}
                   marketplaceName={marketplaceName}
