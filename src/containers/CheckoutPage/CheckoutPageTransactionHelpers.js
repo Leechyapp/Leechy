@@ -196,6 +196,19 @@ export const processCheckoutWithPayment = (orderParams, extraPaymentParams) => {
     stripePaymentMethodId,
   } = extraPaymentParams;
   const storedTx = ensureTransaction(pageData.transaction);
+  const {
+    securityDepositPercentageValue,
+    totalPlusSecurityDepositPrice,
+    securityDepositAmount,
+    securityDepositTransferAmount,
+  } = orderParams;
+  storedTx.attributes.protectedData = {
+    ...storedTx.attributes.protectedData,
+    securityDepositPercentageValue,
+    totalPlusSecurityDepositPrice,
+    securityDepositAmount,
+    securityDepositTransferAmount,
+  };
 
   const ensuredStripeCustomer = ensureStripeCustomer(stripeCustomer);
   const processAlias = pageData?.listing?.attributes?.publicData?.transactionProcessAlias;
