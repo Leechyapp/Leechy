@@ -177,6 +177,7 @@ const OrderPanel = props => {
     onFetchTransactionLineItems,
     onContactUser,
     lineItems,
+    estimatedTrxProtectedData,
     marketplaceCurrency,
     dayCountAvailableForBooking,
     marketplaceName,
@@ -340,6 +341,7 @@ const OrderPanel = props => {
             marketplaceName={marketplaceName}
             onFetchTransactionLineItems={onFetchTransactionLineItems}
             lineItems={lineItems}
+            estimatedTrxProtectedData={estimatedTrxProtectedData}
             fetchLineItemsInProgress={fetchLineItemsInProgress}
             fetchLineItemsError={fetchLineItemsError}
             payoutDetailsWarning={payoutDetailsWarning}
@@ -426,6 +428,7 @@ OrderPanel.defaultProps = {
   subTitle: null,
   monthlyTimeSlots: null,
   lineItems: null,
+  estimatedTrxProtectedData: null,
   fetchLineItemsError: null,
 };
 
@@ -459,6 +462,7 @@ OrderPanel.propTypes = {
   onFetchTransactionLineItems: func.isRequired,
   onContactUser: func,
   lineItems: array,
+  estimatedTrxProtectedData: object,
   fetchLineItemsInProgress: bool.isRequired,
   fetchLineItemsError: propTypes.error,
   marketplaceCurrency: string.isRequired,
