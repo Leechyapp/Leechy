@@ -20,6 +20,7 @@ import {
 
 import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { fetchCurrentUserNotifications } from '../../ducks/user.duck';
+import { transitions } from '../../transactions/transactionProcessBooking';
 
 const { UUID } = sdkTypes;
 
@@ -478,8 +479,8 @@ export const fetchTransaction = (id, txRole, config) => (dispatch, getState, sdk
 
 const delay = ms => new Promise(resolve => window.setTimeout(resolve, ms));
 const refreshTx = (sdk, txId) => sdk.transactions.show({ id: txId }, { expand: true });
-const refreshTransactionEntity = (sdk, txId, dispatch) => {
-  delay(3000)
+const refreshTransactionEntity = (sdk, txId, dispatch, delay = 3000) => {
+  delay(delay)
     .then(() => refreshTx(sdk, txId))
     .then(response => {
       dispatch(addMarketplaceEntities(response));
@@ -522,44 +523,44 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
   }
   dispatch(transitionRequest(transitionName));
 
-  return sdk.transactions
-    .transition({ id: txId, transition: transitionName, params }, { expand: true })
-    .then(response => {
-      dispatch(addMarketplaceEntities(response));
-      dispatch(transitionSuccess());
-      dispatch(fetchCurrentUserNotifications());
+  const onMakeTransition = () => {
+    return sdk.transactions
+      .transition({ id: txId, transition: transitionName, params }, { expand: true })
+      .then(response => {
+        dispatch(addMarketplaceEntities(response));
+        dispatch(transitionSuccess());
+        dispatch(fetchCurrentUserNotifications());
 
-      // There could be automatic transitions after this transition
-      // For example mark-received-from-purchased > auto-complete.
-      // Here, we make 1-2 delayed updates for the tx entity.
-      // This way "leave a review" link should show up for the customer.
-      refreshTransactionEntity(sdk, txId, dispatch);
+        // There could be automatic transitions after this transition
+        // For example mark-received-from-purchased > auto-complete.
+        // Here, we make 1-2 delayed updates for the tx entity.
+        // This way "leave a review" link should show up for the customer.
+        refreshTransactionEntity(sdk, txId, dispatch);
 
-      return response;
-    })
-    .then(response => {
-      if (transitionName === 'transition/accept') {
-        return chargeSecurityDeposit({ transactionId: txId })
-          .then(() => {
-            refreshTransactionEntity(sdk, txId, dispatch);
-            return response;
-          })
-          .catch(e => {
-            log.error(storableError(e), 'charge-security-deposit-failed');
-            return response;
-          });
-      } else {
         return response;
-      }
-    })
-    .catch(e => {
-      dispatch(transitionError(storableError(e)));
-      log.error(e, `${transitionName}-failed`, {
-        txId,
-        transition: transitionName,
+      })
+      .catch(e => {
+        dispatch(transitionError(storableError(e)));
+        log.error(e, `${transitionName}-failed`, {
+          txId,
+          transition: transitionName,
+        });
+        throw e;
       });
-      throw e;
-    });
+  };
+
+  if (transitionName === transitions.ACCEPT) {
+    return chargeSecurityDeposit({ transactionId: txId })
+      .then(() => {
+        return onMakeTransition();
+      })
+      .catch(e => {
+        log.error(storableError(e), 'charge-security-deposit-failed');
+        return onMakeTransition();
+      });
+  } else {
+    return onMakeTransition();
+  }
 };
 
 const fetchMessages = (txId, page, config) => (dispatch, getState, sdk) => {
