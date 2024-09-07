@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { FormattedMessage } from '../../../../util/reactIntl';
 import css from './FileDropzone.module.scss';
-import { MIME_TYPE_JPG, MIME_TYPE_PNG } from '../../../../util/types';
+import { FormattedMessage } from 'react-intl';
+import { MIME_TYPE_JPG, MIME_TYPE_PNG } from '../../util/types';
 
 const MAX_SIZE = 5242880;
 const MAX_FILES = 5;
