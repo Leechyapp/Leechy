@@ -30,7 +30,7 @@ import css from './TransactionPanel.module.css';
 import RefundSecurityDepositButtonMaybe from './RefundSecurityDepositButtonMaybe';
 import ShippingFunctionButtonsMaybe from './ShippingFunctionButtonsMaybe/ShippingFunctionButtonsMaybe';
 import { DeliveryMethodEnum } from '../../../enums/delivery-method-enum';
-import { states } from '../../../transactions/transactionProcessBooking';
+import { states, transitions } from '../../../transactions/transactionProcessBooking';
 
 // Helper function to get display names for different roles
 const displayNames = (currentUser, provider, customer, intl) => {
@@ -125,6 +125,7 @@ export class TransactionPanelComponent extends Component {
       className,
       currentUser,
       transactionRole,
+      lastTransition,
       booking,
       listing,
       customer,
@@ -193,12 +194,10 @@ export class TransactionPanelComponent extends Component {
     const showSendMessageForm =
       !isCustomerBanned && !isCustomerDeleted && !isProviderBanned && !isProviderDeleted;
 
-    const bookingState = booking?.attributes?.state;
     const deliveryMethod = protectedData?.deliveryMethod || 'none';
     const shippingStatus = metadata?.shippingStatus;
     const securityDepositStatus = metadata?.securityDepositStatus;
 
-    console.log(`bookingState`, bookingState);
     console.log(`deliveryMethod`, deliveryMethod);
     console.log(`shippingStatus`, shippingStatus);
     console.log(`securityDepositStatus`, securityDepositStatus);
@@ -213,9 +212,21 @@ export class TransactionPanelComponent extends Component {
         intl={intl}
       />
     );
+
+    const isValidShippingTransition =
+      lastTransition === transitions.ACCEPT ||
+      lastTransition === transitions.COMPLETE ||
+      lastTransition === transitions.OPERATOR_COMPLETE ||
+      lastTransition === transitions.REVIEW_1_BY_PROVIDER ||
+      lastTransition === transitions.REVIEW_2_BY_PROVIDER ||
+      lastTransition === transitions.REVIEW_1_BY_CUSTOMER ||
+      lastTransition === transitions.REVIEW_2_BY_CUSTOMER ||
+      lastTransition === transitions.EXPIRE_CUSTOMER_REVIEW_PERIOD ||
+      lastTransition === transitions.EXPIRE_PROVIDER_REVIEW_PERIOD ||
+      lastTransition === transitions.EXPIRE_REVIEW_PERIOD;
+
     const shippingFunctionButton =
-      deliveryMethod === DeliveryMethodEnum.Shipping &&
-      (bookingState === states.ACCEPTED || bookingState === states.DELIVERED) ? (
+      deliveryMethod === DeliveryMethodEnum.Shipping && isValidShippingTransition ? (
         <ShippingFunctionButtonsMaybe
           transactionId={transactionId}
           isProvider={isProvider}
