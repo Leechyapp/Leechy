@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import FileDropzone from '../FileDropzone/FileDropzone';
 import css from './ShippingFunctionsForm.module.scss';
 import FileAttachmentsWrapper from '../FileAttachmentsWrapper/FileAttachmentsWrapper';
