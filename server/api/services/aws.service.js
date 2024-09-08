@@ -10,8 +10,7 @@ class AwsService {
       Bucket: process.env.AWS_BUCKET,
       Key: filename,
     });
-    // return await getSignedUrl(s3, command, { expiresIn: URL_EXPIRATION_TIME });
-    return {};
+    return await getSignedUrl(s3, command, { expiresIn: URL_EXPIRATION_TIME });
   }
 }
 module.exports = AwsService;

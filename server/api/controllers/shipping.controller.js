@@ -32,11 +32,10 @@ class ShippingController {
           break;
       }
 
-      if (message) {
-        await SharetribeService.sendMessage(req, res, transactionId, message);
-      }
+      const messageRes = await SharetribeService.sendMessage(req, res, transactionId, message);
+      const messageId = messageRes.data.id.uuid;
 
-      res.send('Shipping status updated');
+      res.send({ messageId });
     } catch (error) {
       next(error);
     }

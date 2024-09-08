@@ -1,4 +1,5 @@
 @import '../../../styles/customMediaQueries.css';
+@import '../../../styles/gridDefaults.scss';
 
 .root {
   /* Clearfix */
@@ -178,4 +179,27 @@
 }
 
 .showOlderButton {
+}
+
+.messageImageWrapper {
+  composes: row;
+  max-width: 566px;
+
+  .image {
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+    border-radius: 6px;
+  }
+}
+
+.carouselModalScrollLayer {
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(1, 1, 1, 0.92);
+}
+
+.carouselModalContainer {
+  width: 100%;
+  height: 100%;
 }

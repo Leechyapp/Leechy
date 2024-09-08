@@ -6,9 +6,10 @@ import { FormattedMessage } from 'react-intl';
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ShippingStatusEnum } from '../../../../enums/shipping-status-enum';
-import { onRefreshTransactionEntity } from '../../TransactionPage.duck';
-import { updateShippingStatus } from '../../../../util/api';
+import { loadFilesAndMessages, onRefreshTransactionEntity } from '../../TransactionPage.duck';
+import { saveMessageFiles, updateShippingStatus } from '../../../../util/api';
 import { TransactionRoleEnum } from '../../../../enums/transaction-role.enum';
+import ShippingFunctionsForm from '../../../../components/ShippingFunctionsForm/ShippingFunctionsForm';
 
 const ShippingFunctionButtonsMaybe = props => {
   const { transactionId, isProvider, isCustomer, shippingStatus: currentShippingStatus } = props;
@@ -27,6 +28,8 @@ const ShippingFunctionButtonsMaybe = props => {
   const [shippingFunctionRole, setShippingFunctionRole] = useState();
   const [nextTransition, setNextTransition] = useState();
   const [nextTransitionButton, setNextTransitionButton] = useState();
+
+  const [fileAttachments, setFileAttachments] = useState(new Array());
 
   useEffect(() => {
     let role;
@@ -67,12 +70,32 @@ const ShippingFunctionButtonsMaybe = props => {
   const onShippingFunctionTransition = () => {
     if (nextTransition) {
       setShippingFunctionInProgress(true);
-      updateShippingStatus({ transactionId: transactionId.uuid, nextTransition })
+      updateShippingStatus({ transactionId, nextTransition })
         .then(res => {
-          setShippingFunctionInProgress(false);
+          const messageId = res.messageId;
           // dispatch(onRefreshTransactionEntity(transactionId));
-          console.log(`updateShippingStatus`, res);
-          location.reload();
+          // console.log(`updateShippingStatus`, res);
+          // location.reload();
+          const formData = new FormData();
+          for (let i = 0; i < fileAttachments.length; i++) {
+            formData.append('uploads[]', fileAttachments[i]);
+          }
+          formData.append('transactionId', transactionId);
+          formData.append('messageId', messageId);
+
+          saveMessageFiles(formData)
+            .then(uploadedFile => {
+              dispatch(loadFilesAndMessages({ id: transactionId, uploadedFile })).then(() => {
+                setFileAttachments({ fileAttachments: new Array() });
+                setShippingFunctionModalOpen(false);
+                setShippingFunctionInProgress(false);
+                // location.reload();
+              });
+            })
+            .catch(error => {
+              console.error(error);
+              setShippingFunctionInProgress(false);
+            });
         })
         .catch(err => {
           setShippingFunctionInProgress(false);
@@ -124,24 +147,39 @@ const ShippingFunctionButtonsMaybe = props => {
           usePortal={true}
           onManageDisableScrolling={onManageDisableScrolling}
         >
-          <h4>
-            <FormattedMessage
-              id={`ShippingFunctionButtonsMaybe.shippingFunctionModal.title.${nextTransitionButton}`}
-            />
-          </h4>
-          <p>
-            <FormattedMessage
-              id={`ShippingFunctionButtonsMaybe.shippingFunctionModal.message.${nextTransitionButton}`}
-            />
-          </p>
-          <br />
-          <PrimaryButton
-            inProgress={shippingFunctionInProgress}
-            onClick={() => onShippingFunctionTransition()}
-            type="button"
-          >
-            <FormattedMessage id="ShippingFunctionButtonsMaybe.shippingFunctionModal.submit" />
-          </PrimaryButton>
+          <div className={css.rowUnsetMarginLR}>
+            <div className={css.col12}>
+              <h4>
+                <FormattedMessage
+                  id={`ShippingFunctionButtonsMaybe.shippingFunctionModal.title.${nextTransitionButton}`}
+                />
+              </h4>
+            </div>
+            <div className={css.col12}>
+              <p className={css.shippingFunctionsMessage}>
+                <FormattedMessage
+                  id={`ShippingFunctionButtonsMaybe.shippingFunctionModal.message.${nextTransitionButton}`}
+                />
+              </p>
+            </div>
+            <div className={css.col12}>
+              <div className={css.shippingFunctionsForm}>
+                <ShippingFunctionsForm
+                  fileAttachments={fileAttachments}
+                  setFileAttachments={setFileAttachments}
+                />
+              </div>
+            </div>
+            <br />
+            <PrimaryButton
+              className={css.shippingFunctionModalButton}
+              inProgress={shippingFunctionInProgress}
+              onClick={() => onShippingFunctionTransition()}
+              type="button"
+            >
+              <FormattedMessage id="ShippingFunctionButtonsMaybe.shippingFunctionModal.submit" />
+            </PrimaryButton>
+          </div>
         </Modal>
       </div>
     )

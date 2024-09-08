@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { string, arrayOf, bool, func, number, object } from 'prop-types';
 import dropWhile from 'lodash/dropWhile';
 import classNames from 'classnames';
@@ -14,11 +14,20 @@ import {
   TX_TRANSITION_ACTOR_SYSTEM,
 } from '../../../transactions/transaction';
 
-import { Avatar, InlineTextButton, ReviewRating, UserDisplayName } from '../../../components';
+import {
+  Avatar,
+  InlineTextButton,
+  Modal,
+  ReviewRating,
+  UserDisplayName,
+} from '../../../components';
 
 import { stateDataShape } from '../TransactionPage.stateData';
 
-import css from './ActivityFeed.module.css';
+import css from './ActivityFeed.module.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import { manageDisableScrolling } from '../../../ducks/ui.duck';
+import ImageCarousel from '../../ListingPage/ImageCarousel/ImageCarousel';
 
 const Message = props => {
   const { message, formattedDate } = props;
@@ -198,8 +207,12 @@ export const ActivityFeedComponent = props => {
     onShowOlderMessages,
     intl,
   } = props;
+  const [carouselOpen, setCarouselOpen] = useState(false);
+
   const classes = classNames(rootClassName || css.root, className);
   const processName = stateData.processName;
+  const { files } = useSelector(state => state.TransactionPage);
+  console.log(`files`, files);
 
   // If stateData doesn't have processName, full tx data has not been fetched.
   if (!processName) {
@@ -216,7 +229,38 @@ export const ActivityFeedComponent = props => {
   const hideOldTransitions = hasOlderMessages || fetchMessagesInProgress;
   const items = organizedItems(messages, relevantTransitions, hideOldTransitions);
 
+  const [carouselImages, setCarouselImages] = useState([]);
+  const carouselVariants = ['scaled-xlarge'];
+  const structureCarouselImages = images => {
+    const structuredImages = [];
+    for (let i = 0; i < images.length; i++) {
+      images[i];
+      structuredImages.push({
+        attributes: {
+          variants: {
+            'scaled-xlarge': {
+              height: 1799,
+              name: 'scaled-xlarge',
+              url: images[i].url,
+              width: 2400,
+            },
+          },
+        },
+      });
+    }
+    setCarouselImages(structuredImages);
+    return structuredImages;
+  };
+
+  const handleCarouselOpen = images => {
+    structureCarouselImages(images);
+    setCarouselOpen(true);
+  };
+
   const messageListItem = message => {
+    const imageAttachments = files?.[message.id.uuid];
+    console.log(`imageAttachments`, imageAttachments);
+
     const formattedDate = formatDateWithProximity(message.attributes.createdAt, intl, todayString);
     const isOwnMessage = currentUser?.id && message?.sender?.id?.uuid === currentUser.id?.uuid;
     const messageComponent = isOwnMessage ? (
@@ -227,7 +271,21 @@ export const ActivityFeedComponent = props => {
 
     return (
       <li id={`msg-${message.id.uuid}`} key={message.id.uuid} className={css.messageItem}>
-        {messageComponent}
+        <div className={css.row}>
+          <div className={css.col12}>{messageComponent}</div>
+        </div>
+        {imageAttachments && imageAttachments.length > 0 && (
+          <div className={css.messageImageWrapper} style={isOwnMessage ? { float: 'right' } : null}>
+            <br />
+            {imageAttachments.map(file => {
+              return (
+                <a onClick={() => handleCarouselOpen(imageAttachments)}>
+                  <img className={css.image} src={file.url} />
+                </a>
+              );
+            })}
+          </div>
+        )}
       </li>
     );
   };
@@ -291,6 +349,11 @@ export const ActivityFeedComponent = props => {
     );
   };
 
+  const dispatch = useDispatch();
+  const onManageDisableScrolling = (componentId, disableScrolling) => {
+    dispatch(manageDisableScrolling(componentId, disableScrolling));
+  };
+
   return (
     <ul className={classes}>
       {hasOlderMessages ? (
@@ -307,6 +370,18 @@ export const ActivityFeedComponent = props => {
           return transitionListItem(item);
         }
       })}
+      <Modal
+        id="ListingPage.imageCarousel"
+        scrollLayerClassName={css.carouselModalScrollLayer}
+        containerClassName={css.carouselModalContainer}
+        lightCloseButton
+        isOpen={carouselOpen}
+        onClose={() => setCarouselOpen(false)}
+        usePortal
+        onManageDisableScrolling={onManageDisableScrolling}
+      >
+        <ImageCarousel images={carouselImages} imageVariants={carouselVariants} />
+      </Modal>
     </ul>
   );
 };

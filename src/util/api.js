@@ -2,6 +2,7 @@
 // so, they are not directly calling Marketplace API or Integration API.
 // You can find these api endpoints from 'server/api/...' directory
 
+import axios from 'axios';
 import appSettings from '../config/settings';
 import { types as sdkTypes, transit } from './sdkLoader';
 import Decimal from 'decimal.js';
@@ -100,6 +101,27 @@ const post = (path, body, options = {}) => {
   return request(path, requestOptions);
 };
 
+const postUploadFiles = (path, body) => {
+  const url = `${apiBaseUrl()}${path}`;
+  const options = {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/transit+json',
+    },
+    body: serialize(body),
+  };
+
+  return axios
+    .post(url, body, options)
+    .then(res => {
+      return res.data;
+    })
+    .catch(error => {
+      console.log(error);
+      return {};
+    });
+};
+
 // Fetch transaction line items from the local API endpoint.
 //
 // See `server/api/transaction-line-items.js` to see what data should
@@ -176,7 +198,7 @@ export const fetchMessageFiles = body => {
   return post('/api/message/fetch-files', body);
 };
 export const saveMessageFiles = body => {
-  return post('/api/message/save-files', body);
+  return postUploadFiles('/api/message/save-files', body);
 };
 
 export const updateShippingStatus = body => {

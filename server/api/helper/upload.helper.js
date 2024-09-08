@@ -16,11 +16,8 @@ const upload = multer({
       });
     },
     key: (req, file, cb) => {
-      switch (file.mimetype) {
-        default:
-          cb(null, uuid() + '.jpeg');
-          break;
-      }
+      const filename = uuid() + '.jpeg';
+      cb(null, filename);
     },
   }),
 }).array('uploads[]', 5);

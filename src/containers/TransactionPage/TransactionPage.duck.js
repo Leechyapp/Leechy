@@ -482,10 +482,10 @@ const refreshTx = (sdk, txId) => sdk.transactions.show({ id: txId }, { expand: t
 const refreshTransactionEntity = (sdk, txId, dispatch, delayValue = 3000) => {
   delay(delayValue)
     .then(() => refreshTx(sdk, txId))
-    .then(response => {
+    .then(async response => {
       dispatch(addMarketplaceEntities(response));
-      const transactionId = response.data.data.id.uuid;
-      fetchMessageFiles({ transactionId })
+      const transactionId = response.data.data.id;
+      return await fetchMessageFiles({ transactionId })
         .then(files => {
           dispatch(fetchFilesSuccess(files));
           return response;
@@ -749,6 +749,18 @@ export const loadFilesAndMessages = params => dispatch => {
   return Promise.all([dispatch(updateFilesSuccess({ file: uploadedFile }))]);
 };
 
+export const loadFileAttachments = txId => dispatch => {
+  return fetchMessageFiles({ transactionId: txId })
+    .then(files => {
+      dispatch(fetchFilesSuccess(files));
+      return files;
+    })
+    .catch(err => {
+      console.error(err);
+      return err;
+    });
+};
+
 // loadData is a collection of async calls that need to be made
 // before page has all the info it needs to render itself
 export const loadData = (params, search, config) => (dispatch, getState) => {
@@ -768,5 +780,6 @@ export const loadData = (params, search, config) => (dispatch, getState) => {
     dispatch(fetchTransaction(txId, txRole, config)),
     dispatch(fetchMessages(txId, 1, config)),
     dispatch(fetchNextTransitions(txId)),
+    dispatch(loadFileAttachments(txId)),
   ]);
 };

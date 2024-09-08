@@ -338,6 +338,8 @@
   "FieldReviewRating.star3": "OK - 3 stars",
   "FieldReviewRating.star4": "Good - 4 stars",
   "FieldReviewRating.star5": "Awesome - 5 stars",
+  "FileDropzone.dragAndDropFiles": "Drag n Drop photos here",
+  "FileDropzone.fileTypes": ".JPG or .PNG. Max. 20 MB",
   "FilterComponent.categoryLabel": "Category",
   "FilterComponent.datesLabel": "Dates",
   "FilterComponent.keywordsLabel": "Keywords",
