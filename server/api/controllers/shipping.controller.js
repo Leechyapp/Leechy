@@ -7,7 +7,8 @@ const { UUID } = types;
 class ShippingController {
   static async updateShippingStatus(req, res, next) {
     try {
-      const { transactionId, nextTransition } = req.body;
+      const { nextTransition } = req.body;
+      const transactionId = req.body.transactionId.uuid;
       console.log(`transactionId`, transactionId);
       const updatedTransaction = await SharetribeIntegrationService.updateMetadata({
         id: new UUID(transactionId),

@@ -18,5 +18,17 @@ class SharetribeIntegrationService {
         return error;
       });
   }
+
+  static async showTransaction(params) {
+    return await integrationSdk.transactions
+      .show(params)
+      .then(res => {
+        return res;
+      })
+      .catch(error => {
+        console.error(error);
+        return error;
+      });
+  }
 }
 module.exports = SharetribeIntegrationService;

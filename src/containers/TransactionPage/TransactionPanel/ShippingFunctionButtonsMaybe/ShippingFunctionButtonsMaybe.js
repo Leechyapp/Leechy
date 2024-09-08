@@ -35,33 +35,36 @@ const ShippingFunctionButtonsMaybe = props => {
     let role;
     let transition;
     let transitionButton;
-    switch (currentShippingStatus) {
-      case ShippingStatusEnum.ItemShippingNotStarted:
-      case undefined:
-      case null:
-        role = TransactionRoleEnum.Provider;
-        transition = ShippingStatusEnum.ItemShipped;
-        transitionButton = 'markItemShipped';
-        break;
-      case ShippingStatusEnum.ItemShipped:
-        role = TransactionRoleEnum.Customer;
-        transition = ShippingStatusEnum.ItemReceived;
-        transitionButton = 'markItemReceived';
-        break;
-      case ShippingStatusEnum.ItemReceived:
-        role = TransactionRoleEnum.Customer;
-        transition = ShippingStatusEnum.ItemReturnShipped;
-        transitionButton = 'markItemReturnShipped';
-        break;
-      case ShippingStatusEnum.ItemReturnShipped:
-        role = TransactionRoleEnum.Provider;
-        transition = ShippingStatusEnum.ItemReturnReceived;
-        transitionButton = 'markItemReceivedShipped';
-        break;
-      case ShippingStatusEnum.ItemReturnReceived:
-        transition = ShippingStatusEnum.TransactionCompleted;
-        break;
-    }
+    // switch (currentShippingStatus) {
+    //   case ShippingStatusEnum.ItemShippingNotStarted:
+    //   case undefined:
+    //   case null:
+    //     role = TransactionRoleEnum.Provider;
+    //     transition = ShippingStatusEnum.ItemShipped;
+    //     transitionButton = 'markItemShipped';
+    //     break;
+    //   case ShippingStatusEnum.ItemShipped:
+    //     role = TransactionRoleEnum.Customer;
+    //     transition = ShippingStatusEnum.ItemReceived;
+    //     transitionButton = 'markItemReceived';
+    //     break;
+    //   case ShippingStatusEnum.ItemReceived:
+    //     role = TransactionRoleEnum.Customer;
+    //     transition = ShippingStatusEnum.ItemReturnShipped;
+    //     transitionButton = 'markItemReturnShipped';
+    //     break;
+    //   case ShippingStatusEnum.ItemReturnShipped:
+    //     role = TransactionRoleEnum.Provider;
+    //     transition = ShippingStatusEnum.ItemReturnReceived;
+    //     transitionButton = 'markItemReceivedShipped';
+    //     break;
+    //   case ShippingStatusEnum.ItemReturnReceived:
+    //     transition = ShippingStatusEnum.TransactionCompleted;
+    //     break;
+    // }
+    role = TransactionRoleEnum.Provider;
+    transition = ShippingStatusEnum.ItemReturnReceived;
+    transitionButton = 'markItemReceivedShipped';
     setShippingFunctionRole(role);
     setNextTransition(transition);
     setNextTransitionButton(transitionButton);
@@ -76,21 +79,25 @@ const ShippingFunctionButtonsMaybe = props => {
           // dispatch(onRefreshTransactionEntity(transactionId));
           // console.log(`updateShippingStatus`, res);
           // location.reload();
+          const transactionIdUUID = transactionId.uuid;
+
           const formData = new FormData();
           for (let i = 0; i < fileAttachments.length; i++) {
             formData.append('uploads[]', fileAttachments[i]);
           }
-          formData.append('transactionId', transactionId);
+          formData.append('transactionId', transactionIdUUID);
           formData.append('messageId', messageId);
 
           saveMessageFiles(formData)
             .then(uploadedFile => {
-              dispatch(loadFilesAndMessages({ id: transactionId, uploadedFile })).then(() => {
-                setFileAttachments({ fileAttachments: new Array() });
-                setShippingFunctionModalOpen(false);
-                setShippingFunctionInProgress(false);
-                // location.reload();
-              });
+              dispatch(loadFilesAndMessages({ id: transactionIdUUID, uploadedFile })).then(
+                files => {
+                  setFileAttachments(files);
+                  setShippingFunctionModalOpen(false);
+                  setShippingFunctionInProgress(false);
+                  // location.reload();
+                }
+              );
             })
             .catch(error => {
               console.error(error);
