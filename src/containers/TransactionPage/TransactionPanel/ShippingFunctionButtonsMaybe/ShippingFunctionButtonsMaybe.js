@@ -35,39 +35,33 @@ const ShippingFunctionButtonsMaybe = props => {
     let role;
     let transition;
     let transitionButton;
-    // switch (currentShippingStatus) {
-    //   case ShippingStatusEnum.ItemShippingNotStarted:
-    //   case undefined:
-    //   case null:
-    //     role = TransactionRoleEnum.Provider;
-    //     transition = ShippingStatusEnum.ItemShipped;
-    //     transitionButton = 'markItemShipped';
-    //     break;
-    //   case ShippingStatusEnum.ItemShipped:
-    //     role = TransactionRoleEnum.Customer;
-    //     transition = ShippingStatusEnum.ItemReceived;
-    //     transitionButton = 'markItemReceived';
-    //     break;
-    //   case ShippingStatusEnum.ItemReceived:
-    //     role = TransactionRoleEnum.Customer;
-    //     transition = ShippingStatusEnum.ItemReturnShipped;
-    //     transitionButton = 'markItemReturnShipped';
-    //     break;
-    //   case ShippingStatusEnum.ItemReturnShipped:
-    //     role = TransactionRoleEnum.Provider;
-    //     transition = ShippingStatusEnum.ItemReturnReceived;
-    //     transitionButton = 'markItemReceivedShipped';
-    //     break;
-    //   case ShippingStatusEnum.ItemReturnReceived:
-    //     transition = ShippingStatusEnum.TransactionCompleted;
-    //     break;
-    // }
-    role = TransactionRoleEnum.Provider;
-    transition = ShippingStatusEnum.ItemReturnReceived;
-    transitionButton = 'markItemReceivedShipped';
-    setShippingFunctionRole(role);
-    setNextTransition(transition);
-    setNextTransitionButton(transitionButton);
+    switch (currentShippingStatus) {
+      case ShippingStatusEnum.ItemShippingNotStarted:
+      case undefined:
+      case null:
+        role = TransactionRoleEnum.Provider;
+        transition = ShippingStatusEnum.ItemShipped;
+        transitionButton = 'markItemShipped';
+        break;
+      case ShippingStatusEnum.ItemShipped:
+        role = TransactionRoleEnum.Customer;
+        transition = ShippingStatusEnum.ItemReceived;
+        transitionButton = 'markItemReceived';
+        break;
+      case ShippingStatusEnum.ItemReceived:
+        role = TransactionRoleEnum.Customer;
+        transition = ShippingStatusEnum.ItemReturnShipped;
+        transitionButton = 'markItemReturnShipped';
+        break;
+      case ShippingStatusEnum.ItemReturnShipped:
+        role = TransactionRoleEnum.Provider;
+        transition = ShippingStatusEnum.ItemReturnReceived;
+        transitionButton = 'markItemReceivedShipped';
+        break;
+      case ShippingStatusEnum.ItemReturnReceived:
+        transition = ShippingStatusEnum.TransactionCompleted;
+        break;
+    }
   }, [currentShippingStatus]);
 
   const onShippingFunctionTransition = () => {
