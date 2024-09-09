@@ -62,6 +62,12 @@ const ShippingFunctionButtonsMaybe = props => {
         transition = ShippingStatusEnum.TransactionCompleted;
         break;
     }
+    // role = TransactionRoleEnum.Provider;
+    // transition = ShippingStatusEnum.ItemReturnReceived;
+    // transitionButton = 'markItemReceivedShipped';
+    setShippingFunctionRole(role);
+    setNextTransition(transition);
+    setNextTransitionButton(transitionButton);
   }, [currentShippingStatus]);
 
   const onShippingFunctionTransition = () => {
@@ -72,7 +78,6 @@ const ShippingFunctionButtonsMaybe = props => {
           const messageId = res.messageId;
           // dispatch(onRefreshTransactionEntity(transactionId));
           // console.log(`updateShippingStatus`, res);
-          // location.reload();
           const transactionIdUUID = transactionId.uuid;
 
           const formData = new FormData();
@@ -86,10 +91,10 @@ const ShippingFunctionButtonsMaybe = props => {
             .then(uploadedFile => {
               dispatch(loadFilesAndMessages({ id: transactionIdUUID, uploadedFile })).then(
                 files => {
-                  setFileAttachments(files);
-                  setShippingFunctionModalOpen(false);
-                  setShippingFunctionInProgress(false);
-                  // location.reload();
+                  // setFileAttachments(files);
+                  // setShippingFunctionModalOpen(false);
+                  // setShippingFunctionInProgress(false);
+                  location.reload();
                 }
               );
             })
