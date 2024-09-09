@@ -60,7 +60,7 @@ class MessageController {
       }
       console.log(`Save fileAttachments (2)`, fileAttachments);
 
-      return { files: fileAttachments };
+      res.send(fileAttachments);
     } catch (error) {
       next(error);
     }
