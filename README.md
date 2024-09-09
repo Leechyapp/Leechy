@@ -93,6 +93,8 @@ git push heroku main
 
 ```
 
+trigger deploy
+
 ## Documentation
 
 See the Sharetribe Developer Docs: [sharetribe.com/docs/](https://www.sharetribe.com/docs/)
