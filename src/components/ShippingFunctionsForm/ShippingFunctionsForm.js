@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FileDropzone from '../FileDropzone/FileDropzone';
 import css from './ShippingFunctionsForm.module.scss';
 import FileAttachmentsWrapper from '../FileAttachmentsWrapper/FileAttachmentsWrapper';
 
 const ShippingFunctionsForm = props => {
   const { fileAttachments, setFileAttachments } = props;
-  const [showUploadFilesModal, setShowUploadFilesModal] = useState(false);
 
-  const onShowUploadFilesModal = show => {
-    setShowUploadFilesModal(show);
-  };
+  const onShowUploadFilesModal = show => {};
 
   const onDeleteFile = index => {
     const fileAttachmentsUpdated =
