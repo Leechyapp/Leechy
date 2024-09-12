@@ -1,5 +1,6 @@
 import { CapacitorConfig } from '@capacitor/cli';
 import { CapcaitorEnv } from './capacitor.env';
+/// <reference types="@capacitor/splash-screen" />
 
 let serverConfig: CapacitorConfig['server'];
 
@@ -38,7 +39,25 @@ const config: CapacitorConfig = {
   appName: CapcaitorEnv.REACT_CAPACITOR_APP_NAME,
   webDir: 'www',
   bundledWebRuntime: false,
-  server: serverConfig
+  server: serverConfig,
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 3000,
+      launchAutoHide: true,
+      launchFadeOutDuration: 3000,
+      backgroundColor: "#ffffffff",
+      androidSplashResourceName: "splash",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: true,
+      androidSpinnerStyle: "large",
+      iosSpinnerStyle: "small",
+      spinnerColor: "#999999",
+      splashFullScreen: true,
+      splashImmersive: true,
+      layoutName: "launch_screen",
+      useDialog: true,
+    },
+  },
 };
 
 export default config;

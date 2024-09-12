@@ -1938,6 +1938,11 @@
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-6.1.1.tgz#4f82544957ecc2b945ec456a22f4cca3b2a06f30"
   integrity sha512-he6+Fhj6x1dSnOzM98xaPvioOU8MNO+qpodCJwnHE3mIRonTpFutXJK8DP8fnNhjDPk2km9VafLSfOeiZXNv3Q==
 
+"@capacitor/splash-screen@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/splash-screen/-/splash-screen-6.0.2.tgz#b235f8eed0554707bfa0ce76bd0a2ff120144b4a"
+  integrity sha512-WC0KYZ+ev15up03xs4fTnoTKwBVUSxXsKKQr/8XAncvi/nAG8qrpanW8OlavSC5zF5e1IZZDLsI2GSv0SkZ7VQ==
+
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz#00629c35a688e05a88b1cda684fb9d5e73f000a1"

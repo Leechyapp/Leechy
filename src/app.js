@@ -36,6 +36,7 @@ import Routes from './routing/Routes';
 import defaultMessages from './translations/en.json';
 import { App } from '@capacitor/app';
 import isNativePlatform from './util/isNativePlatform';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 // If you want to change the language of default (fallback) translations,
 // change the imports to match the wanted locale:
@@ -252,6 +253,7 @@ export const ClientApp = props => {
 
   useEffect(() => {
     if (isNativePlatform) {
+      splashScreenInit();
       App.addListener('backButton', ({ canGoBack }) => {
         // if (window.location.pathname === '/') {
         //   return;
@@ -264,6 +266,22 @@ export const ClientApp = props => {
       });
     }
   }, []);
+
+  const splashScreenInit = async () => {
+    // Hide the splash (you should do this on app launch)
+    await SplashScreen.hide();
+
+    // Show the splash for an indefinite amount of time:
+    await SplashScreen.show({
+      autoHide: false,
+    });
+
+    // Show the splash for two seconds and then automatically hide it:
+    await SplashScreen.show({
+      showDuration: 2000,
+      autoHide: true,
+    });
+  }
 
   return (
     <Configurations appConfig={appConfig}>
