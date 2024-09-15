@@ -209,6 +209,38 @@ const EnvironmentVariableWarning = props => {
   );
 };
 
+const splashScreenInit = async () => {
+  // Hide the splash (you should do this on app launch)
+  // await SplashScreen.hide();
+
+  // // Show the splash for an indefinite amount of time:
+  await SplashScreen.show({
+    autoHide: false,
+  });
+
+  // // Show the splash for 2 seconds and then automatically hide it:
+  await SplashScreen.show({
+    showDuration: 2000,
+    autoHide: true,
+  });
+};
+
+const initNativePlatform = () => {
+  if (isNativePlatform) {
+    splashScreenInit();
+    App.addListener('backButton', ({ canGoBack }) => {
+      // if (window.location.pathname === '/') {
+      //   return;
+      // }
+      if (canGoBack) {
+        window.history.back();
+      } else {
+        App.exitApp();
+      }
+    });
+  }
+};
+
 export const ClientApp = props => {
   const { store, hostedTranslations = {}, hostedConfig = {} } = props;
   const appConfig = mergeConfig(hostedConfig, defaultConfig);
@@ -251,18 +283,7 @@ export const ClientApp = props => {
   const logLoadDataCalls = appSettings?.env !== 'test';
 
   useEffect(() => {
-    if (isNativePlatform) {
-      App.addListener('backButton', ({ canGoBack }) => {
-        // if (window.location.pathname === '/') {
-        //   return;
-        // }
-        if (canGoBack) {
-          window.history.back();
-        } else {
-          App.exitApp();
-        }
-      });
-    }
+    initNativePlatform();
   }, []);
 
   return (
@@ -302,6 +323,10 @@ export const ServerApp = props => {
       />
     );
   }
+
+  useEffect(() => {
+    initNativePlatform();
+  }, []);
 
   return (
     <Configurations appConfig={appConfig}>

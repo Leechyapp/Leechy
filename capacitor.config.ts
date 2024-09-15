@@ -3,13 +3,15 @@ import { CapcaitorEnv } from './capacitor.env';
 
 let serverConfig: CapacitorConfig['server'];
 
-const ENV_MOBILE: string = 'prod';
+const ENV_MOBILE: string = 'dev';
 
 switch (ENV_MOBILE) {
   case 'dev':
     serverConfig = {
-      url: 'http://localhost:3020',
-      allowNavigation: ['localhost:3020']
+      // url: 'http://localhost:3020',
+      // allowNavigation: ['localhost:3020']
+      url: 'http://localhost:4000',
+      allowNavigation: ['localhost:4000']
     };
     break;
   case 'staging':
@@ -38,7 +40,25 @@ const config: CapacitorConfig = {
   appName: CapcaitorEnv.REACT_CAPACITOR_APP_NAME,
   webDir: 'www',
   bundledWebRuntime: false,
-  server: serverConfig
+  server: serverConfig,
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 5000,
+      // launchAutoHide: true,
+      launchFadeOutDuration: 5000,
+      backgroundColor: "#ffffffff",
+      androidSplashResourceName: "splash",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: true,
+      androidSpinnerStyle: "large",
+      iosSpinnerStyle: "small",
+      spinnerColor: "#999999",
+      splashFullScreen: true,
+      splashImmersive: true,
+      layoutName: "launch_screen",
+      useDialog: true,
+    },
+  },
 };
 
 export default config;
