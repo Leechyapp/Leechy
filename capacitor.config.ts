@@ -4,13 +4,15 @@ import { CapcaitorEnv } from './capacitor.env';
 
 let serverConfig: CapacitorConfig['server'];
 
-const ENV_MOBILE: string = 'prod';
+const ENV_MOBILE: string = 'dev';
 
 switch (ENV_MOBILE) {
   case 'dev':
     serverConfig = {
-      url: 'http://localhost:3020',
-      allowNavigation: ['localhost:3020']
+      // url: 'http://localhost:3020',
+      // allowNavigation: ['localhost:3020']
+      url: 'http://localhost:4000',
+      allowNavigation: ['localhost:4000']
     };
     break;
   case 'staging':
@@ -42,9 +44,9 @@ const config: CapacitorConfig = {
   server: serverConfig,
   plugins: {
     SplashScreen: {
-      launchShowDuration: 3000,
-      launchAutoHide: true,
-      launchFadeOutDuration: 3000,
+      launchShowDuration: 5000,
+      // launchAutoHide: true,
+      launchFadeOutDuration: 5000,
       backgroundColor: "#ffffffff",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
