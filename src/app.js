@@ -214,16 +214,16 @@ const splashScreenInit = async () => {
   // Hide the splash (you should do this on app launch)
   // await SplashScreen.hide();
 
-  // // Show the splash for an indefinite amount of time:
-  await SplashScreen.show({
-    autoHide: false,
-  });
+  // // // Show the splash for an indefinite amount of time:
+  // await SplashScreen.show({
+  //   autoHide: false,
+  // });
 
-  // // Show the splash for 2 seconds and then automatically hide it:
-  await SplashScreen.show({
-    showDuration: 2000,
-    autoHide: true,
-  });
+  // // // Show the splash for 2 seconds and then automatically hide it:
+  // await SplashScreen.show({
+  //   showDuration: 2000,
+  //   autoHide: true,
+  // });
 };
 
 const initNativePlatform = () => {
