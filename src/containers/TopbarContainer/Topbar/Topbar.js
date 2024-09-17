@@ -224,6 +224,7 @@ class TopbarComponent extends Component {
       config,
       routeConfiguration,
       includeAndroid,
+      hideMobileSearchIcon,
     } = this.props;
 
     // if (isAndroidPlatform && !includeAndroid) {
@@ -325,13 +326,17 @@ class TopbarComponent extends Component {
             alt={intl.formatMessage({ id: 'Topbar.logoIcon' })}
             linkToExternalSite={config?.topbar?.logoLink}
           />
-          <Button
-            rootClassName={css.searchMenu}
-            onClick={this.handleMobileSearchOpen}
-            title={intl.formatMessage({ id: 'Topbar.searchIcon' })}
-          >
-            <SearchIcon className={css.searchMenuIcon} />
-          </Button>
+          {hideMobileSearchIcon ? (
+            <div className={css.searchMenu}></div>
+          ) : (
+            <Button
+              rootClassName={css.searchMenu}
+              onClick={this.handleMobileSearchOpen}
+              title={intl.formatMessage({ id: 'Topbar.searchIcon' })}
+            >
+              <SearchIcon className={css.searchMenuIcon} />
+            </Button>
+          )}
         </div>
         <div className={css.desktop}>
           <TopbarDesktop

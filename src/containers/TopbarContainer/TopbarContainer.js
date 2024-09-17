@@ -32,6 +32,7 @@ export const TopbarContainerComponent = props => {
     sendVerificationEmailInProgress,
     sendVerificationEmailError,
     onResendVerificationEmail,
+    hideMobileSearchIcon,
     ...rest
   } = props;
 
@@ -54,6 +55,7 @@ export const TopbarContainerComponent = props => {
       sendVerificationEmailInProgress={sendVerificationEmailInProgress}
       sendVerificationEmailError={sendVerificationEmailError}
       showGenericError={hasGenericError}
+      hideMobileSearchIcon={hideMobileSearchIcon}
       {...rest}
     />
   );
@@ -67,6 +69,7 @@ TopbarContainerComponent.defaultProps = {
   notificationCount: 0,
   sendVerificationEmailError: null,
   authScopes: null,
+  hideMobileSearchIcon: false,
 };
 
 TopbarContainerComponent.propTypes = {
@@ -91,6 +94,8 @@ TopbarContainerComponent.propTypes = {
     push: func.isRequired,
   }).isRequired,
   location: shape({ state: object }).isRequired,
+
+  hideMobileSearchIcon: bool,
 };
 
 const mapStateToProps = state => {
@@ -135,10 +140,7 @@ const mapDispatchToProps = dispatch => ({
 // See: https://github.com/ReactTraining/react-router/issues/4671
 const TopbarContainer = compose(
   withRouter,
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
+  connect(mapStateToProps, mapDispatchToProps)
 )(TopbarContainerComponent);
 
 export default TopbarContainer;
