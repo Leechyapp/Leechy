@@ -7,9 +7,15 @@ import { intlShape } from '../../util/reactIntl';
 import { LinkedLogo } from '../../components';
 
 import css from './CheckoutPage.module.css';
+import isNativePlatform from '../../util/isNativePlatform';
+import TopbarContainer from '../TopbarContainer/TopbarContainer';
 
 const CustomTopbar = props => {
   const [isMobile, setIsMobile] = useState(false);
+
+  if (isNativePlatform) {
+    return <TopbarContainer mobileRootClassName={css.mobileTopbar} hideMobileSearchIcon={true} />;
+  }
 
   useEffect(() => {
     // set initial value
