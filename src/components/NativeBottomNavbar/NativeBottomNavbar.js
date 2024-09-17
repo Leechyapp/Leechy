@@ -62,17 +62,11 @@ const NativeBottomNavbar = injectIntl(props => {
   };
 
   const handleLogout = () => {
-    dispatch(logout(historyPush)).then(() => {
+    dispatch(logout()).then(() => {
       const path = pathByRouteName('LandingPage', routeConfiguration);
-
-      // In production we ensure that data is really lost,
-      // but in development mode we use stored values for debugging
-      if (appSettings.dev) {
-        history.push(path);
-      } else if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined') {
         window.location = path;
       }
-
       console.log('logged out'); // eslint-disable-line
     });
   };
