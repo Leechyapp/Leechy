@@ -65,7 +65,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
 // The "./translations/en.json" has generic English translations
 // that should work as a default translation if some translation keys are missing
 // from the hosted translation.json (which can be edited in Console). The other files
-// (e.g. en.json) in that directory has Biketribe themed translations.
+// (e.g. en.json) in that directory has Leechy themed translations.
 //
 // If you are using a non-english locale, point `messagesInLocale` to correct <lang>.json file.
 // That way the priority order would be:
@@ -213,12 +213,10 @@ const EnvironmentVariableWarning = props => {
 const splashScreenInit = async () => {
   // Hide the splash (you should do this on app launch)
   // await SplashScreen.hide();
-
   // // // Show the splash for an indefinite amount of time:
   // await SplashScreen.show({
   //   autoHide: false,
   // });
-
   // // // Show the splash for 2 seconds and then automatically hide it:
   // await SplashScreen.show({
   //   showDuration: 2000,

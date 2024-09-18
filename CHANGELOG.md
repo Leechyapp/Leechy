@@ -186,9 +186,8 @@ This also prepares the codebase for future configuration possibilities:
 - [change] Allow distinguishing customer and provider commission translations in OrderBreakdown and
   email templates [#307](https://github.com/sharetribe/web-template/pull/307)
 - [change] Add environment variable REACT_APP_MARKETPLACE_NAME and add code-comments to built-in
-  configs about hosted configs, which might overwrite them. Check that the line doesn't use
-  'Biketribe' if you take update from the upstream!
-  [#305](https://github.com/sharetribe/web-template/pull/305)
+  configs about hosted configs, which might overwrite them. Check that the line doesn't use 'Leechy'
+  if you take update from the upstream! [#305](https://github.com/sharetribe/web-template/pull/305)
 - [change] Updated a small patch of outdated libraries: express, body-parser, moment,
   moment-timezone, helmet, nodemon, decimal.js, concurrently, classnames, jose, passport
   [#304](https://github.com/sharetribe/web-template/pull/304)
@@ -370,7 +369,7 @@ This is a major version release. Mainly due to a new process and big changes to 
 - [add] This PR adds a 3rd process (default-inquiry) to the template.
 
   - As a consequence, CheckoutPage has been refactored heavily
-  - This removes en.json file (Biketribe-themed translations) and
+  - This removes en.json file (Leechy-themed translations) and
   - This renames defaultMicrocopy.json (with generic copy-texts) to be the new en.json file
   - This PR branch evolved to be v3 development branch. It included the following PRs too.
   - Read more about the changes from PR:
@@ -391,8 +390,8 @@ This is a major version release. Mainly due to a new process and big changes to 
   [#201](https://github.com/sharetribe/web-template/pull/201)
 - [fix] Add default sort options to en.json (microcopy)
   [#204](https://github.com/sharetribe/web-template/pull/204)
-- [delete] Remove en.json file (Biketribe-themed translations) and rename defaultMicrocopy.json to
-  be the new en.json file. [#203](https://github.com/sharetribe/web-template/pull/203)
+- [delete] Remove en.json file (Leechy-themed translations) and rename defaultMicrocopy.json to be
+  the new en.json file. [#203](https://github.com/sharetribe/web-template/pull/203)
 - [change] Updates to the copy texts in the defaultMicrocopy.json file.
   [#199](https://github.com/sharetribe/web-template/pull/199)
 - [fix] asset data denormalization: null values were not handled correctly.
@@ -491,7 +490,7 @@ This major release takes configurations from hosted assets.
 - Show `MaintenanceMode` component if mandatory configs are not found from hosted assets
 - Add `SectionFooter` to PageBuilder and use it from `FooterContainer`.
 - Delete the old Footer component
-- Add defaultMicrocopy.json. It talks about _listings_ instead of Biketribe _bikes_.
+- Add defaultMicrocopy.json. It talks about _listings_ instead of Leechy _bikes_.
   - The _**en.json**_ is a good themed starting point to be copied for a _translation.json_ aka
     Console > Content > Microcopy
   - If translation.json is not set, _**defaultMicrocopy.json**_ is used instead.
@@ -820,7 +819,7 @@ and the Docs will be updated to reflect the fact that this is the new default Te
   [#53](https://github.com/sharetribe/web-template/pull/53)
 - [fix] ListingImageGallery didn't get variantPrefix due to buggy mergeConfig.
   [#51](https://github.com/sharetribe/web-template/pull/51)
-- [fix] Update configListing.js to more closely match Biketribe configs. Also fix label in
+- [fix] Update configListing.js to more closely match Leechy configs. Also fix label in
   ListingPage/SectionDetailsMaybe and add grid for secondary filter panel.
   [#50](https://github.com/sharetribe/web-template/pull/50)
 - [fix] TransactionPage/enquiry: timeSlot query was missing extra parameter
@@ -847,9 +846,9 @@ and the Docs will be updated to reflect the fact that this is the new default Te
 
   [#44](https://github.com/sharetribe/web-template/pull/44)
 
-- [change] Biketribe theming: update links in footer and add social media sharing images.
+- [change] Leechy theming: update links in footer and add social media sharing images.
   [#43](https://github.com/sharetribe/web-template/pull/43)
-- [change] Biketribe theming: lots of UI related changes, but also some refactoring of components.
+- [change] Leechy theming: lots of UI related changes, but also some refactoring of components.
   [#42](https://github.com/sharetribe/web-template/pull/42)
 - [change] Refactor configurations:
 
