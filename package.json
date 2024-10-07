@@ -144,7 +144,11 @@
     "test-server": "jest ./server/**/*.test.js",
     "heroku-postbuild": "yarn run build",
     "postinstall": "patch-package",
-    "translate": "node scripts/translations.js"
+    "translate": "node scripts/translations.js",
+    "migrate": "cd ./server/api/database && knex migrate:latest --knexfile knexFile.js",
+    "make:migration": "cd ./server/api/database && knex migrate:make --knexfile knexFile.js",
+    "dev-rollback": "cd ./server/api/database && knex migrate:rollback --knexfile knexFile.js",
+    "seed:run": "cd ./server/api/database && knex seed:run --knexfile knexFile.js"
   },
   "browserslist": {
     "production": [
