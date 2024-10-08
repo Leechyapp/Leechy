@@ -1,6 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 import { CapcaitorEnv } from './capacitor.env';
+
 /// <reference types="@capacitor/splash-screen" />
+/// <reference types="@capacitor/push-notifications" />
 
 let serverConfig: CapacitorConfig['server'];
 
@@ -12,7 +14,7 @@ switch (ENV_MOBILE) {
       // url: 'http://localhost:3020',
       // allowNavigation: ['localhost:3020']
       url: 'http://localhost:4000',
-      allowNavigation: ['localhost:4000']
+      allowNavigation: ['localhost:4000'],
     };
     break;
   case 'staging':
@@ -20,7 +22,7 @@ switch (ENV_MOBILE) {
       // url: 'https://staging.example.com',
       // allowNavigation: ['staging.example.com']
       url: CapcaitorEnv.REACT_CAPACITOR_STAGING_WEB_URL,
-      allowNavigation: [CapcaitorEnv.REACT_CAPACITOR_STAGING_ALLOW_NAV_URL]
+      allowNavigation: [CapcaitorEnv.REACT_CAPACITOR_STAGING_ALLOW_NAV_URL],
     };
     break;
   case 'prod':
@@ -28,7 +30,7 @@ switch (ENV_MOBILE) {
       // url: 'https://example.com',
       // allowNavigation: ['example.com']
       url: CapcaitorEnv.REACT_CAPACITOR_PROD_WEB_URL,
-      allowNavigation: [CapcaitorEnv.REACT_CAPACITOR_PROD_ALLOW_NAV_URL]
+      allowNavigation: [CapcaitorEnv.REACT_CAPACITOR_PROD_ALLOW_NAV_URL],
     };
     break;
   default:
@@ -47,17 +49,20 @@ const config: CapacitorConfig = {
       launchShowDuration: 5000,
       // launchAutoHide: true,
       launchFadeOutDuration: 5000,
-      backgroundColor: "#ffffffff",
-      androidSplashResourceName: "splash",
-      androidScaleType: "CENTER_CROP",
+      backgroundColor: '#ffffffff',
+      androidSplashResourceName: 'splash',
+      androidScaleType: 'CENTER_CROP',
       showSpinner: true,
-      androidSpinnerStyle: "large",
-      iosSpinnerStyle: "small",
-      spinnerColor: "#999999",
+      androidSpinnerStyle: 'large',
+      iosSpinnerStyle: 'small',
+      spinnerColor: '#999999',
       splashFullScreen: true,
       splashImmersive: true,
-      layoutName: "launch_screen",
+      layoutName: 'launch_screen',
       useDialog: true,
+    },
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
   },
 };
