@@ -127,6 +127,19 @@ npx cap open android
 Once the android folder has been synced "npx cap sync android" and Android has been opened, push the
 play button on Android Studio (which should download the .apk and launch the app in your device)
 
+#### Errors:
+If you run any errors such as:
+```
+✖ copy android - failed!
+[error] Error: EACCES: permission denied, open '/home/[username]/Documents/GitHub/[YourRepo]/android/app/src/main/assets/capacitor.config.json'
+```
+then manually create an "assets" golder in "android/app/src/main" and grant access to the folder:
+```
+cd android/app/src/main
+sudo mkdir assets
+sudo chmod -R 777 assets
+```
+
 #### Port forwarding
 
 Navigate to chrome://inspect/#devices
