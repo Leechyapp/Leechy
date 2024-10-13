@@ -9,7 +9,7 @@ class UserService {
     return user ? user.id : null;
   }
 
-  static async search(whereObj, columns) {
+  static async search(whereObj, columns = ['*']) {
     const user = await knexDB('User')
       .first()
       .select(columns)
