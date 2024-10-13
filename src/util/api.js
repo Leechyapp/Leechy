@@ -204,3 +204,16 @@ export const saveMessageFiles = body => {
 export const updateShippingStatus = body => {
   return post('/api/shipping/update-shipping-status', body);
 };
+
+export const searchFollowsCount = body => {
+  return post('/api/follows/search-follows-count', body);
+};
+export const followUnfollowUser = body => {
+  return post('/api/follows/follow-unfollow-user', body);
+};
+export const getFollowersList = body => {
+  return post('/api/follows/get-followers-list', body);
+};
+export const getFollowingList = body => {
+  return post('/api/follows/get-following-list', body);
+};
