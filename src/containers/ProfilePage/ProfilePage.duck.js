@@ -3,6 +3,7 @@ import { fetchCurrentUser } from '../../ducks/user.duck';
 import { types as sdkTypes, createImageVariantConfig } from '../../util/sdkLoader';
 import { denormalisedResponseEntities } from '../../util/data';
 import { storableError } from '../../util/errors';
+import { searchFollowsCount } from '../../util/api';
 
 const { UUID } = sdkTypes;
 
@@ -22,6 +23,8 @@ export const QUERY_REVIEWS_REQUEST = 'app/ProfilePage/QUERY_REVIEWS_REQUEST';
 export const QUERY_REVIEWS_SUCCESS = 'app/ProfilePage/QUERY_REVIEWS_SUCCESS';
 export const QUERY_REVIEWS_ERROR = 'app/ProfilePage/QUERY_REVIEWS_ERROR';
 
+export const FETCH_FOLLOWS_COUNT_SUCCESS = 'app/ProfilePage/FETCH_FOLLOWS_COUNT_SUCCESS';
+
 // ================ Reducer ================ //
 
 const initialState = {
@@ -31,6 +34,7 @@ const initialState = {
   queryListingsError: null,
   reviews: [],
   queryReviewsError: null,
+  followsCount: null,
 };
 
 export default function profilePageReducer(state = initialState, action = {}) {
@@ -64,6 +68,9 @@ export default function profilePageReducer(state = initialState, action = {}) {
       return { ...state, reviews: payload };
     case QUERY_REVIEWS_ERROR:
       return { ...state, reviews: [], queryReviewsError: payload };
+
+    case FETCH_FOLLOWS_COUNT_SUCCESS:
+      return { ...state, followsCount: payload.followsCount };
 
     default:
       return state;
@@ -120,6 +127,11 @@ export const queryReviewsError = e => ({
   type: QUERY_REVIEWS_ERROR,
   error: true,
   payload: e,
+});
+
+export const fetchFollowsCountSuccess = followsCount => ({
+  type: FETCH_FOLLOWS_COUNT_SUCCESS,
+  payload: { followsCount },
 });
 
 // ================ Thunks ================ //
@@ -185,6 +197,19 @@ export const showUser = (userId, config) => (dispatch, getState, sdk) => {
     .catch(e => dispatch(showUserError(storableError(e))));
 };
 
+export const fetchUserFollowsCount = (userId, config) => (dispatch, getState, sdk) => {
+  return searchFollowsCount({
+    sharetribeProfileUserId: userId,
+  })
+    .then(response => {
+      dispatch(fetchFollowsCountSuccess(response));
+      return response;
+    })
+    .catch(e => {
+      // dispatch(showUserError(storableError(e)))
+    });
+};
+
 export const loadData = (params, search, config) => (dispatch, getState, sdk) => {
   const userId = new UUID(params.id);
 
@@ -195,6 +220,7 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
   return Promise.all([
     dispatch(fetchCurrentUser()),
     dispatch(showUser(userId, config)),
+    dispatch(fetchUserFollowsCount(userId, config)),
     dispatch(queryUserListings(userId, config)),
     dispatch(queryUserReviews(userId)),
   ]);
