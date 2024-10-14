@@ -16,7 +16,7 @@ import {
 import { ensureCurrentUser, ensureUser } from '../../util/data';
 import { withViewport } from '../../util/uiHelpers';
 import { pickCustomFieldProps } from '../../util/fieldHelpers';
-import { isScrollingDisabled } from '../../ducks/ui.duck';
+import { isScrollingDisabled, manageDisableScrolling } from '../../ducks/ui.duck';
 import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import {
   Heading,
@@ -30,43 +30,133 @@ import {
   ButtonTabNavHorizontal,
   LayoutSideNavigation,
   SecondaryButton,
+  Button,
+  Modal,
 } from '../../components';
 
 import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
 import FooterContainer from '../../containers/FooterContainer/FooterContainer';
 import NotFoundPage from '../../containers/NotFoundPage/NotFoundPage';
 
-import css from './ProfilePage.module.css';
+import css from './ProfilePage.module.scss';
 import SectionDetailsMaybe from './SectionDetailsMaybe';
 import SectionTextMaybe from './SectionTextMaybe';
 import SectionMultiEnumMaybe from './SectionMultiEnumMaybe';
 import SectionReportBlockUser from './SectionReportBlockUser/SectionReportBlockUser';
-import { unblockUser } from '../../util/api';
+import { followUnfollowUser, unblockUser } from '../../util/api';
 import { fetchCurrentUser } from '../../ducks/user.duck';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
+import FollowsListTabs from '../../components/FollowsListTabs/FollowsListTabs';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
+const FollowersFollowingSection = props => {
+  const { profileUser } = props;
+
+  const state = useSelector(state => state.ProfilePage);
+  const { followsCount } = state;
+
+  const followersCount = followsCount?.followersCount ? followsCount.followersCount : 0;
+  const followingCount = followsCount?.followingCount ? followsCount.followingCount : 0;
+
+  const sharetribeProfileUserId = profileUser.id;
+
+  const dispatch = useDispatch();
+  const onManageDisableScrolling = (componentId, disableScrolling) => {
+    dispatch(manageDisableScrolling(componentId, disableScrolling));
+  };
+
+  const [followsModalOpen, setFollowsModalOpen] = useState(false);
+
+  const onFollowUnfollow = () => {
+    followUnfollowUser({ sharetribeProfileUserId })
+      .then(res => {
+        console.log(`onFollowUnfollow res`, res);
+      })
+      .catch(error => {
+        console.error(`onFollowUnfollow error`, error);
+      });
+  };
+
+  return (
+    <>
+      <div className={css.row}>
+        <div className={css.colFollowers} onClick={() => setFollowsModalOpen(true)}>
+          <div className={css.followerFollowingColumns}>
+            <br />
+            <span className={css.value}>{followersCount}</span>
+            <br />
+            <span className={css.title}>
+              <FormattedMessage id="ProfilePage.followers.title" />
+            </span>
+          </div>
+        </div>
+        <div className={css.colFollowing} onClick={() => setFollowsModalOpen(true)}>
+          <div className={[css.followerFollowingColumns, css.divider].join(' ')}>
+            <br />
+            <span className={css.value}>{followingCount}</span>
+            <br />
+            <span className={css.title}>
+              <FormattedMessage id="ProfilePage.following.title" />
+            </span>
+          </div>
+        </div>
+        <div className={css.col12}>
+          <Button className={css.followUnfollowButton} onClick={() => onFollowUnfollow()}>
+            <FormattedMessage id="ProfilePage.follow.button.text" />
+          </Button>
+        </div>
+      </div>
+      <Modal
+        id="ProfilePage.followsModal"
+        isOpen={followsModalOpen}
+        onClose={() => setFollowsModalOpen(false)}
+        usePortal
+        onManageDisableScrolling={onManageDisableScrolling}
+      >
+        <FollowsListTabs
+          sharetribeProfileUserId={sharetribeProfileUserId}
+          followersCount={followersCount}
+          followingCount={followingCount}
+        />
+      </Modal>
+    </>
+  );
+};
+
 export const AsideContent = props => {
-  const { user, displayName, isCurrentUser } = props;
+  const { user, displayName, isCurrentUser, profileUser } = props;
   return (
     <div className={css.asideContent}>
-      <AvatarLarge className={css.avatar} user={user} disableProfileLink />
-      <H2 as="h1" className={css.mobileHeading}>
-        {displayName ? (
-          <FormattedMessage id="ProfilePage.mobileHeading" values={{ name: displayName }} />
+      <div className={css.userDetails}>
+        <div className={css.row}>
+          <AvatarLarge className={css.avatar} user={user} disableProfileLink />
+        </div>
+        <div className={css.row}>
+          <div className={css.col12}>
+            <H2 as="h1" className={css.mobileHeading}>
+              {displayName ? (
+                <FormattedMessage id="ProfilePage.mobileHeading" values={{ name: displayName }} />
+              ) : null}
+            </H2>
+          </div>
+        </div>
+        <div className={css.row}>
+          <div className={css.col12}>
+            <FollowersFollowingSection profileUser={profileUser} />
+          </div>
+        </div>
+        {isCurrentUser ? (
+          <>
+            <NamedLink className={css.editLinkMobile} name="ProfileSettingsPage">
+              <FormattedMessage id="ProfilePage.editProfileLinkMobile" />
+            </NamedLink>
+            <NamedLink className={css.editLinkDesktop} name="ProfileSettingsPage">
+              <FormattedMessage id="ProfilePage.editProfileLinkDesktop" />
+            </NamedLink>
+          </>
         ) : null}
-      </H2>
-      {isCurrentUser ? (
-        <>
-          <NamedLink className={css.editLinkMobile} name="ProfileSettingsPage">
-            <FormattedMessage id="ProfilePage.editProfileLinkMobile" />
-          </NamedLink>
-          <NamedLink className={css.editLinkDesktop} name="ProfileSettingsPage">
-            <FormattedMessage id="ProfilePage.editProfileLinkDesktop" />
-          </NamedLink>
-        </>
-      ) : null}
+      </div>
     </div>
   );
 };
@@ -310,10 +400,16 @@ export const ProfilePageComponent = props => {
       }}
     >
       <LayoutSideNavigation
+        mainColumnClassName={css.main}
         sideNavClassName={css.aside}
         topbar={<TopbarContainer />}
         sideNav={
-          <AsideContent user={user} isCurrentUser={isCurrentUser} displayName={displayName} />
+          <AsideContent
+            user={user}
+            isCurrentUser={isCurrentUser}
+            displayName={displayName}
+            profileUser={profileUser}
+          />
         }
         footer={<FooterContainer />}
       >

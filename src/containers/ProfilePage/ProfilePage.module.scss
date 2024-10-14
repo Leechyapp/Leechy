@@ -1,4 +1,5 @@
 @import '../../styles/customMediaQueries.css';
+@import '../../styles/gridDefaults.scss';
 
 .error {
   margin-top: 5px;
@@ -15,30 +16,42 @@
   color: var(--colorFail);
 }
 
+.main {
+  border: none;
+}
+
 .aside {
   box-shadow: none;
 }
 
 .asideContent {
-  width: 100%;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  border-bottom: 1px solid var(--colorGrey100);
+  flex-direction: column;
+  width: 100%;
+  max-width: 350px;
 
-  @media (--viewportLarge) {
-    flex-direction: column;
-    border-bottom: none;
+  @media (--viewportMaxLarge) {
+    margin: 0 auto;
+  }
+
+  .userDetails {
+    width: 350px;
+    max-height: 350px;
+    border-radius: 12px;
+    border: 1px solid var(--colorGrey200);
+    padding: 32px;
+    margin: 0 auto;
+
+    @media (--viewportMaxLarge) {
+      margin-top: 15px;
+      width: 100%;
+    }
   }
 }
 
 .avatar {
-  margin: 30px 26px 29px 0;
+  margin: 0 auto 25px auto;
   flex-shrink: 0;
-
-  @media (--viewportLarge) {
-    margin: 0 96px 48px 0;
-  }
 }
 
 .mobileHeading {
@@ -297,4 +310,38 @@
 .detailLabel {
   font-weight: var(--fontWeightSemiBold);
   letter-spacing: -0.09px;
+}
+
+.followerFollowingColumns {
+  text-align: center;
+
+  &.divider {
+    border-left: 1px solid var(--colorGrey200);
+  }
+}
+
+.colFollowers,
+.colFollowing {
+  composes: col6;
+
+  .icon {
+    margin-bottom: 5px;
+  }
+
+  .value {
+    font-style: normal;
+    font-weight: var(--fontWeightMedium);
+    font-size: 20px;
+  }
+
+  .title {
+    font-size: 12px;
+    font-weight: var(--fontWeightRegular);
+  }
+}
+
+.followUnfollowButton {
+  margin-top: 20px;
+  min-height: 40px;
+  width: 100%;
 }
