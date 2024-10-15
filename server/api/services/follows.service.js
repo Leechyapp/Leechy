@@ -23,6 +23,17 @@ class FollowsService {
     return data;
   }
 
+  static async searchIsCurrentUserFollowing(currentUserId, profileUserId) {
+    const data = await knexDB('Follows')
+      .first()
+      .count({ count: 'id' })
+      .where({
+        followedUserId: currentUserId,
+        followingUserId: profileUserId,
+      });
+    return data && data?.count > 0;
+  }
+
   static async insert(dataObj) {
     const data = await knexDB('Follows').insert(dataObj);
     return data;
