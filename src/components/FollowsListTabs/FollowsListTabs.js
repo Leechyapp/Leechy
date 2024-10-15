@@ -6,7 +6,8 @@ import Avatar from '../Avatar/Avatar';
 import { FollowsEnum } from '../../enums/follows.enum';
 import { FormattedMessage } from 'react-intl';
 
-const FollowsItem = item => {
+const FollowsItem = props => {
+  const { item } = props;
   return (
     <div key={item.id} className={css.followsListItem}>
       <div className={css.rowUnsetMarginLR}>
@@ -59,7 +60,7 @@ const FollowsListTabs = props => {
       } else {
         getFollowingList({ sharetribeProfileUserId, limit: 10, offset: 0 })
           .then(res => {
-            setFollowersList(res.data);
+            setFollowingList(res.data);
             //   setFollowersCount(res.count);
           })
           .catch(error => {

@@ -196,11 +196,6 @@ export const AsideContent = props => {
             </H2>
           </div>
         </div> */}
-        {/* <div className={css.row}>
-          <div className={css.col12}>
-            <FollowersFollowingSection profileUser={profileUser} />
-          </div>
-        </div> */}
         {isCurrentUser ? (
           <div className={css.row}>
             <div className={css.col12}>
