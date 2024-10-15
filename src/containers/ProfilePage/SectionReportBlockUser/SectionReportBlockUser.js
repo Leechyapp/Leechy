@@ -52,22 +52,22 @@ const SectionReportBlockUser = props => {
         <div className={css.col12}>
           {isAuthenticated ? (
             <p className={css.reportLink} onClick={() => setReportProfileModalOpen(true)}>
-              Report this profile
+              <FormattedText id="SectionReportBlockUser.reportProfile.button" />
             </p>
           ) : (
             <p className={css.reportLink}>
-              <NamedLink name="LoginPage">Report this profile</NamedLink>
+              <FormattedText id="SectionReportBlockUser.reportProfile.button" />
             </p>
           )}
         </div>
         <div className={css.col12}>
           {isAuthenticated ? (
             <p className={css.blockLink} onClick={() => onBlockUser()}>
-              Block user
+              <FormattedText id="SectionReportBlockUser.blockUser.button" />
             </p>
           ) : (
             <p className={css.blockLink}>
-              <NamedLink name="LoginPage">Block user</NamedLink>
+              <FormattedText id="SectionReportBlockUser.blockUser.button" />
             </p>
           )}
         </div>
@@ -84,7 +84,7 @@ const SectionReportBlockUser = props => {
             <div className={css.col12}>
               <br />
               <p className={css.mobileMarginTop}>
-                You have reported profile, we will review your report within 24 hours.
+                <FormattedText id="SectionReportBlockUser.reportProfile.message" />
               </p>
             </div>
           ) : (
@@ -96,28 +96,28 @@ const SectionReportBlockUser = props => {
                   onClick={() => onReportProfile(1)}
                   type="button"
                 >
-                  Report objectionable content
+                  <FormattedText id="SectionReportBlockUser.report.objectionableContent.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(2)}
                   type="button"
                 >
-                  Report spam
+                  <FormattedText id="SectionReportBlockUser.report.spam.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(3)}
                   type="button"
                 >
-                  Report deceptive content
+                  <FormattedText id="SectionReportBlockUser.deceptiveContent.spam.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(4)}
                   type="button"
                 >
-                  This user should be removed
+                  <FormattedText id="SectionReportBlockUser.shouldBeRemoved.spam.button" />
                 </SecondaryButton>
               </form>
             </div>
