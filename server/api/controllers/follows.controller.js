@@ -47,8 +47,8 @@ class FollowsController {
         followingUserId: profileId,
       };
       const followExists = await FollowsService.search(followsObj);
-      if (followExists && followExists.length > 0) {
-        await FollowsService.delete(followsObj);
+      if (followExists && followExists.id) {
+        await FollowsService.delete({ id: followExists.id });
         res.send({ code: 'unfollowed' });
       } else {
         await FollowsService.insert(followsObj);
