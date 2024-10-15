@@ -110,11 +110,11 @@ const FollowersFollowingSection = props => {
                 </H3>
               </div>
               <div className={css.colMenu}>
-                <div className={css.profileMoreMenuIcon}>
-                  <FontAwesomeIcon
-                    icon={faEllipsisVertical}
-                    onClick={() => setShowProfileMoreMenu(!showProfileMoreMenu)}
-                  />
+                <div
+                  className={css.profileMoreMenuIcon}
+                  onClick={() => setShowProfileMoreMenu(true)}
+                >
+                  <FontAwesomeIcon icon={faEllipsisVertical} />
                 </div>
               </div>
             </div>
