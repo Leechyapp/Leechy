@@ -4,6 +4,33 @@ import Button from '../Button/Button';
 import { getFollowersList, getFollowingList } from '../../util/api';
 import Avatar from '../Avatar/Avatar';
 import { FollowsEnum } from '../../enums/follows.enum';
+import { FormattedMessage } from 'react-intl';
+
+const FollowsItem = item => {
+  return (
+    <div key={item.id} className={css.followsListItem}>
+      <div className={css.rowUnsetMarginLR}>
+        <div className={css.col2}>
+          <Avatar user={item.user} />
+        </div>
+        <div className={css.col4}>
+          <p className={css.displayName}>{item?.user?.attributes?.profile?.displayName}</p>
+        </div>
+        <div className={css.col6}>
+          {/* {item.following ? ( */}
+          <Button className={css.followsButton}>
+            <FormattedMessage id="FollowsListTabs.unfollow.button" />
+          </Button>
+          {/* ) : (
+            <Button className={css.followsButton}>
+              <FormattedMessage id="FollowsListTabs.follow.button" />
+            </Button>
+          )} */}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const FollowsListTabs = props => {
   const { sharetribeProfileUserId, followersCount, followingCount } = props;
@@ -45,7 +72,9 @@ const FollowsListTabs = props => {
   const zeroFollowsResultsElem = (
     <div className={css.rowUnsetMarginLR}>
       <div className={css.col12}>
-        <p>0 results</p>
+        <p>
+          <FormattedMessage id="FollowsListTabs.noResults" />
+        </p>
       </div>
     </div>
   );
@@ -77,46 +106,14 @@ const FollowsListTabs = props => {
           {currentTab === FollowsEnum.FollowersTab && (
             <>
               {followersList && followersList.length > 0
-                ? followersList.map(item => (
-                    <div key={item.id} className={css.followsListItem}>
-                      <div className={css.rowUnsetMarginLR}>
-                        <div className={css.col2}>
-                          <Avatar user={item.user} />
-                        </div>
-                        <div className={css.col4}>
-                          <p className={css.displayName}>
-                            {item.user.attributes.profile.displayName}
-                          </p>
-                        </div>
-                        <div className={css.col6}>
-                          <Button className={css.followsButton}>Unfollow</Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                ? followersList.map(item => <FollowsItem item={item} />)
                 : zeroFollowsResultsElem}
             </>
           )}
           {currentTab === FollowsEnum.FollowingTab && (
             <>
               {followingList && followingList.length > 0
-                ? followingList.map(item => (
-                    <div key={item.id} className={css.followsListItem}>
-                      <div className={css.rowUnsetMarginLR}>
-                        <div className={css.col2}>
-                          <Avatar user={item.user} />
-                        </div>
-                        <div className={css.col4}>
-                          <p className={css.displayName}>
-                            {item.user.attributes.profile.displayName}
-                          </p>
-                        </div>
-                        <div className={css.col6}>
-                          <Button className={css.followsButton}>Unfollow</Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                ? followingList.map(item => <FollowsItem item={item} />)
                 : zeroFollowsResultsElem}
             </>
           )}
