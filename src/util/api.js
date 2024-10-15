@@ -205,8 +205,8 @@ export const updateShippingStatus = body => {
   return post('/api/shipping/update-shipping-status', body);
 };
 
-export const searchFollowsCount = body => {
-  return post('/api/follows/search-follows-count', body);
+export const searchInitialFollowsData = body => {
+  return post('/api/follows/search-initial-follows-data', body);
 };
 export const followUnfollowUser = body => {
   return post('/api/follows/follow-unfollow-user', body);

@@ -6,7 +6,7 @@ const { types } = require('sharetribe-flex-sdk');
 const { UUID } = types;
 
 class FollowsController {
-  static async searchFollowsCount(req, res, next) {
+  static async searchInitialFollowsData(req, res, next) {
     try {
       const { sharetribeProfileUserId } = req.body;
       const profileId = await UserService.searchIdWithUUID(sharetribeProfileUserId.uuid);
@@ -20,7 +20,12 @@ class FollowsController {
           followedUserId: profileId,
         },
       });
-      res.send({ followersCount, followingCount });
+
+      let isFollowing = false;
+      if (req?.userId) {
+        isFollowing = await FollowsService.searchIsCurrentUserFollowing(req.userId, profileId);
+      }
+      res.send({ followersCount, followingCount, isFollowing });
     } catch (error) {
       next(error);
     }
@@ -81,6 +86,7 @@ class FollowsController {
         user.profileImage = included[0];
 
         followsList[i].user = user;
+        // followsList[i].following = followsList[i].followedUserId === req.userId;
       }
       res.send({
         data: followsList,
@@ -118,6 +124,7 @@ class FollowsController {
         user.profileImage = included[0];
 
         followsList[i].user = user;
+        // followsList[i].following = followsList[i].following === req.userId;
       }
 
       res.send(pager);

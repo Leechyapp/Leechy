@@ -58,10 +58,11 @@ const FollowersFollowingSection = props => {
   const [showProfileMoreMenu, setShowProfileMoreMenu] = useState(false);
 
   const state = useSelector(state => state.ProfilePage);
-  const { followsCount } = state;
+  const { initialFollowsData } = state;
 
-  const followersCount = followsCount?.followersCount ? followsCount.followersCount : 0;
-  const followingCount = followsCount?.followingCount ? followsCount.followingCount : 0;
+  const followersCount = initialFollowsData?.followersCount ? initialFollowsData.followersCount : 0;
+  const followingCount = initialFollowsData?.followingCount ? initialFollowsData.followingCount : 0;
+  const isFollowing = initialFollowsData?.isFollowing;
 
   const sharetribeProfileUserId = profileUser.id;
 
@@ -137,8 +138,15 @@ const FollowersFollowingSection = props => {
                 </div>
               </div>
               <div className={css.colFollowsButton}>
-                <Button className={css.followsButton} onClick={() => onFollowUnfollow()}>
-                  <FormattedMessage id="ProfilePage.follow.button.text" />
+                <Button
+                  className={isFollowing ? css.followingButton : css.followsButton}
+                  onClick={() => onFollowUnfollow()}
+                >
+                  {isFollowing ? (
+                    <FormattedMessage id="ProfilePage.following.button.text" />
+                  ) : (
+                    <FormattedMessage id="ProfilePage.follow.button.text" />
+                  )}
                 </Button>
               </div>
             </div>

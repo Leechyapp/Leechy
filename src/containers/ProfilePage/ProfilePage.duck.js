@@ -3,7 +3,7 @@ import { fetchCurrentUser } from '../../ducks/user.duck';
 import { types as sdkTypes, createImageVariantConfig } from '../../util/sdkLoader';
 import { denormalisedResponseEntities } from '../../util/data';
 import { storableError } from '../../util/errors';
-import { searchFollowsCount } from '../../util/api';
+import { searchInitialFollowsData } from '../../util/api';
 
 const { UUID } = sdkTypes;
 
@@ -23,7 +23,8 @@ export const QUERY_REVIEWS_REQUEST = 'app/ProfilePage/QUERY_REVIEWS_REQUEST';
 export const QUERY_REVIEWS_SUCCESS = 'app/ProfilePage/QUERY_REVIEWS_SUCCESS';
 export const QUERY_REVIEWS_ERROR = 'app/ProfilePage/QUERY_REVIEWS_ERROR';
 
-export const FETCH_FOLLOWS_COUNT_SUCCESS = 'app/ProfilePage/FETCH_FOLLOWS_COUNT_SUCCESS';
+export const FETCH_INITIAL_FOLLOWS_DATA_SUCCESS =
+  'app/ProfilePage/FETCH_INITIAL_FOLLOWS_DATA_SUCCESS';
 
 // ================ Reducer ================ //
 
@@ -34,7 +35,7 @@ const initialState = {
   queryListingsError: null,
   reviews: [],
   queryReviewsError: null,
-  followsCount: null,
+  initialFollowsData: null,
 };
 
 export default function profilePageReducer(state = initialState, action = {}) {
@@ -69,8 +70,8 @@ export default function profilePageReducer(state = initialState, action = {}) {
     case QUERY_REVIEWS_ERROR:
       return { ...state, reviews: [], queryReviewsError: payload };
 
-    case FETCH_FOLLOWS_COUNT_SUCCESS:
-      return { ...state, followsCount: payload.followsCount };
+    case FETCH_INITIAL_FOLLOWS_DATA_SUCCESS:
+      return { ...state, initialFollowsData: payload.initialFollowsData };
 
     default:
       return state;
@@ -129,9 +130,9 @@ export const queryReviewsError = e => ({
   payload: e,
 });
 
-export const fetchFollowsCountSuccess = followsCount => ({
-  type: FETCH_FOLLOWS_COUNT_SUCCESS,
-  payload: { followsCount },
+export const fetchInitialFollowsDataSuccess = initialFollowsData => ({
+  type: FETCH_INITIAL_FOLLOWS_DATA_SUCCESS,
+  payload: { initialFollowsData },
 });
 
 // ================ Thunks ================ //
@@ -198,11 +199,11 @@ export const showUser = (userId, config) => (dispatch, getState, sdk) => {
 };
 
 export const fetchUserFollowsCount = (userId, config) => (dispatch, getState, sdk) => {
-  return searchFollowsCount({
+  return searchInitialFollowsData({
     sharetribeProfileUserId: userId,
   })
     .then(response => {
-      dispatch(fetchFollowsCountSuccess(response));
+      dispatch(fetchInitialFollowsDataSuccess(response));
       return response;
     })
     .catch(e => {
