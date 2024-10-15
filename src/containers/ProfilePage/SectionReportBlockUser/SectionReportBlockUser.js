@@ -1,13 +1,14 @@
 import React from 'react';
 import { useState } from 'react';
 import css from './SectionReportBlockUser.module.scss';
-import { Modal, NamedLink, SecondaryButton } from '../../../components';
+import { Modal, SecondaryButton } from '../../../components';
 import { isScrollingDisabled, manageDisableScrolling } from '../../../ducks/ui.duck';
 import { useDispatch, useSelector } from 'react-redux';
 import { blockUser, sendContactEmail } from '../../../util/api';
 import { fetchCurrentUser } from '../../../ducks/user.duck';
 import { propTypes } from '../../../util/types';
 import { func, shape } from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 const SectionReportBlockUser = props => {
   const { profileUser } = props;
@@ -52,22 +53,26 @@ const SectionReportBlockUser = props => {
         <div className={css.col12}>
           {isAuthenticated ? (
             <p className={css.reportLink} onClick={() => setReportProfileModalOpen(true)}>
-              <FormattedText id="SectionReportBlockUser.reportProfile.button" />
+              <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
             </p>
           ) : (
             <p className={css.reportLink}>
-              <FormattedText id="SectionReportBlockUser.reportProfile.button" />
+              <NamedLink name="LoginPage">
+                <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
+              </NamedLink>
             </p>
           )}
         </div>
         <div className={css.col12}>
           {isAuthenticated ? (
             <p className={css.blockLink} onClick={() => onBlockUser()}>
-              <FormattedText id="SectionReportBlockUser.blockUser.button" />
+              <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
             </p>
           ) : (
             <p className={css.blockLink}>
-              <FormattedText id="SectionReportBlockUser.blockUser.button" />
+              <NamedLink name="LoginPage">
+                <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
+              </NamedLink>
             </p>
           )}
         </div>
@@ -84,7 +89,7 @@ const SectionReportBlockUser = props => {
             <div className={css.col12}>
               <br />
               <p className={css.mobileMarginTop}>
-                <FormattedText id="SectionReportBlockUser.reportProfile.message" />
+                <FormattedMessage id="SectionReportBlockUser.reportProfile.message" />
               </p>
             </div>
           ) : (
@@ -96,28 +101,28 @@ const SectionReportBlockUser = props => {
                   onClick={() => onReportProfile(1)}
                   type="button"
                 >
-                  <FormattedText id="SectionReportBlockUser.report.objectionableContent.button" />
+                  <FormattedMessage id="SectionReportBlockUser.report.objectionableContent.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(2)}
                   type="button"
                 >
-                  <FormattedText id="SectionReportBlockUser.report.spam.button" />
+                  <FormattedMessage id="SectionReportBlockUser.report.spam.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(3)}
                   type="button"
                 >
-                  <FormattedText id="SectionReportBlockUser.deceptiveContent.spam.button" />
+                  <FormattedMessage id="SectionReportBlockUser.deceptiveContent.spam.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(4)}
                   type="button"
                 >
-                  <FormattedText id="SectionReportBlockUser.shouldBeRemoved.spam.button" />
+                  <FormattedMessage id="SectionReportBlockUser.shouldBeRemoved.spam.button" />
                 </SecondaryButton>
               </form>
             </div>
