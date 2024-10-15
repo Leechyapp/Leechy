@@ -20,7 +20,6 @@ import { isScrollingDisabled, manageDisableScrolling } from '../../ducks/ui.duck
 import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import {
   Heading,
-  H2,
   H4,
   Page,
   AvatarLarge,
@@ -32,6 +31,7 @@ import {
   SecondaryButton,
   Button,
   Modal,
+  H3,
 } from '../../components';
 
 import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
@@ -47,11 +47,15 @@ import { followUnfollowUser, unblockUser } from '../../util/api';
 import { fetchCurrentUser } from '../../ducks/user.duck';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 import FollowsListTabs from '../../components/FollowsListTabs/FollowsListTabs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
 const FollowersFollowingSection = props => {
-  const { profileUser } = props;
+  const { profileUser, displayName, user } = props;
+
+  const [showProfileMoreMenu, setShowProfileMoreMenu] = useState(false);
 
   const state = useSelector(state => state.ProfilePage);
   const { followsCount } = state;
@@ -80,59 +84,102 @@ const FollowersFollowingSection = props => {
 
   return (
     <>
-      <div className={css.row}>
-        <div className={css.colFollowers} onClick={() => setFollowsModalOpen(true)}>
-          <div className={css.followerFollowingColumns}>
-            <br />
-            <span className={css.value}>{followersCount}</span>
-            <br />
-            <span className={css.title}>
-              <FormattedMessage id="ProfilePage.followers.title" />
-            </span>
+      <div className={css.rowUnsetMarginLR}>
+        <div className={css.colAvatar}>
+          <div className={css.row}>
+            <div className={css.avatarContainer}>
+              <AvatarLarge className={css.avatarMobile} user={user} disableProfileLink />
+            </div>
+          </div>
+          <div className={css.row}>
+            <NamedLink name="ProfileSettingsPage" className={css.editLinkMobile}>
+              <FormattedMessage id="ProfilePage.editProfileLinkMobile" />
+            </NamedLink>
           </div>
         </div>
-        <div className={css.colFollowing} onClick={() => setFollowsModalOpen(true)}>
-          <div className={[css.followerFollowingColumns, css.divider].join(' ')}>
-            <br />
-            <span className={css.value}>{followingCount}</span>
-            <br />
-            <span className={css.title}>
-              <FormattedMessage id="ProfilePage.following.title" />
-            </span>
+        <div className={css.colUserContentSide}>
+          <div className={css.userContentSide}>
+            <div className={css.row}>
+              <div className={css.colDisplayName}>
+                <H3 as="h1" className={css.desktopHeading1}>
+                  <FormattedMessage
+                    id="ProfilePage.desktopHeading1"
+                    values={{ name: displayName }}
+                  />
+                </H3>
+              </div>
+              <div className={css.colMenu}>
+                <div className={css.profileMoreMenuIcon}>
+                  <FontAwesomeIcon
+                    icon={faEllipsisVertical}
+                    onClick={() => setShowProfileMoreMenu(!showProfileMoreMenu)}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className={css.row}>
+              <div className={css.colFollowers} onClick={() => setFollowsModalOpen(true)}>
+                <div className={css.followsColumns}>
+                  <br />
+                  <span className={css.value}>{followersCount}</span>{' '}
+                  <span className={css.title}>
+                    <FormattedMessage id="ProfilePage.followers.title" />
+                  </span>
+                </div>
+              </div>
+              <div className={css.colFollowing} onClick={() => setFollowsModalOpen(true)}>
+                <div className={[css.followsColumns, css.divider].join(' ')}>
+                  <br />
+                  <span className={css.value}>{followingCount}</span>{' '}
+                  <span className={css.title}>
+                    <FormattedMessage id="ProfilePage.following.title" />
+                  </span>
+                </div>
+              </div>
+              <div className={css.colFollowsButton}>
+                <Button className={css.followsButton} onClick={() => onFollowUnfollow()}>
+                  <FormattedMessage id="ProfilePage.follow.button.text" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-        <div className={css.col12}>
-          <Button className={css.followUnfollowButton} onClick={() => onFollowUnfollow()}>
-            <FormattedMessage id="ProfilePage.follow.button.text" />
-          </Button>
-        </div>
+        <Modal
+          id="ProfilePage.followsModal"
+          isOpen={followsModalOpen}
+          onClose={() => setFollowsModalOpen(false)}
+          usePortal
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <FollowsListTabs
+            sharetribeProfileUserId={sharetribeProfileUserId}
+            followersCount={followersCount}
+            followingCount={followingCount}
+          />
+        </Modal>
+        <Modal
+          id="ProfilePage.profileMoreMenu"
+          isOpen={showProfileMoreMenu}
+          onClose={() => setShowProfileMoreMenu(false)}
+          usePortal
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <SectionReportBlockUser profileUser={profileUser} />
+        </Modal>
       </div>
-      <Modal
-        id="ProfilePage.followsModal"
-        isOpen={followsModalOpen}
-        onClose={() => setFollowsModalOpen(false)}
-        usePortal
-        onManageDisableScrolling={onManageDisableScrolling}
-      >
-        <FollowsListTabs
-          sharetribeProfileUserId={sharetribeProfileUserId}
-          followersCount={followersCount}
-          followingCount={followingCount}
-        />
-      </Modal>
     </>
   );
 };
 
 export const AsideContent = props => {
-  const { user, displayName, isCurrentUser, profileUser } = props;
+  const { user, isCurrentUser } = props;
   return (
     <div className={css.asideContent}>
       <div className={css.userDetails}>
         <div className={css.row}>
           <AvatarLarge className={css.avatar} user={user} disableProfileLink />
         </div>
-        <div className={css.row}>
+        {/* <div className={css.row}>
           <div className={css.col12}>
             <H2 as="h1" className={css.mobileHeading}>
               {displayName ? (
@@ -140,21 +187,22 @@ export const AsideContent = props => {
               ) : null}
             </H2>
           </div>
-        </div>
-        <div className={css.row}>
+        </div> */}
+        {/* <div className={css.row}>
           <div className={css.col12}>
             <FollowersFollowingSection profileUser={profileUser} />
           </div>
-        </div>
+        </div> */}
         {isCurrentUser ? (
-          <>
-            <NamedLink className={css.editLinkMobile} name="ProfileSettingsPage">
-              <FormattedMessage id="ProfilePage.editProfileLinkMobile" />
-            </NamedLink>
-            <NamedLink className={css.editLinkDesktop} name="ProfileSettingsPage">
-              <FormattedMessage id="ProfilePage.editProfileLinkDesktop" />
-            </NamedLink>
-          </>
+          <div className={css.row}>
+            <div className={css.col12}>
+              <div className={css.linkContainer}>
+                <NamedLink className={css.editLinkDesktop} name="ProfileSettingsPage">
+                  <FormattedMessage id="ProfilePage.editProfileLinkDesktop" />
+                </NamedLink>
+              </div>
+            </div>
+          </div>
         ) : null}
       </div>
     </div>
@@ -248,7 +296,7 @@ export const DesktopReviews = props => {
 };
 
 export const CustomUserFields = props => {
-  const { publicData, metadata, userFieldConfig, isCurrentUser, profileUser } = props;
+  const { publicData, metadata, userFieldConfig } = props;
 
   const shouldPickUserField = fieldConfig => fieldConfig?.showConfig?.displayInProfile !== false;
   const propsForCustomFields =
@@ -257,7 +305,6 @@ export const CustomUserFields = props => {
 
   return (
     <>
-      {!isCurrentUser && <SectionReportBlockUser profileUser={profileUser} />}
       <SectionDetailsMaybe {...props} />
       {propsForCustomFields.map(customFieldProps => {
         const { schemaType, ...fieldProps } = customFieldProps;
@@ -287,6 +334,7 @@ export const MainContent = props => {
     intl,
     isCurrentUser,
     profileUser,
+    user,
   } = props;
 
   const hasListings = listings.length > 0;
@@ -338,9 +386,16 @@ export const MainContent = props => {
     </div>
   ) : (
     <div>
-      <H2 as="h1" className={css.desktopHeading}>
-        <FormattedMessage id="ProfilePage.desktopHeading" values={{ name: displayName }} />
-      </H2>
+      {/* <H3 as="h1" className={css.desktopHeading}>
+        <FormattedMessage id="ProfilePage.desktopHeading1" values={{ name: displayName }} />
+      </H3> */}
+      <div className={css.followsSection}>
+        <FollowersFollowingSection
+          profileUser={profileUser}
+          displayName={displayName}
+          user={user}
+        />
+      </div>
       {hasBio ? <p className={css.bio}>{bio}</p> : null}
       <CustomUserFields
         publicData={publicData}
@@ -423,6 +478,7 @@ export const ProfilePageComponent = props => {
           intl={intl}
           isCurrentUser={isCurrentUser}
           profileUser={profileUser}
+          user={user}
           {...rest}
         />
       </LayoutSideNavigation>
