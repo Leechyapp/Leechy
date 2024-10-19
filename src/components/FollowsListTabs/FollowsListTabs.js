@@ -7,7 +7,7 @@ import { FollowsEnum } from '../../enums/follows.enum';
 import { FormattedMessage } from 'react-intl';
 
 const FollowsItem = props => {
-  const { item } = props;
+  const { item, currentTab } = props;
   return (
     <div key={item.id} className={css.followsListItem}>
       <div className={css.rowUnsetMarginLR}>
@@ -18,15 +18,15 @@ const FollowsItem = props => {
           <p className={css.displayName}>{item?.user?.attributes?.profile?.displayName}</p>
         </div>
         <div className={css.col6}>
-          {/* {item.following ? ( */}
-          <Button className={css.followsButton}>
-            <FormattedMessage id="FollowsListTabs.unfollow.button" />
-          </Button>
-          {/* ) : (
+          {item.following ? (
+            <Button className={css.followsButton}>
+              <FormattedMessage id="FollowsListTabs.unfollow.button" />
+            </Button>
+          ) : (
             <Button className={css.followsButton}>
               <FormattedMessage id="FollowsListTabs.follow.button" />
             </Button>
-          )} */}
+          )}
         </div>
       </div>
     </div>
@@ -119,14 +119,14 @@ const FollowsListTabs = props => {
             {currentTab === FollowsEnum.FollowersTab && (
               <>
                 {followersList && followersList.length > 0
-                  ? followersList.map(item => <FollowsItem item={item} />)
+                  ? followersList.map(item => <FollowsItem item={item} currentTab={currentTab} />)
                   : zeroFollowsResultsElem}
               </>
             )}
             {currentTab === FollowsEnum.FollowingTab && (
               <>
                 {followingList && followingList.length > 0
-                  ? followingList.map(item => <FollowsItem item={item} />)
+                  ? followingList.map(item => <FollowsItem item={item} currentTab={currentTab} />)
                   : zeroFollowsResultsElem}
               </>
             )}

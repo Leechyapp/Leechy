@@ -37,6 +37,11 @@ class FollowsController {
       const { sharetribeProfileUserId } = req.body;
 
       let profileId = await UserService.searchIdWithUUID(sharetribeProfileUserId.uuid);
+
+      if (currentUserId === profileId) {
+        return res.status(400).send('You cannot follow yourself.');
+      }
+
       if (!profileId) {
         const newProfileUser = await UserSyncService.insert({}, sharetribeProfileUserId.uuid);
         profileId = newProfileUser[0];
@@ -86,7 +91,15 @@ class FollowsController {
         user.profileImage = included[0];
 
         followsList[i].user = user;
-        // followsList[i].following = followsList[i].followedUserId === req.userId;
+
+        if (req.userId && profileId) {
+          followsList[i].following = await FollowsService.searchIsCurrentUserFollowing(
+            req.userId,
+            profileId
+          );
+        } else {
+          followsList[i].following = false;
+        }
       }
       res.send({
         data: followsList,
@@ -124,7 +137,17 @@ class FollowsController {
         user.profileImage = included[0];
 
         followsList[i].user = user;
-        // followsList[i].following = followsList[i].following === req.userId;
+
+        if (req.userId === profileId) {
+          followsList[i].following = true;
+        } else if (req.userId && req.userId !== profileId) {
+          followsList[i].following = await FollowsService.searchIsCurrentUserFollowing(
+            req.userId,
+            profileId
+          );
+        } else {
+          followsList[i].following = false;
+        }
       }
 
       res.send(pager);

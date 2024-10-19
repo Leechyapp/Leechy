@@ -50,7 +50,11 @@ import FollowsListTabs from '../../components/FollowsListTabs/FollowsListTabs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { FollowsEnum } from '../../enums/follows.enum';
-import { fetchFollowersCountSuccess, fetchIsFollowingSuccess } from './ProfilePage.duck';
+import {
+  fetchFollowersCountSuccess,
+  fetchFollowingCountSuccess,
+  fetchIsFollowingSuccess,
+} from './ProfilePage.duck';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
@@ -87,7 +91,7 @@ const FollowersFollowingSection = props => {
           dispatch(fetchFollowersCountSuccess(newFollowersCount));
         } else if (res?.code === FollowsEnum.Followed) {
           dispatch(fetchIsFollowingSuccess(true));
-          dispatch(fetchFollowersCountSuccess(followingCount + 1));
+          dispatch(fetchFollowersCountSuccess(followersCount + 1));
         }
       })
       .catch(error => {
