@@ -177,10 +177,12 @@
     }
 
     .followsColumns {
-      // text-align: center;
-      // &.divider {
-      //   border-left: 1px solid var(--colorGrey200);
-      // }
+      margin-top: 22px;
+      width: 100px;
+      &:hover {
+        background-color: var(--colorGrey75);
+        cursor: pointer;
+      }
     }
 
     .colFollowers,
@@ -205,10 +207,6 @@
       .title {
         font-size: 12px;
         font-weight: var(--fontWeightRegular);
-      }
-
-      &:hover {
-        background-color: var(--colorGrey100);
       }
     }
 

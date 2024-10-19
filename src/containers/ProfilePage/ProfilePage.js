@@ -136,7 +136,6 @@ const FollowersFollowingSection = props => {
                 onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowersTab)}
               >
                 <div className={css.followsColumns}>
-                  <br />
                   <span className={css.value}>{followersCount}</span>{' '}
                   <span className={css.title}>
                     <FormattedMessage id="ProfilePage.followers.title" />
@@ -148,7 +147,6 @@ const FollowersFollowingSection = props => {
                 onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowingTab)}
               >
                 <div className={[css.followsColumns, css.divider].join(' ')}>
-                  <br />
                   <span className={css.value}>{followingCount}</span>{' '}
                   <span className={css.title}>
                     <FormattedMessage id="ProfilePage.following.title" />
