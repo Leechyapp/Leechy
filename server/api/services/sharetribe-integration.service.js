@@ -31,6 +31,17 @@ class SharetribeIntegrationService {
       });
   }
 
+  static async showUser(params) {
+    return integrationSdk.users
+      .show(params)
+      .then(res => {
+        return res;
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+
   static async searchStripeAccountId(authorId) {
     const result = await this.showUser({
       id: authorId,
