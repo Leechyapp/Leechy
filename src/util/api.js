@@ -204,3 +204,7 @@ export const saveMessageFiles = body => {
 export const updateShippingStatus = body => {
   return post('/api/shipping/update-shipping-status', body);
 };
+
+export const updatePayoutSettings = body => {
+  return post('/api/stripe-account/update-payout-settings', body);
+};
