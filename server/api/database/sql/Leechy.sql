@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS Follows;
 
 CREATE TABLE Follows (
     id int NOT NULL AUTO_INCREMENT,
-	followedUserId int NOT NULL,
+    followedUserId int NOT NULL,
     followingUserId int NOT NULL,
     created datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_followedUserId_followingUserId (followedUserId, followingUserId),
