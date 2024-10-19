@@ -85,7 +85,7 @@
     "sitemap": "^7.1.1",
     "smoothscroll-polyfill": "^0.4.0",
     "source-map-support": "^0.5.21",
-    "stripe": "^16.6.0",
+    "stripe": "^17.2.1",
     "unified": "^9.2.2",
     "url": "^0.11.0",
     "uuidv4": "^6.2.13"
