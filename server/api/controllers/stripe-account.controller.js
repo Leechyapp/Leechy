@@ -7,11 +7,8 @@ class StripeAccountController {
       const stripeAccountId = await SharetribeIntegrationService.searchStripeAccountId(
         req.userUUID
       );
-      const stripePayoutSettings = await StripeApiService.updateAccountToAutomaticPayouts(
-        stripeAccountId
-      );
-      console.log(`stripePayoutSettings`, stripePayoutSettings);
-      res.send(stripePayoutSettings);
+      await StripeApiService.updateAccountToAutomaticPayouts(stripeAccountId);
+      res.send('Payout settings updated');
     } catch (error) {
       next(error);
     }
