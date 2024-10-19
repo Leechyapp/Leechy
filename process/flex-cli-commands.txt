@@ -31,6 +31,7 @@ flex-cli notifications preview --template process/templates/booking-money-paid -
 flex-cli notifications preview --template process/templates/booking-new-request --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications preview --template process/templates/booking-operator-accepted-request --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications preview --template process/templates/booking-operator-declined-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-payout-details --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications preview --template process/templates/booking-review-by-customer-wanted --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications preview --template process/templates/booking-review-by-other-party-published --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications preview --template process/templates/booking-review-by-other-party-unpublished --context process/sample-template-context.json -m leechy-dev
@@ -43,6 +44,7 @@ flex-cli notifications send --template process/templates/booking-money-paid --co
 flex-cli notifications send --template process/templates/booking-new-request --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications send --template process/templates/booking-operator-accepted-request --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications send --template process/templates/booking-operator-declined-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-payout-details --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications send --template process/templates/booking-review-by-customer-wanted --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications send --template process/templates/booking-review-by-other-party-published --context process/sample-template-context.json -m leechy-dev
 flex-cli notifications send --template process/templates/booking-review-by-other-party-unpublished --context process/sample-template-context.json -m leechy-dev
