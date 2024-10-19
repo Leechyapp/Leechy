@@ -206,6 +206,10 @@
         font-size: 12px;
         font-weight: var(--fontWeightRegular);
       }
+
+      &:hover {
+        background-color: var(--colorGrey100);
+      }
     }
 
     .colFollowsButton {

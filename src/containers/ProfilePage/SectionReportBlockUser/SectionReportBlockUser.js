@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import css from './SectionReportBlockUser.module.scss';
-import { Modal, SecondaryButton } from '../../../components';
+import { Modal, NamedLink, SecondaryButton } from '../../../components';
 import { isScrollingDisabled, manageDisableScrolling } from '../../../ducks/ui.duck';
 import { useDispatch, useSelector } from 'react-redux';
 import { blockUser, sendContactEmail } from '../../../util/api';

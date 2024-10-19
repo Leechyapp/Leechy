@@ -34,9 +34,20 @@ const FollowsItem = props => {
 };
 
 const FollowsListTabs = props => {
-  const { sharetribeProfileUserId, followersCount, followingCount } = props;
+  const {
+    currentTab,
+    setCurrentTab,
+    sharetribeProfileUserId,
+    followersCount,
+    followingCount,
+  } = props;
 
-  const [currentTab, setCurrentTab] = useState(FollowsEnum.FollowersTab);
+  if (!currentTab) {
+    return null;
+  }
+  if (!sharetribeProfileUserId) {
+    return null;
+  }
 
   const [followersList, setFollowersList] = useState(new Array());
   const [followingList, setFollowingList] = useState(new Array());
@@ -47,7 +58,7 @@ const FollowsListTabs = props => {
   const tabClassActive = [css.tab, css.active].join(' ');
 
   useEffect(() => {
-    if (sharetribeProfileUserId) {
+    if (currentTab && sharetribeProfileUserId) {
       if (currentTab === FollowsEnum.FollowersTab) {
         getFollowersList({ sharetribeProfileUserId, limit: 10, offset: 0 })
           .then(res => {
@@ -57,7 +68,7 @@ const FollowsListTabs = props => {
           .catch(error => {
             console.error(error);
           });
-      } else {
+      } else if (currentTab === FollowsEnum.FollowingTab) {
         getFollowingList({ sharetribeProfileUserId, limit: 10, offset: 0 })
           .then(res => {
             setFollowingList(res.data);
@@ -68,7 +79,7 @@ const FollowsListTabs = props => {
           });
       }
     }
-  }, [sharetribeProfileUserId]);
+  }, [currentTab, sharetribeProfileUserId]);
 
   const zeroFollowsResultsElem = (
     <div className={css.rowUnsetMarginLR}>
@@ -81,46 +92,48 @@ const FollowsListTabs = props => {
   );
 
   return (
-    <>
-      <div className={css.row}>
-        <div className={css.col6}>
-          {' '}
-          <div
-            className={currentTab === FollowsEnum.FollowersTab ? tabClassActive : css.tab}
-            onClick={() => setCurrentTab(FollowsEnum.FollowersTab)}
-          >
-            {followersCount} Followers
+    currentTab && (
+      <>
+        <div className={css.row}>
+          <div className={css.col6}>
+            {' '}
+            <div
+              className={currentTab === FollowsEnum.FollowersTab ? tabClassActive : css.tab}
+              onClick={() => setCurrentTab(FollowsEnum.FollowersTab)}
+            >
+              {followersCount} Followers
+            </div>
+          </div>
+          <div className={css.col6}>
+            {' '}
+            <div
+              className={currentTab === FollowsEnum.FollowingTab ? tabClassActive : css.tab}
+              onClick={() => setCurrentTab(FollowsEnum.FollowingTab)}
+            >
+              {followingCount} Following
+            </div>
           </div>
         </div>
-        <div className={css.col6}>
-          {' '}
-          <div
-            className={currentTab === FollowsEnum.FollowingTab ? tabClassActive : css.tab}
-            onClick={() => setCurrentTab(FollowsEnum.FollowingTab)}
-          >
-            {followingCount} Following
+        <div className={css.row}>
+          <div className={css.col12}>
+            {currentTab === FollowsEnum.FollowersTab && (
+              <>
+                {followersList && followersList.length > 0
+                  ? followersList.map(item => <FollowsItem item={item} />)
+                  : zeroFollowsResultsElem}
+              </>
+            )}
+            {currentTab === FollowsEnum.FollowingTab && (
+              <>
+                {followingList && followingList.length > 0
+                  ? followingList.map(item => <FollowsItem item={item} />)
+                  : zeroFollowsResultsElem}
+              </>
+            )}
           </div>
         </div>
-      </div>
-      <div className={css.row}>
-        <div className={css.col12}>
-          {currentTab === FollowsEnum.FollowersTab && (
-            <>
-              {followersList && followersList.length > 0
-                ? followersList.map(item => <FollowsItem item={item} />)
-                : zeroFollowsResultsElem}
-            </>
-          )}
-          {currentTab === FollowsEnum.FollowingTab && (
-            <>
-              {followingList && followingList.length > 0
-                ? followingList.map(item => <FollowsItem item={item} />)
-                : zeroFollowsResultsElem}
-            </>
-          )}
-        </div>
-      </div>
-    </>
+      </>
+    )
   );
 };
 

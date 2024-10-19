@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { bool, arrayOf, number, shape } from 'prop-types';
 import { compose } from 'redux';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -49,6 +49,7 @@ import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottom
 import FollowsListTabs from '../../components/FollowsListTabs/FollowsListTabs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
+import { FollowsEnum } from '../../enums/follows.enum';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
@@ -71,7 +72,14 @@ const FollowersFollowingSection = props => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
   };
 
+  const [selectedFollowsTab, setSelectedFollowsTab] = useState();
   const [followsModalOpen, setFollowsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (selectedFollowsTab) {
+      setFollowsModalOpen(true);
+    }
+  }, [selectedFollowsTab]);
 
   const onFollowUnfollow = () => {
     followUnfollowUser({ sharetribeProfileUserId })
@@ -81,6 +89,10 @@ const FollowersFollowingSection = props => {
       .catch(error => {
         console.error(`onFollowUnfollow error`, error);
       });
+  };
+
+  const onSetFollowsModalOpen = tab => {
+    setSelectedFollowsTab(tab);
   };
 
   return (
@@ -119,7 +131,10 @@ const FollowersFollowingSection = props => {
               </div>
             </div>
             <div className={css.row}>
-              <div className={css.colFollowers} onClick={() => setFollowsModalOpen(true)}>
+              <div
+                className={css.colFollowers}
+                onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowersTab)}
+              >
                 <div className={css.followsColumns}>
                   <br />
                   <span className={css.value}>{followersCount}</span>{' '}
@@ -128,7 +143,10 @@ const FollowersFollowingSection = props => {
                   </span>
                 </div>
               </div>
-              <div className={css.colFollowing} onClick={() => setFollowsModalOpen(true)}>
+              <div
+                className={css.colFollowing}
+                onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowingTab)}
+              >
                 <div className={[css.followsColumns, css.divider].join(' ')}>
                   <br />
                   <span className={css.value}>{followingCount}</span>{' '}
@@ -160,6 +178,8 @@ const FollowersFollowingSection = props => {
           onManageDisableScrolling={onManageDisableScrolling}
         >
           <FollowsListTabs
+            currentTab={selectedFollowsTab}
+            setCurrentTab={setSelectedFollowsTab}
             sharetribeProfileUserId={sharetribeProfileUserId}
             followersCount={followersCount}
             followingCount={followingCount}
