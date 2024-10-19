@@ -8,7 +8,7 @@ class StripeAccountRoute extends BaseRoute {
     router.post(
       this.ROOT_PATH + '/update-payout-settings',
       authMiddleware,
-      StripeAccountController.retrieveStripeAccount
+      StripeAccountController.updatePayoutSettings
     );
   }
 }
