@@ -30,5 +30,14 @@ class SharetribeIntegrationService {
         return error;
       });
   }
+
+  static async searchStripeAccountId(authorId) {
+    const result = await this.showUser({
+      id: authorId,
+      include: ['stripeAccount'],
+    });
+    const stripeAccountId = result?.data?.included?.[0]?.attributes?.stripeAccountId;
+    return stripeAccountId;
+  }
 }
 module.exports = SharetribeIntegrationService;
