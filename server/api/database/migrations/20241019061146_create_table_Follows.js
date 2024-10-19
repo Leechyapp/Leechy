@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-  knex.raw(`
+  return knex.raw(`
         CREATE TABLE Follows (
             id int NOT NULL AUTO_INCREMENT,
             followedUserId int NOT NULL,
@@ -20,5 +20,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-  knex.dropTable('Follows');
+  return knex.schema.dropTable('Follows');
 };

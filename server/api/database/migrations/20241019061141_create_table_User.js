@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-  knex.raw(`
+  return knex.raw(`
         CREATE TABLE User (
             id int NOT NULL AUTO_INCREMENT,
             sharetribeUUID varchar(255) NOT NULL,
@@ -18,5 +18,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-  knex.dropTable('User');
+  return knex.schema.dropTable('User');
 };
