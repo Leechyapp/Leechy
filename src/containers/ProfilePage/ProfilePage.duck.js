@@ -23,8 +23,9 @@ export const QUERY_REVIEWS_REQUEST = 'app/ProfilePage/QUERY_REVIEWS_REQUEST';
 export const QUERY_REVIEWS_SUCCESS = 'app/ProfilePage/QUERY_REVIEWS_SUCCESS';
 export const QUERY_REVIEWS_ERROR = 'app/ProfilePage/QUERY_REVIEWS_ERROR';
 
-export const FETCH_INITIAL_FOLLOWS_DATA_SUCCESS =
-  'app/ProfilePage/FETCH_INITIAL_FOLLOWS_DATA_SUCCESS';
+export const FETCH_FOLLOWERS_COUNT_SUCCESS = 'app/ProfilePage/FETCH_FOLLOWERS_COUNT_SUCCESS';
+export const FETCH_FOLLOWING_COUNT_SUCCESS = 'app/ProfilePage/FETCH_FOLLOWING_COUNT_SUCCESS';
+export const FETCH_IS_FOLLOWING_SUCCESS = 'app/ProfilePage/FETCH_IS_FOLLOWING_SUCCESS';
 
 // ================ Reducer ================ //
 
@@ -35,7 +36,9 @@ const initialState = {
   queryListingsError: null,
   reviews: [],
   queryReviewsError: null,
-  initialFollowsData: null,
+  followersCount: 0,
+  followingCount: 0,
+  isFollowing: false,
 };
 
 export default function profilePageReducer(state = initialState, action = {}) {
@@ -70,8 +73,12 @@ export default function profilePageReducer(state = initialState, action = {}) {
     case QUERY_REVIEWS_ERROR:
       return { ...state, reviews: [], queryReviewsError: payload };
 
-    case FETCH_INITIAL_FOLLOWS_DATA_SUCCESS:
-      return { ...state, initialFollowsData: payload.initialFollowsData };
+    case FETCH_FOLLOWERS_COUNT_SUCCESS:
+      return { ...state, followersCount: payload.followersCount };
+    case FETCH_FOLLOWING_COUNT_SUCCESS:
+      return { ...state, followingCount: payload.followingCount };
+    case FETCH_IS_FOLLOWING_SUCCESS:
+      return { ...state, isFollowing: payload.isFollowing };
 
     default:
       return state;
@@ -130,9 +137,17 @@ export const queryReviewsError = e => ({
   payload: e,
 });
 
-export const fetchInitialFollowsDataSuccess = initialFollowsData => ({
-  type: FETCH_INITIAL_FOLLOWS_DATA_SUCCESS,
-  payload: { initialFollowsData },
+export const fetchFollowersCountSuccess = followersCount => ({
+  type: FETCH_FOLLOWERS_COUNT_SUCCESS,
+  payload: { followersCount },
+});
+export const fetchFollowingCountSuccess = followingCount => ({
+  type: FETCH_FOLLOWING_COUNT_SUCCESS,
+  payload: { followingCount },
+});
+export const fetchIsFollowingSuccess = isFollowing => ({
+  type: FETCH_IS_FOLLOWING_SUCCESS,
+  payload: { isFollowing },
 });
 
 // ================ Thunks ================ //
@@ -203,7 +218,15 @@ export const fetchUserFollowsCount = (userId, config) => (dispatch, getState, sd
     sharetribeProfileUserId: userId,
   })
     .then(response => {
-      dispatch(fetchInitialFollowsDataSuccess(response));
+      if (response?.followersCount) {
+        dispatch(fetchFollowersCountSuccess(response.followersCount));
+      }
+      if (response?.followingCount) {
+        dispatch(fetchFollowingCountSuccess(response.followingCount));
+      }
+      if (response?.isFollowing) {
+        dispatch(fetchIsFollowingSuccess(response.isFollowing));
+      }
       return response;
     })
     .catch(e => {

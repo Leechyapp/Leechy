@@ -50,6 +50,7 @@ import FollowsListTabs from '../../components/FollowsListTabs/FollowsListTabs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { FollowsEnum } from '../../enums/follows.enum';
+import { fetchFollowersCountSuccess, fetchIsFollowingSuccess } from './ProfilePage.duck';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
@@ -59,11 +60,7 @@ const FollowersFollowingSection = props => {
   const [showProfileMoreMenu, setShowProfileMoreMenu] = useState(false);
 
   const state = useSelector(state => state.ProfilePage);
-  const { initialFollowsData } = state;
-
-  const followersCount = initialFollowsData?.followersCount ? initialFollowsData.followersCount : 0;
-  const followingCount = initialFollowsData?.followingCount ? initialFollowsData.followingCount : 0;
-  const isFollowing = initialFollowsData?.isFollowing;
+  const { followersCount, followingCount, isFollowing } = state;
 
   const sharetribeProfileUserId = profileUser.id;
 
@@ -84,7 +81,14 @@ const FollowersFollowingSection = props => {
   const onFollowUnfollow = () => {
     followUnfollowUser({ sharetribeProfileUserId })
       .then(res => {
-        console.log(`onFollowUnfollow res`, res);
+        if (res?.code === FollowsEnum.Unfollowed) {
+          dispatch(fetchIsFollowingSuccess(false));
+          const newFollowersCount = followersCount > 0 ? followersCount - 1 : 0;
+          dispatch(fetchFollowersCountSuccess(newFollowersCount));
+        } else if (res?.code === FollowsEnum.Followed) {
+          dispatch(fetchIsFollowingSuccess(true));
+          dispatch(fetchFollowersCountSuccess(followingCount + 1));
+        }
       })
       .catch(error => {
         console.error(`onFollowUnfollow error`, error);
