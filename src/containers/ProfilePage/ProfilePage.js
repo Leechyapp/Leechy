@@ -55,11 +55,14 @@ import {
   fetchFollowingCountSuccess,
   fetchIsFollowingSuccess,
 } from './ProfilePage.duck';
+import { useRouteConfiguration } from '../../context/routeConfigurationContext';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { pathByRouteName } from '../../util/routes';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
 const FollowersFollowingSection = props => {
-  const { profileUser, displayName, user } = props;
+  const { profileUser, displayName, user, isCurrentUser } = props;
 
   const [showProfileMoreMenu, setShowProfileMoreMenu] = useState(false);
 
@@ -68,6 +71,8 @@ const FollowersFollowingSection = props => {
 
   const sharetribeProfileUserId = profileUser.id;
 
+  const history = useHistory();
+  const routeConfiguration = useRouteConfiguration();
   const dispatch = useDispatch();
   const onManageDisableScrolling = (componentId, disableScrolling) => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
@@ -103,20 +108,24 @@ const FollowersFollowingSection = props => {
     setSelectedFollowsTab(tab);
   };
 
+  const redirectToProfileSettingsPage = () => {
+    history.push(pathByRouteName('ProfileSettingsPage', routeConfiguration));
+  };
+
   return (
     <>
       <div className={css.rowUnsetMarginLR}>
         <div className={css.colAvatar}>
           <div className={css.row}>
             <div className={css.avatarContainer}>
-              <AvatarLarge className={css.avatarMobile} user={user} disableProfileLink />
+              <AvatarLarge className={css.avatarMobile} user={user} disableProfileLink={true} />
             </div>
           </div>
-          <div className={css.row}>
+          {/* <div className={css.row}>
             <NamedLink name="ProfileSettingsPage" className={css.editLinkMobile}>
               <FormattedMessage id="ProfilePage.editProfileLinkMobile" />
             </NamedLink>
-          </div>
+          </div> */}
         </div>
         <div className={css.colUserContentSide}>
           <div className={css.userContentSide}>
@@ -162,16 +171,25 @@ const FollowersFollowingSection = props => {
                 </div>
               </div>
               <div className={css.colFollowsButton}>
-                <Button
-                  className={isFollowing ? css.followingButton : css.followsButton}
-                  onClick={() => onFollowUnfollow()}
-                >
-                  {isFollowing ? (
-                    <FormattedMessage id="ProfilePage.following.button.text" />
-                  ) : (
-                    <FormattedMessage id="ProfilePage.follow.button.text" />
-                  )}
-                </Button>
+                {isCurrentUser ? (
+                  <Button
+                    className={css.editProfileButton}
+                    onClick={() => redirectToProfileSettingsPage()}
+                  >
+                    <FormattedMessage id="ProfilePage.editProfile.button.text" />
+                  </Button>
+                ) : (
+                  <Button
+                    className={isFollowing ? css.followingButton : css.followsButton}
+                    onClick={() => onFollowUnfollow()}
+                  >
+                    {isFollowing ? (
+                      <FormattedMessage id="ProfilePage.following.button.text" />
+                    ) : (
+                      <FormattedMessage id="ProfilePage.follow.button.text" />
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -222,7 +240,7 @@ export const AsideContent = props => {
             </H2>
           </div>
         </div> */}
-        {isCurrentUser ? (
+        {/* {isCurrentUser ? (
           <div className={css.row}>
             <div className={css.col12}>
               <div className={css.linkContainer}>
@@ -232,7 +250,7 @@ export const AsideContent = props => {
               </div>
             </div>
           </div>
-        ) : null}
+        ) : null} */}
       </div>
     </div>
   );
@@ -423,6 +441,7 @@ export const MainContent = props => {
           profileUser={profileUser}
           displayName={displayName}
           user={user}
+          isCurrentUser={isCurrentUser}
         />
       </div>
       {hasBio ? <p className={css.bio}>{bio}</p> : null}
