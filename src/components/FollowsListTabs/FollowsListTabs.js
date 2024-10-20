@@ -5,16 +5,32 @@ import { getFollowersList, getFollowingList } from '../../util/api';
 import Avatar from '../Avatar/Avatar';
 import { FollowsEnum } from '../../enums/follows.enum';
 import { FormattedMessage } from 'react-intl';
+import { useRouteConfiguration } from '../../context/routeConfigurationContext';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { pathByRouteName } from '../../util/routes';
 
 const FollowsItem = props => {
-  const { item, currentTab } = props;
+  const { item, currentTab, setFollowsModalOpen } = props;
+
+  const history = useHistory();
+  const routeConfiguration = useRouteConfiguration();
+
+  const redirectToProfileSettingsPage = () => {
+    setFollowsModalOpen(false);
+    history.push(
+      pathByRouteName('ProfilePage', routeConfiguration, {
+        id: item.user.id.uuid,
+      })
+    );
+  };
+
   return (
     <div key={item.id} className={css.followsListItem}>
       <div className={css.rowUnsetMarginLR}>
-        <div className={css.col2}>
-          <Avatar user={item.user} />
+        <div className={css.col2} onClick={() => redirectToProfileSettingsPage()}>
+          <Avatar user={item.user} disableProfileLink={true} />
         </div>
-        <div className={css.col4}>
+        <div className={css.col4} onClick={() => redirectToProfileSettingsPage()}>
           <p className={css.displayName}>{item?.user?.attributes?.profile?.displayName}</p>
         </div>
         <div className={css.col6}>
@@ -40,6 +56,7 @@ const FollowsListTabs = props => {
     sharetribeProfileUserId,
     followersCount,
     followingCount,
+    setFollowsModalOpen,
   } = props;
 
   if (!currentTab) {
@@ -119,14 +136,26 @@ const FollowsListTabs = props => {
             {currentTab === FollowsEnum.FollowersTab && (
               <>
                 {followersList && followersList.length > 0
-                  ? followersList.map(item => <FollowsItem item={item} currentTab={currentTab} />)
+                  ? followersList.map(item => (
+                      <FollowsItem
+                        item={item}
+                        currentTab={currentTab}
+                        setFollowsModalOpen={setFollowsModalOpen}
+                      />
+                    ))
                   : zeroFollowsResultsElem}
               </>
             )}
             {currentTab === FollowsEnum.FollowingTab && (
               <>
                 {followingList && followingList.length > 0
-                  ? followingList.map(item => <FollowsItem item={item} currentTab={currentTab} />)
+                  ? followingList.map(item => (
+                      <FollowsItem
+                        item={item}
+                        currentTab={currentTab}
+                        setFollowsModalOpen={setFollowsModalOpen}
+                      />
+                    ))
                   : zeroFollowsResultsElem}
               </>
             )}

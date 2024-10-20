@@ -207,6 +207,7 @@ const FollowersFollowingSection = props => {
             sharetribeProfileUserId={sharetribeProfileUserId}
             followersCount={followersCount}
             followingCount={followingCount}
+            setFollowsModalOpen={setFollowsModalOpen}
           />
         </Modal>
         <Modal
