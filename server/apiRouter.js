@@ -25,6 +25,7 @@ const ContactRoute = require('./api/routes/contact.route');
 const SecurityDepositRoute = require('./api/routes/security-deposit.route');
 const MessageRoute = require('./api/routes/message.route');
 const ShippingRoute = require('./api/routes/shipping.route');
+const PushNotificationRoute = require('./api/routes/push-notification.route');
 
 const router = express.Router();
 
@@ -90,5 +91,6 @@ new ContactRoute(router);
 new SecurityDepositRoute(router);
 new MessageRoute(router);
 new ShippingRoute(router);
+new PushNotificationRoute(router);
 
 module.exports = router;
