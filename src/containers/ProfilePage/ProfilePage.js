@@ -50,11 +50,7 @@ import FollowsListTabs from '../../components/FollowsListTabs/FollowsListTabs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { FollowsEnum } from '../../enums/follows.enum';
-import {
-  fetchFollowersCountSuccess,
-  fetchFollowingCountSuccess,
-  fetchIsFollowingSuccess,
-} from './ProfilePage.duck';
+import { fetchFollowersCountSuccess, fetchIsFollowingSuccess } from './ProfilePage.duck';
 import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { pathByRouteName } from '../../util/routes';
@@ -83,7 +79,9 @@ const FollowersFollowingSection = props => {
 
   useEffect(() => {
     if (selectedFollowsTab) {
-      setFollowsModalOpen(true);
+      if (followsModalOpen !== true) {
+        setFollowsModalOpen(true);
+      }
     }
   }, [selectedFollowsTab]);
 
@@ -205,8 +203,6 @@ const FollowersFollowingSection = props => {
             currentTab={selectedFollowsTab}
             setCurrentTab={setSelectedFollowsTab}
             sharetribeProfileUserId={sharetribeProfileUserId}
-            followersCount={followersCount}
-            followingCount={followingCount}
             setFollowsModalOpen={setFollowsModalOpen}
           />
         </Modal>

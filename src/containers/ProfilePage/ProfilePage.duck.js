@@ -213,7 +213,7 @@ export const showUser = (userId, config) => (dispatch, getState, sdk) => {
     .catch(e => dispatch(showUserError(storableError(e))));
 };
 
-export const fetchUserFollowsCount = (userId, config) => (dispatch, getState, sdk) => {
+export const fetchInitialFollowsData = userId => (dispatch, getState, sdk) => {
   return searchInitialFollowsData({
     sharetribeProfileUserId: userId,
   })
@@ -244,7 +244,7 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
   return Promise.all([
     dispatch(fetchCurrentUser()),
     dispatch(showUser(userId, config)),
-    dispatch(fetchUserFollowsCount(userId, config)),
+    dispatch(fetchInitialFollowsData(userId)),
     dispatch(queryUserListings(userId, config)),
     dispatch(queryUserReviews(userId)),
   ]);

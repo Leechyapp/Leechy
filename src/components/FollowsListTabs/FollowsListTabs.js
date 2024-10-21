@@ -1,19 +1,42 @@
 import { useEffect, useState } from 'react';
 import css from './FollowsListTabs.module.scss';
 import Button from '../Button/Button';
-import { getFollowersList, getFollowingList } from '../../util/api';
+import { followUnfollowUser, getFollowersList, getFollowingList } from '../../util/api';
 import Avatar from '../Avatar/Avatar';
 import { FollowsEnum } from '../../enums/follows.enum';
 import { FormattedMessage } from 'react-intl';
 import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { pathByRouteName } from '../../util/routes';
+import { fetchInitialFollowsData } from '../../containers/ProfilePage/ProfilePage.duck';
+import { useDispatch, useSelector } from 'react-redux';
 
 const FollowsItem = props => {
-  const { item, currentTab, setFollowsModalOpen } = props;
+  const { item, setFollowsModalOpen, index, updateFollowsItem } = props;
 
   const history = useHistory();
   const routeConfiguration = useRouteConfiguration();
+
+  const state = useSelector(state => state);
+  const { currentUser } = state.user;
+  const { isAuthenticated } = state.auth;
+  const currentUserId = currentUser.id.uuid;
+
+  const onFollowUnfollow = sharetribeProfileUserId => {
+    followUnfollowUser({ sharetribeProfileUserId })
+      .then(res => {
+        if (res?.code === FollowsEnum.Unfollowed) {
+          item.following = false;
+          updateFollowsItem(item, index);
+        } else if (res?.code === FollowsEnum.Followed) {
+          item.following = true;
+          updateFollowsItem(item, index);
+        }
+      })
+      .catch(error => {
+        console.error(`onFollowUnfollow error`, error);
+      });
+  };
 
   const redirectToProfileSettingsPage = () => {
     setFollowsModalOpen(false);
@@ -34,12 +57,30 @@ const FollowsItem = props => {
           <p className={css.displayName}>{item?.user?.attributes?.profile?.displayName}</p>
         </div>
         <div className={css.col6}>
-          {item.following ? (
-            <Button className={css.followsButton}>
-              <FormattedMessage id="FollowsListTabs.unfollow.button" />
-            </Button>
+          {isAuthenticated ? (
+            currentUserId !== item.user.id.uuid ? (
+              <></>
+            ) : (
+              <>
+                {item.following ? (
+                  <Button
+                    className={css.unfollowButton}
+                    onClick={() => onFollowUnfollow(item.user.id)}
+                  >
+                    <FormattedMessage id="FollowsListTabs.unfollow.button" />
+                  </Button>
+                ) : (
+                  <Button
+                    className={css.followsButton}
+                    onClick={() => onFollowUnfollow(item.user.id)}
+                  >
+                    <FormattedMessage id="FollowsListTabs.follow.button" />
+                  </Button>
+                )}
+              </>
+            )
           ) : (
-            <Button className={css.followsButton}>
+            <Button className={css.followsButton} onClick={() => redirectToProfileSettingsPage()}>
               <FormattedMessage id="FollowsListTabs.follow.button" />
             </Button>
           )}
@@ -50,14 +91,7 @@ const FollowsItem = props => {
 };
 
 const FollowsListTabs = props => {
-  const {
-    currentTab,
-    setCurrentTab,
-    sharetribeProfileUserId,
-    followersCount,
-    followingCount,
-    setFollowsModalOpen,
-  } = props;
+  const { currentTab, setCurrentTab, sharetribeProfileUserId, setFollowsModalOpen } = props;
 
   if (!currentTab) {
     return null;
@@ -66,11 +100,13 @@ const FollowsListTabs = props => {
     return null;
   }
 
+  const dispatch = useDispatch();
+
   const [followersList, setFollowersList] = useState(new Array());
   const [followingList, setFollowingList] = useState(new Array());
 
-  //   const [followersCount, setFollowersCount] = useState(0);
-  //   const [followingCount, setFollowingCount] = useState(0);
+  const state = useSelector(state => state.ProfilePage);
+  const { followersCount, followingCount } = state;
 
   const tabClassActive = [css.tab, css.active].join(' ');
 
@@ -80,7 +116,6 @@ const FollowsListTabs = props => {
         getFollowersList({ sharetribeProfileUserId, limit: 10, offset: 0 })
           .then(res => {
             setFollowersList(res.data);
-            //   setFollowersCount(res.count);
           })
           .catch(error => {
             console.error(error);
@@ -89,7 +124,6 @@ const FollowsListTabs = props => {
         getFollowingList({ sharetribeProfileUserId, limit: 10, offset: 0 })
           .then(res => {
             setFollowingList(res.data);
-            //   setFollowersCount(res.count);
           })
           .catch(error => {
             console.error(error);
@@ -107,6 +141,32 @@ const FollowsListTabs = props => {
       </div>
     </div>
   );
+
+  const getFollowsItem = (currentTab, item, index) => {
+    const updateFollowsItem = (item, index) => {
+      if (FollowsEnum.FollowersTab) {
+        const updatedFollowsList = [...followersList];
+        updatedFollowsList[index] = item;
+        setFollowersList(updatedFollowsList);
+        dispatch(fetchInitialFollowsData(sharetribeProfileUserId));
+      } else {
+        const updatedFollowsList = [...followingList];
+        updatedFollowsList[index] = item;
+        setFollowersList(updatedFollowsList);
+        dispatch(fetchInitialFollowsData(sharetribeProfileUserId));
+      }
+    };
+
+    return (
+      <FollowsItem
+        item={item}
+        currentTab={currentTab}
+        setFollowsModalOpen={setFollowsModalOpen}
+        index={index}
+        updateFollowsItem={updateFollowsItem}
+      />
+    );
+  };
 
   return (
     currentTab && (
@@ -136,26 +196,14 @@ const FollowsListTabs = props => {
             {currentTab === FollowsEnum.FollowersTab && (
               <>
                 {followersList && followersList.length > 0
-                  ? followersList.map(item => (
-                      <FollowsItem
-                        item={item}
-                        currentTab={currentTab}
-                        setFollowsModalOpen={setFollowsModalOpen}
-                      />
-                    ))
+                  ? followersList.map((item, index) => getFollowsItem(currentTab, item, index))
                   : zeroFollowsResultsElem}
               </>
             )}
             {currentTab === FollowsEnum.FollowingTab && (
               <>
                 {followingList && followingList.length > 0
-                  ? followingList.map(item => (
-                      <FollowsItem
-                        item={item}
-                        currentTab={currentTab}
-                        setFollowsModalOpen={setFollowsModalOpen}
-                      />
-                    ))
+                  ? followingList.map((item, index) => getFollowsItem(currentTab, item, index))
                   : zeroFollowsResultsElem}
               </>
             )}

@@ -88,7 +88,7 @@ class FollowsController {
         });
         const user = sharetribeRes?.data;
         const included = sharetribeRes?.included;
-        user.profileImage = included[0];
+        user.profileImage = included && included?.length > 0 ? included[0] : null;
 
         followsList[i].user = user;
 
@@ -134,7 +134,7 @@ class FollowsController {
         });
         const user = sharetribeRes?.data;
         const included = sharetribeRes?.included;
-        user.profileImage = included[0];
+        user.profileImage = included && included?.length > 0 ? included[0] : null;
 
         followsList[i].user = user;
 
