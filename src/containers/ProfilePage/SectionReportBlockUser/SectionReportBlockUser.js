@@ -8,6 +8,7 @@ import { blockUser, sendContactEmail } from '../../../util/api';
 import { fetchCurrentUser } from '../../../ducks/user.duck';
 import { propTypes } from '../../../util/types';
 import { func, shape } from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 const SectionReportBlockUser = props => {
   const { profileUser } = props;
@@ -52,22 +53,26 @@ const SectionReportBlockUser = props => {
         <div className={css.col12}>
           {isAuthenticated ? (
             <p className={css.reportLink} onClick={() => setReportProfileModalOpen(true)}>
-              Report this profile
+              <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
             </p>
           ) : (
             <p className={css.reportLink}>
-              <NamedLink name="LoginPage">Report this profile</NamedLink>
+              <NamedLink name="LoginPage">
+                <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
+              </NamedLink>
             </p>
           )}
         </div>
         <div className={css.col12}>
           {isAuthenticated ? (
             <p className={css.blockLink} onClick={() => onBlockUser()}>
-              Block user
+              <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
             </p>
           ) : (
             <p className={css.blockLink}>
-              <NamedLink name="LoginPage">Block user</NamedLink>
+              <NamedLink name="LoginPage">
+                <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
+              </NamedLink>
             </p>
           )}
         </div>
@@ -84,7 +89,7 @@ const SectionReportBlockUser = props => {
             <div className={css.col12}>
               <br />
               <p className={css.mobileMarginTop}>
-                You have reported profile, we will review your report within 24 hours.
+                <FormattedMessage id="SectionReportBlockUser.reportProfile.message" />
               </p>
             </div>
           ) : (
@@ -96,28 +101,28 @@ const SectionReportBlockUser = props => {
                   onClick={() => onReportProfile(1)}
                   type="button"
                 >
-                  Report objectionable content
+                  <FormattedMessage id="SectionReportBlockUser.report.objectionableContent.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(2)}
                   type="button"
                 >
-                  Report spam
+                  <FormattedMessage id="SectionReportBlockUser.report.spam.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(3)}
                   type="button"
                 >
-                  Report deceptive content
+                  <FormattedMessage id="SectionReportBlockUser.deceptiveContent.spam.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(4)}
                   type="button"
                 >
-                  This user should be removed
+                  <FormattedMessage id="SectionReportBlockUser.shouldBeRemoved.spam.button" />
                 </SecondaryButton>
               </form>
             </div>

@@ -1,4 +1,5 @@
 @import '../../styles/customMediaQueries.css';
+@import '../../styles/gridDefaults.scss';
 
 .error {
   margin-top: 5px;
@@ -15,65 +16,231 @@
   color: var(--colorFail);
 }
 
+.main {
+  border: none;
+}
+
 .aside {
   box-shadow: none;
+  @media (--viewportMaxLarge) {
+    margin-top: -40px;
+  }
+}
+
+.followsSection {
+  width: 100%;
+  @media (--viewportLarge) {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
 }
 
 .asideContent {
-  width: 100%;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  border-bottom: 1px solid var(--colorGrey100);
+  flex-direction: column;
+  width: 100%;
+  max-width: 350px;
 
-  @media (--viewportLarge) {
-    flex-direction: column;
-    border-bottom: none;
+  @media (--viewportMaxLarge) {
+    margin: 0 auto;
+  }
+
+  .userDetails {
+    width: 120px;
+    max-height: 350px;
+    padding: 16px;
+    margin: 0 auto;
+
+    @media (--viewportMaxLarge) {
+      margin-top: 15px;
+      width: 100%;
+    }
   }
 }
 
 .avatar {
-  margin: 30px 26px 29px 0;
   flex-shrink: 0;
-
+  display: none;
+  text-align: center;
+  line-height: 105px;
+  img {
+    margin-bottom: 12px;
+  }
   @media (--viewportLarge) {
-    margin: 0 96px 48px 0;
+    display: block;
   }
 }
 
 .mobileHeading {
   flex-shrink: 0;
   margin: 60px 0 0 0;
-
-  @media (--viewportMedium) {
-    margin: 49px 0 0 0;
-  }
   @media (--viewportLarge) {
     display: none;
   }
 }
 
-.editLinkMobile {
-  margin-top: 17px;
-
-  /* Pull the link to the end of the container */
-  margin-left: auto;
-
-  @media (--viewportMedium) {
-    margin-top: 20px;
+.colAvatar {
+  display: block;
+  width: 20%;
+  flex: $flexColDefault;
+  @media (--viewportXSmall) {
+    width: 20%;
   }
   @media (--viewportLarge) {
     display: none;
   }
+
+  .avatarContainer {
+    width: 130px;
+
+    .avatarMobile {
+      flex-shrink: 0;
+      display: block;
+      float: left;
+      text-align: center;
+      line-height: 50px;
+      width: 50px;
+      height: 50px;
+
+      img {
+        margin-bottom: 12px;
+      }
+
+      @media (--viewportSmall) {
+        line-height: 60px;
+        width: 60px;
+        height: 60px;
+      }
+      @media (--viewportMedium) {
+        line-height: 90px;
+        width: 80px;
+        height: 80px;
+      }
+      @media (--viewportLarge) {
+        display: none;
+      }
+    }
+  }
 }
 
-.editLinkDesktop {
-  display: none;
-
-  @media (--viewportLarge) {
-    display: inline;
-    padding: 6px 0 2px 0;
+.colUserContentSide {
+  flex: $flexColDefault;
+  width: 75%;
+  @media (--viewportSmall) {
+    width: 75%;
   }
+  @media (--viewportLarge) {
+    width: 100%;
+  }
+
+  .userContentSide {
+    height: auto;
+    margin-top: -20px;
+    margin-bottom: 35px;
+    text-align: left;
+    @media (--viewportMaxXSmall) {
+      margin-left: 25px;
+    }
+    @media (--viewportLarge) {
+      height: 130px;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .colDisplayName {
+      flex: $flexColDefault;
+      width: 90%;
+    }
+
+    .colMenu {
+      flex: $flexColDefault;
+      width: 10%;
+
+      .profileMoreMenuIcon {
+        text-align: center;
+        border-radius: 50%;
+        float: right;
+        &:hover {
+          cursor: pointer;
+          background-color: var(--colorGrey75);
+        }
+        @media (--viewportMaxLarge) {
+          margin-top: 20px;
+        }
+        @media (--viewportLarge) {
+          margin-top: 25px;
+          margin-right: 20px;
+          width: 25px;
+          height: 25px;
+        }
+      }
+    }
+
+    .followsColumns {
+      margin-top: 22px;
+      width: 100px;
+      &:hover {
+        background-color: var(--colorGrey75);
+        cursor: pointer;
+      }
+    }
+
+    .colFollowers,
+    .colFollowing {
+      flex: $flexColDefault;
+      width: 50%;
+
+      @media (--viewportLarge) {
+        width: 20%;
+      }
+
+      .icon {
+        margin-bottom: 5px;
+      }
+
+      .value {
+        font-style: normal;
+        font-weight: var(--fontWeightMedium);
+        font-size: 20px;
+      }
+
+      .title {
+        font-size: 12px;
+        font-weight: var(--fontWeightRegular);
+      }
+    }
+
+    .colFollowsButton {
+      flex: $flexColDefault;
+      width: 100%;
+      @media (--viewportLarge) {
+        width: 20%;
+      }
+
+      .followsButton,
+      .editProfileButton {
+        margin-top: 22px;
+        min-height: 30px;
+        float: left;
+        width: 100%;
+        max-width: 100%;
+        @media (--viewportLarge) {
+          max-width: 100px;
+        }
+      }
+
+      .followingButton {
+        @extend .followsButton;
+        border: 2px solid var(--marketplaceColor);
+        background-color: 1px solid var(--colorWhite);
+        color: var(--marketplaceColor);
+      }
+    }
+  }
+}
+
+.linkContainer {
+  margin-top: 15px;
 }
 
 .desktopHeading {
@@ -82,6 +249,18 @@
   @media (--viewportLarge) {
     display: block;
     margin: 0 0 24px 0;
+  }
+}
+
+.desktopHeading1 {
+  margin-bottom: -10px;
+  font-size: 20px;
+  font-weight: 600;
+  @media (--viewportMedium) {
+    font-size: 24px;
+  }
+  @media (--viewportLarge) {
+    font-size: 28px;
   }
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heading, PropertyGroup } from '../../components';
 
-import css from './ProfilePage.module.css';
+import css from './ProfilePage.module.scss';
 
 const SectionMultiEnumMaybe = props => {
   const { heading, options, selectedOptions } = props;

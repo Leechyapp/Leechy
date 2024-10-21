@@ -2,7 +2,7 @@ import React from 'react';
 import { Heading } from '../../components';
 import { richText } from '../../util/richText';
 
-import css from './ProfilePage.module.css';
+import css from './ProfilePage.module.scss';
 
 const MIN_LENGTH_FOR_LONG_WORDS = 20;
 

@@ -3,7 +3,7 @@ import { FormattedMessage } from '../../util/reactIntl';
 import { Heading } from '../../components';
 import { getFieldValue } from '../../util/fieldHelpers';
 
-import css from './ProfilePage.module.css';
+import css from './ProfilePage.module.scss';
 
 const SectionDetailsMaybe = props => {
   const { publicData, metadata, userFieldConfig, intl } = props;

@@ -1,9 +1,8 @@
 const SharetribeService = require('../services/sharetribe.service');
-const HttpException = require('../classes/http-exception.class');
 const UserService = require('../services/user.service');
 const UserSyncService = require('../services/user-sync.service');
 
-exports.authMiddleware = async (req, res, next) => {
+exports.authPublicMiddleware = async (req, res, next) => {
   try {
     const currentUser = await SharetribeService.getCurrentUser(req, res);
     if (currentUser?.data?.id?.uuid) {
@@ -18,9 +17,9 @@ exports.authMiddleware = async (req, res, next) => {
       }
       next();
     } else {
-      next(new HttpException(401, 'Not authorized'));
+      next();
     }
   } catch (error) {
-    next(new HttpException(401, error));
+    next();
   }
 };
