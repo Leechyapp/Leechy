@@ -217,3 +217,7 @@ export const getFollowersList = body => {
 export const getFollowingList = body => {
   return post('/api/follows/get-following-list', body);
 };
+
+export const updatePayoutSettings = body => {
+  return post('/api/stripe-account/update-payout-settings', body);
+};
