@@ -58,7 +58,7 @@ const FollowsItem = props => {
         </div>
         <div className={css.col6}>
           {isAuthenticated ? (
-            currentUserId !== item.user.id.uuid ? (
+            currentUserId === item.user.id.uuid ? (
               <></>
             ) : (
               <>
