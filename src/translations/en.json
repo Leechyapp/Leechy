@@ -351,6 +351,8 @@
   "FollowsListTabs.noResults": "0 results",
   "FollowsListTabs.unfollow.button": "Following",
   "FollowsListTabs.follow.button": "Follow",
+  "FollowsListTabs.followers.count": "{followersCount} Followers",
+  "FollowsListTabs.following.count": "{followingCount} Followers",
   "ImageCarousel.imageAltText": "listing photo {index}/{count}",
   "ImageFromFile.couldNotReadFile": "Couldn't read file",
   "InboxPage.default-booking.accepted.status": "Accepted",

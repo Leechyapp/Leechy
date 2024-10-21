@@ -23,7 +23,6 @@ import {
   H4,
   Page,
   AvatarLarge,
-  NamedLink,
   ListingCard,
   Reviews,
   ButtonTabNavHorizontal,
@@ -62,8 +61,9 @@ const FollowersFollowingSection = props => {
 
   const [showProfileMoreMenu, setShowProfileMoreMenu] = useState(false);
 
-  const state = useSelector(state => state.ProfilePage);
-  const { followersCount, followingCount, isFollowing } = state;
+  const state = useSelector(state => state);
+  const { followersCount, followingCount, isFollowing } = state.ProfilePage;
+  const { isAuthenticated } = state.auth;
 
   const sharetribeProfileUserId = profileUser.id;
 
@@ -86,20 +86,24 @@ const FollowersFollowingSection = props => {
   }, [selectedFollowsTab]);
 
   const onFollowUnfollow = () => {
-    followUnfollowUser({ sharetribeProfileUserId })
-      .then(res => {
-        if (res?.code === FollowsEnum.Unfollowed) {
-          dispatch(fetchIsFollowingSuccess(false));
-          const newFollowersCount = followersCount > 0 ? followersCount - 1 : 0;
-          dispatch(fetchFollowersCountSuccess(newFollowersCount));
-        } else if (res?.code === FollowsEnum.Followed) {
-          dispatch(fetchIsFollowingSuccess(true));
-          dispatch(fetchFollowersCountSuccess(followersCount + 1));
-        }
-      })
-      .catch(error => {
-        console.error(`onFollowUnfollow error`, error);
-      });
+    if (isAuthenticated) {
+      followUnfollowUser({ sharetribeProfileUserId })
+        .then(res => {
+          if (res?.code === FollowsEnum.Unfollowed) {
+            dispatch(fetchIsFollowingSuccess(false));
+            const newFollowersCount = followersCount > 0 ? followersCount - 1 : 0;
+            dispatch(fetchFollowersCountSuccess(newFollowersCount));
+          } else if (res?.code === FollowsEnum.Followed) {
+            dispatch(fetchIsFollowingSuccess(true));
+            dispatch(fetchFollowersCountSuccess(followersCount + 1));
+          }
+        })
+        .catch(error => {
+          console.error(`onFollowUnfollow error`, error);
+        });
+    } else {
+      history.push(pathByRouteName('LoginPage', routeConfiguration));
+    }
   };
 
   const onSetFollowsModalOpen = tab => {
@@ -119,11 +123,6 @@ const FollowersFollowingSection = props => {
               <AvatarLarge className={css.avatarMobile} user={user} disableProfileLink={true} />
             </div>
           </div>
-          {/* <div className={css.row}>
-            <NamedLink name="ProfileSettingsPage" className={css.editLinkMobile}>
-              <FormattedMessage id="ProfilePage.editProfileLinkMobile" />
-            </NamedLink>
-          </div> */}
         </div>
         <div className={css.colUserContentSide}>
           <div className={css.userContentSide}>
@@ -137,12 +136,14 @@ const FollowersFollowingSection = props => {
                 </H3>
               </div>
               <div className={css.colMenu}>
-                <div
-                  className={css.profileMoreMenuIcon}
-                  onClick={() => setShowProfileMoreMenu(true)}
-                >
-                  <FontAwesomeIcon icon={faEllipsisVertical} />
-                </div>
+                {isAuthenticated && !isCurrentUser && (
+                  <div
+                    className={css.profileMoreMenuIcon}
+                    onClick={() => setShowProfileMoreMenu(true)}
+                  >
+                    <FontAwesomeIcon icon={faEllipsisVertical} />
+                  </div>
+                )}
               </div>
             </div>
             <div className={css.row}>
@@ -221,33 +222,13 @@ const FollowersFollowingSection = props => {
 };
 
 export const AsideContent = props => {
-  const { user, isCurrentUser } = props;
+  const { user } = props;
   return (
     <div className={css.asideContent}>
       <div className={css.userDetails}>
         <div className={css.row}>
           <AvatarLarge className={css.avatar} user={user} disableProfileLink />
         </div>
-        {/* <div className={css.row}>
-          <div className={css.col12}>
-            <H2 as="h1" className={css.mobileHeading}>
-              {displayName ? (
-                <FormattedMessage id="ProfilePage.mobileHeading" values={{ name: displayName }} />
-              ) : null}
-            </H2>
-          </div>
-        </div> */}
-        {/* {isCurrentUser ? (
-          <div className={css.row}>
-            <div className={css.col12}>
-              <div className={css.linkContainer}>
-                <NamedLink className={css.editLinkDesktop} name="ProfileSettingsPage">
-                  <FormattedMessage id="ProfilePage.editProfileLinkDesktop" />
-                </NamedLink>
-              </div>
-            </div>
-          </div>
-        ) : null} */}
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ const FollowsItem = props => {
   const state = useSelector(state => state);
   const { currentUser } = state.user;
   const { isAuthenticated } = state.auth;
-  const currentUserId = currentUser.id.uuid;
+  const currentUserId = currentUser?.id?.uuid;
 
   const onFollowUnfollow = sharetribeProfileUserId => {
     followUnfollowUser({ sharetribeProfileUserId })
@@ -178,7 +178,7 @@ const FollowsListTabs = props => {
               className={currentTab === FollowsEnum.FollowersTab ? tabClassActive : css.tab}
               onClick={() => setCurrentTab(FollowsEnum.FollowersTab)}
             >
-              {followersCount} Followers
+              <FormattedMessage id="FollowsListTabs.followers.count" values={{ followersCount }} />
             </div>
           </div>
           <div className={css.col6}>
@@ -187,7 +187,7 @@ const FollowsListTabs = props => {
               className={currentTab === FollowsEnum.FollowingTab ? tabClassActive : css.tab}
               onClick={() => setCurrentTab(FollowsEnum.FollowingTab)}
             >
-              {followingCount} Following
+              <FormattedMessage id="FollowsListTabs.following.count" values={{ followingCount }} />
             </div>
           </div>
         </div>

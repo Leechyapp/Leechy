@@ -239,35 +239,8 @@
   }
 }
 
-.editLinkMobile {
-  margin-top: 10px;
-  /* Pull the link to the end of the container */
-  margin-left: 10px;
-  font-size: 14px;
-  @media (--viewportSmall) {
-    margin-left: 16px;
-  }
-  @media (--viewportMedium) {
-    margin-top: 20px;
-  }
-  @media (--viewportLarge) {
-    display: none;
-  }
-}
-
 .linkContainer {
   margin-top: 15px;
-}
-
-.editLinkDesktop {
-  display: none;
-
-  @media (--viewportLarge) {
-    font-size: 15px;
-    margin-left: 8px;
-    display: inline;
-    padding: 6px 0 2px 0;
-  }
 }
 
 .desktopHeading {
