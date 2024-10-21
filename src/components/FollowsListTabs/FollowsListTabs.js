@@ -23,19 +23,23 @@ const FollowsItem = props => {
   const currentUserId = currentUser?.id?.uuid;
 
   const onFollowUnfollow = sharetribeProfileUserId => {
-    followUnfollowUser({ sharetribeProfileUserId })
-      .then(res => {
-        if (res?.code === FollowsEnum.Unfollowed) {
-          item.following = false;
-          updateFollowsItem(item, index);
-        } else if (res?.code === FollowsEnum.Followed) {
-          item.following = true;
-          updateFollowsItem(item, index);
-        }
-      })
-      .catch(error => {
-        console.error(`onFollowUnfollow error`, error);
-      });
+    if (isAuthenticated) {
+      followUnfollowUser({ sharetribeProfileUserId })
+        .then(res => {
+          if (res?.code === FollowsEnum.Unfollowed) {
+            item.following = false;
+            updateFollowsItem(item, index);
+          } else if (res?.code === FollowsEnum.Followed) {
+            item.following = true;
+            updateFollowsItem(item, index);
+          }
+        })
+        .catch(error => {
+          console.error(`onFollowUnfollow error`, error);
+        });
+    } else {
+      history.push(pathByRouteName('LoginPage', routeConfiguration));
+    }
   };
 
   const redirectToProfileSettingsPage = () => {
@@ -80,7 +84,7 @@ const FollowsItem = props => {
               </>
             )
           ) : (
-            <Button className={css.followsButton} onClick={() => redirectToProfileSettingsPage()}>
+            <Button className={css.followsButton} onClick={() => onFollowUnfollow()}>
               <FormattedMessage id="FollowsListTabs.follow.button" />
             </Button>
           )}
