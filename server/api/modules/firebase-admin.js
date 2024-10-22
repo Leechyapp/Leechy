@@ -1,10 +1,10 @@
-// const { initializeApp, credential } = require('firebase-admin/app');
-// const path = require('path');
+const FirebaseAdmin = require('firebase-admin/app');
+const path = require('path');
 
-// const serviceAccount = path.resolve(__dirname, `./service-account-${process.env.NODE_ENV}.json`);
+const serviceAccount = path.resolve(__dirname, `./service-account-${process.env.NODE_ENV}.json`);
 
-// const FirebaseAdmin = initializeApp({
-//   credential: credential.cert(serviceAccount),
-// });
+FirebaseAdmin.initializeApp({
+  credential: FirebaseAdmin.credential.cert(serviceAccount),
+});
 
-// module.exports = FirebaseAdmin;
+module.exports = FirebaseAdmin;
