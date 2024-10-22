@@ -1,5 +1,7 @@
 const PushNotificationCodeEnum = require('../enums/push-notification-code.enum');
+const FcmTokenService = require('../services/fcm-token.service');
 const PushNotificationService = require('../services/push-notification.service');
+const PushNotificationUtil = require('../utils/push-notification.util');
 
 class PushNotificationController {
   static async sendPushNotification(req, res, next) {
@@ -10,7 +12,7 @@ class PushNotificationController {
 
       switch (pushNotificationCode) {
         case PushNotificationCodeEnum.Message:
-          messageBody = PushNotificationUtil.getFirebaseTokenMessagePayload(
+          messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
             `John D. sent you a message`,
             `message body`,
@@ -20,7 +22,7 @@ class PushNotificationController {
           );
           break;
         case PushNotificationCodeEnum.BookingRequested:
-          messageBody = PushNotificationUtil.getFirebaseTokenMessagePayload(
+          messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
             `John D. sent you a booking request`,
             `message body`,
@@ -44,24 +46,21 @@ class PushNotificationController {
     }
   }
 
-  static async update(req, res, next) {
+  static async updateFCMToken(req, res, next) {
     try {
       const { fcmToken } = req.body;
 
       const insertUserWithFcmToken = async () => {
-        await FcmTokenService.insertUserFcmToken(fcmToken, req.efUserId);
+        await FcmTokenService.insertUserFcmToken(fcmToken, req.userId);
       };
 
       const tokenCount = await FcmTokenService.getFcmTokenCount(fcmToken);
       if (tokenCount === 0) {
         await insertUserWithFcmToken();
       } else {
-        const userFcmTokenMatch = await FcmTokenService.getUserFcmTokenMatch(
-          fcmToken,
-          req.efUserId
-        );
+        const userFcmTokenMatch = await FcmTokenService.getUserFcmTokenMatch(fcmToken, req.userId);
         if (userFcmTokenMatch) {
-          await FcmTokenService.updateLastActiveUserFcmToken(fcmToken, req.efUserId);
+          await FcmTokenService.updateLastActiveUserFcmToken(fcmToken, req.userId);
         } else {
           await FcmTokenService.deleteUserWithFcmToken(fcmToken);
           await insertUserWithFcmToken();

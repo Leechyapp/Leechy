@@ -1,5 +1,5 @@
 class PushNotificationUtil {
-  static getFirebaseTokenMessagePayload(token, title, body, data) {
+  static getFirebasePayload(token, title, body, data) {
     return {
       token,
       notification: {
@@ -10,3 +10,4 @@ class PushNotificationUtil {
     };
   }
 }
+module.exports = PushNotificationUtil;

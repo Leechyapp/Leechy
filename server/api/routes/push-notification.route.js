@@ -10,6 +10,11 @@ class PushNotificationRoute extends BaseRoute {
       authMiddleware,
       PushNotificationController.sendPushNotification
     );
+    router.post(
+      this.ROOT_PATH + '/update-fcm-token',
+      authMiddleware,
+      PushNotificationController.updateFCMToken
+    );
   }
 }
 
