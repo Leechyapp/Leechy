@@ -16,3 +16,6 @@ build
 .env
 npm-debug.log
 yarn-error.log
+
+# Google services
+server/api/modules/service-account-development.json
