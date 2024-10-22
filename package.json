@@ -138,7 +138,7 @@
     "build": "yarn run migrate && yarn build-web&&yarn build-server",
     "build-web": "sharetribe-scripts build",
     "build-server": "sharetribe-scripts build-server",
-    "format": "prettier --write '**/*.{js,css}'",
+    "format": "prettier --write '**/*.{js,css,scss}'",
     "format-ci": "prettier --list-different '**/*.{js,css}'",
     "format-docs": "prettier --write '**/*.md'",
     "test": "NODE_ICU_DATA=node_modules/full-icu sharetribe-scripts test",
