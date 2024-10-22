@@ -145,7 +145,8 @@ sudo chmod -R 777 assets
 Navigate to chrome://inspect/#devices
 
 - Click "Port forwarding..."
-- Set port 3020 and localhost:3020
+- Set front-end port 3020 and localhost:3020
+- Set back-end port 3520 and localhost:3520
 
 #### Unable to connect (port forwarding)
 
@@ -159,6 +160,14 @@ adb start-server
 adb reverse tcp:8081  tcp:8081
 
 On Windows, add "./" in from of adb, so "./adb".
+
+Live reload documentation
+```
+npm install -g @ionic/cli native-run
+```
+https://capacitorjs.com/docs/guides/live-reload
+https://ionicframework.com/docs/cli/commands/capacitor-run
+
 ```
 
 #### Changing Asset Images (Icons)
