@@ -2,7 +2,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
 
 export default class PushNotificationService {
   static registerPushNotifications = setNotifications => {
-    console.log('Initializing HomePage');
+    console.log('registerPushNotifications');
 
     // Register with Apple / Google to receive push via APNS/FCM
     PushNotifications.register();
