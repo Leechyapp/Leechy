@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { any, string } from 'prop-types';
 import ReactDOMServer from 'react-dom/server';
 
@@ -36,7 +36,10 @@ import Routes from './routing/Routes';
 import defaultMessages from './translations/en.json';
 import { App } from '@capacitor/app';
 import isNativePlatform from './util/isNativePlatform';
-import { SplashScreen } from '@capacitor/splash-screen';
+// import { SplashScreen } from '@capacitor/splash-screen';
+import { PushNotifications } from '@capacitor/push-notifications';
+import PushNotificationService from './services/push-notifications.service';
+import { Toast } from '@capacitor/toast';
 
 // If you want to change the language of default (fallback) translations,
 // change the imports to match the wanted locale:
@@ -240,9 +243,37 @@ const initNativePlatform = () => {
   }
 };
 
+const initPushNotifications = setNotifications => {
+  if (isNativePlatform) {
+    PushNotifications.checkPermissions().then(res => {
+      if (res.receive !== 'granted') {
+        PushNotifications.requestPermissions().then(res => {
+          if (res.receive === 'denied') {
+            showToast('Push Notification permission denied');
+          } else {
+            showToast('Push Notification permission granted');
+            PushNotificationService.registerPushNotifications(setNotifications);
+          }
+        });
+      } else {
+        register();
+      }
+    });
+  }
+};
+
+const showToast = async msg => {
+  await Toast.show({
+    text: msg,
+  });
+};
+
 export const ClientApp = props => {
   const { store, hostedTranslations = {}, hostedConfig = {} } = props;
   const appConfig = mergeConfig(hostedConfig, defaultConfig);
+
+  const [notifications, setNotifications] = useState([]);
+  console.log(`notifications`, notifications);
 
   // Show warning on the localhost:3000, if the environment variable key contains "SECRET"
   if (appSettings.dev) {
@@ -283,6 +314,7 @@ export const ClientApp = props => {
 
   useEffect(() => {
     initNativePlatform();
+    initPushNotifications(setNotifications);
   }, []);
 
   return (
