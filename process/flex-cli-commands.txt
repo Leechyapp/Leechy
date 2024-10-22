@@ -1,0 +1,51 @@
+# List the processes
+flex-cli process list -m leechy-dev
+flex-cli process list -m leechy-test
+flex-cli process list -m leechy
+
+# Pull process
+flex-cli process pull --process default-booking --version 1 --path process -m leechy-dev
+flex-cli process pull --process default-booking --version 1 --path process -m leechy-test
+flex-cli process pull --process default-booking --version 1 --path process -m leechy
+
+# Push / update process:
+flex-cli process push --path process --process default-booking -m leechy-dev
+flex-cli process push --path process --process default-booking -m leechy-test
+flex-cli process push --path process --process default-booking -m leechy
+
+# Point transaction to version #:
+flex-cli process update-alias --process default-booking --alias release-1 --version # -m leechy-dev
+flex-cli process update-alias --process default-booking --alias release-1 --version # -m leechy-test
+flex-cli process update-alias --process default-booking --alias release-1 --version # -m leechy
+
+# Search Schema
+flex-cli search -m leechy-dev
+
+Email Templates
+# Transactional templates
+## Previews
+flex-cli notifications preview --template process/templates/booking-accepted-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-declined-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-expired-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-money-paid --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-new-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-operator-accepted-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-operator-declined-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-payout-details --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-review-by-customer-wanted --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-review-by-other-party-published --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-review-by-other-party-unpublished --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications preview --template process/templates/booking-review-by-provider-wanted --context process/sample-template-context.json -m leechy-dev
+## Sends
+flex-cli notifications send --template process/templates/booking-accepted-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-declined-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-expired-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-money-paid --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-new-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-operator-accepted-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-operator-declined-request --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-payout-details --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-review-by-customer-wanted --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-review-by-other-party-published --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-review-by-other-party-unpublished --context process/sample-template-context.json -m leechy-dev
+flex-cli notifications send --template process/templates/booking-review-by-provider-wanted --context process/sample-template-context.json -m leechy-dev

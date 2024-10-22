@@ -256,3 +256,24 @@ git fetch upstream
 git merge upstream/main
 
 ```
+
+## DB Migrations with Knex
+
+```
+# Firstly, please ensure knex is installed globally
+npm i -g knex
+
+# Database creation
+Create database in MySQL called "YourDatabaseName"
+
+# Once DB is created, run db migrations:
+yarn run migrate
+
+# To create a new migration file, run:
+yarn run make:migration create_table_example
+
+# Rollbacks
+# ***PLEASE BE CAREFUL DOING ROLLBACKS ON PRODUCTION***
+# To rollback the latest db migrations, run:
+yarn run dev-rollback
+```

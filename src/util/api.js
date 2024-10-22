@@ -204,3 +204,20 @@ export const saveMessageFiles = body => {
 export const updateShippingStatus = body => {
   return post('/api/shipping/update-shipping-status', body);
 };
+
+export const searchInitialFollowsData = body => {
+  return post('/api/follows/search-initial-follows-data', body);
+};
+export const followUnfollowUser = body => {
+  return post('/api/follows/follow-unfollow-user', body);
+};
+export const getFollowersList = body => {
+  return post('/api/follows/get-followers-list', body);
+};
+export const getFollowingList = body => {
+  return post('/api/follows/get-following-list', body);
+};
+
+export const updatePayoutSettings = body => {
+  return post('/api/stripe-account/update-payout-settings', body);
+};

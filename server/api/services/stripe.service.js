@@ -16,6 +16,19 @@ class StripeApiService {
   static async createRefund(dataObj) {
     return await stripe.refunds.create(dataObj);
   }
+
+  static async updateAccountToAutomaticPayouts(stripeAccountId) {
+    const account = await stripe.accounts.update(stripeAccountId, {
+      settings: {
+        payouts: {
+          schedule: {
+            interval: 'daily',
+          },
+        },
+      },
+    });
+    return account;
+  }
 }
 
 module.exports = StripeApiService;

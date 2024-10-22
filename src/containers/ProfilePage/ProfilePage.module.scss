@@ -1,0 +1,479 @@
+@import '../../styles/customMediaQueries.css';
+@import '../../styles/gridDefaults.scss';
+
+.error {
+  margin-top: 5px;
+
+  @media (--viewportMedium) {
+    margin-top: 4px;
+  }
+  @media (--viewportLarge) {
+    margin-top: 3px;
+  }
+}
+
+.error {
+  color: var(--colorFail);
+}
+
+.main {
+  border: none;
+}
+
+.aside {
+  box-shadow: none;
+  @media (--viewportMaxLarge) {
+    margin-top: -40px;
+  }
+}
+
+.followsSection {
+  width: 100%;
+  @media (--viewportLarge) {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+}
+
+.asideContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 350px;
+
+  @media (--viewportMaxLarge) {
+    margin: 0 auto;
+  }
+
+  .userDetails {
+    width: 120px;
+    max-height: 350px;
+    padding: 16px;
+    margin: 0 auto;
+
+    @media (--viewportMaxLarge) {
+      margin-top: 15px;
+      width: 100%;
+    }
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+  display: none;
+  text-align: center;
+  line-height: 105px;
+  img {
+    margin-bottom: 12px;
+  }
+  @media (--viewportLarge) {
+    display: block;
+  }
+}
+
+.mobileHeading {
+  flex-shrink: 0;
+  margin: 60px 0 0 0;
+  @media (--viewportLarge) {
+    display: none;
+  }
+}
+
+.colAvatar {
+  display: block;
+  width: 20%;
+  flex: $flexColDefault;
+  @media (--viewportXSmall) {
+    width: 20%;
+  }
+  @media (--viewportLarge) {
+    display: none;
+  }
+
+  .avatarContainer {
+    width: 130px;
+
+    .avatarMobile {
+      flex-shrink: 0;
+      display: block;
+      float: left;
+      text-align: center;
+      line-height: 50px;
+      width: 50px;
+      height: 50px;
+
+      img {
+        margin-bottom: 12px;
+      }
+
+      @media (--viewportSmall) {
+        line-height: 60px;
+        width: 60px;
+        height: 60px;
+      }
+      @media (--viewportMedium) {
+        line-height: 90px;
+        width: 80px;
+        height: 80px;
+      }
+      @media (--viewportLarge) {
+        display: none;
+      }
+    }
+  }
+}
+
+.colUserContentSide {
+  flex: $flexColDefault;
+  width: 75%;
+  @media (--viewportSmall) {
+    width: 75%;
+  }
+  @media (--viewportLarge) {
+    width: 100%;
+  }
+
+  .userContentSide {
+    height: auto;
+    margin-top: -20px;
+    margin-bottom: 35px;
+    text-align: left;
+    @media (--viewportMaxXSmall) {
+      margin-left: 25px;
+    }
+    @media (--viewportLarge) {
+      height: 130px;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .colDisplayName {
+      flex: $flexColDefault;
+      width: 90%;
+    }
+
+    .colMenu {
+      flex: $flexColDefault;
+      width: 10%;
+
+      .profileMoreMenuIcon {
+        text-align: center;
+        border-radius: 50%;
+        float: right;
+        &:hover {
+          cursor: pointer;
+          background-color: var(--colorGrey75);
+        }
+        @media (--viewportMaxLarge) {
+          margin-top: 20px;
+        }
+        @media (--viewportLarge) {
+          margin-top: 25px;
+          margin-right: 20px;
+          width: 25px;
+          height: 25px;
+        }
+      }
+    }
+
+    .followsColumns {
+      margin-top: 22px;
+      width: 100px;
+      &:hover {
+        background-color: var(--colorGrey75);
+        cursor: pointer;
+      }
+    }
+
+    .colFollowers,
+    .colFollowing {
+      flex: $flexColDefault;
+      width: 50%;
+
+      @media (--viewportLarge) {
+        width: 20%;
+      }
+
+      .icon {
+        margin-bottom: 5px;
+      }
+
+      .value {
+        font-style: normal;
+        font-weight: var(--fontWeightMedium);
+        font-size: 20px;
+      }
+
+      .title {
+        font-size: 12px;
+        font-weight: var(--fontWeightRegular);
+      }
+    }
+
+    .colFollowsButton {
+      flex: $flexColDefault;
+      width: 100%;
+      @media (--viewportLarge) {
+        width: 20%;
+      }
+
+      .followsButton,
+      .editProfileButton {
+        margin-top: 22px;
+        min-height: 30px;
+        float: left;
+        width: 100%;
+        max-width: 100%;
+        @media (--viewportLarge) {
+          max-width: 100px;
+        }
+      }
+
+      .followingButton {
+        @extend .followsButton;
+        border: 2px solid var(--marketplaceColor);
+        background-color: 1px solid var(--colorWhite);
+        color: var(--marketplaceColor);
+      }
+    }
+  }
+}
+
+.linkContainer {
+  margin-top: 15px;
+}
+
+.desktopHeading {
+  display: none;
+
+  @media (--viewportLarge) {
+    display: block;
+    margin: 0 0 24px 0;
+  }
+}
+
+.desktopHeading1 {
+  margin-bottom: -10px;
+  font-size: 20px;
+  font-weight: 600;
+  @media (--viewportMedium) {
+    font-size: 24px;
+  }
+  @media (--viewportLarge) {
+    font-size: 28px;
+  }
+}
+
+.bio {
+  /* Preserve newlines, but collapse other whitespace */
+  white-space: pre-line;
+  margin: 5px 0 24px 0;
+
+  @media (--viewportMedium) {
+    margin: 4px 0 51px 0;
+  }
+  @media (--viewportLarge) {
+    margin: 0 0 56px 0;
+    max-width: 600px;
+  }
+}
+
+.listingsContainer {
+  composes: clearfix from global;
+  border-top: 1px solid var(--colorGrey100);
+  padding-bottom: 23px;
+
+  @media (--viewportMedium) {
+    padding-bottom: 22px;
+  }
+}
+
+.listingsTitle {
+  color: var(--colorGrey700);
+  margin-bottom: 0;
+
+  @media (--viewportMedium) {
+    margin-top: 48px;
+    margin-bottom: 8px;
+  }
+  @media (--viewportLarge) {
+    margin-top: 56px;
+    margin-bottom: 8px;
+  }
+}
+
+.withBioMissingAbove {
+  /* Avoid extra borders in mobile when bio is missing */
+  border-top: none;
+
+  @media (--viewportLarge) {
+    border-top: 1px solid var(--colorGrey100);
+  }
+}
+
+.listings {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.listing {
+  width: 100%;
+
+  /* Single column in mobile */
+  margin-top: 34px;
+  &:first-of-type {
+    margin-top: 18px;
+  }
+
+  @media (--viewportMedium) {
+    /* Two columns in desktop */
+    width: calc(50% - 12px);
+    margin-bottom: 36px;
+
+    /* Horizontal space */
+    &:nth-of-type(odd) {
+      margin-right: 12px;
+    }
+    &:nth-of-type(even) {
+      margin-left: 12px;
+    }
+
+    /* Vertical space */
+    margin-top: 0;
+    &:nth-of-type(1),
+    &:nth-of-type(2) {
+      margin-top: 20px;
+    }
+  }
+}
+
+.mobileReviewsTitle {
+  margin: 24px 0 26px 0;
+}
+
+.mobileReviews {
+  border-top: 1px solid var(--colorGrey100);
+  margin-bottom: 36px;
+}
+
+.desktopReviews {
+  border-top: 1px solid var(--colorGrey100);
+
+  @media (--viewportMedium) {
+    margin-bottom: 48px;
+  }
+
+  @media (--viewportLarge) {
+    margin-bottom: 0;
+  }
+}
+
+.desktopReviewsWrapper {
+  max-width: 600px;
+  margin-top: 28px;
+}
+
+.desktopReviewsTitle {
+  composes: textLarge from global;
+  margin-bottom: 0;
+}
+
+.desktopReviewsTabNav {
+  margin-bottom: 32px;
+}
+
+.sectionText {
+  padding: 0 24px;
+  margin-bottom: 30px;
+
+  @media (--viewportMedium) {
+    padding: 0;
+    margin-bottom: 40px;
+  }
+}
+
+/* 
+ * Custom field component classes 
+ */
+
+.sectionHeading {
+  /* Font for sections titles */
+  composes: p from global;
+  padding: 0;
+  font-weight: var(--fontWeightBold);
+
+  margin-top: 0;
+  margin-bottom: 12px;
+
+  @media (--viewportMedium) {
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+}
+
+.text {
+  font-weight: var(--fontWeightRegular);
+  padding: 1px 0 5px 0;
+  margin: 0;
+
+  /* Preserve newlines, but collapse other whitespace */
+  white-space: pre-line;
+
+  @media (--viewportMedium) {
+    padding: 3px 0 5px 0;
+    margin: 0;
+  }
+}
+
+.ingress {
+  composes: p from global;
+  margin: 0;
+
+  /* Preserve newlines, but collapse other whitespace */
+  white-space: pre-line;
+
+  @media (--viewportMedium) {
+    margin: 0;
+  }
+}
+
+.sectionMultiEnum,
+.sectionDetails {
+  padding: 0 24px;
+  margin-bottom: 30px;
+
+  @media (--viewportMedium) {
+    padding: 0;
+    margin-bottom: 40px;
+  }
+}
+
+.details {
+  padding-bottom: 1px;
+  margin: 0;
+}
+
+.detailsRow {
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1px 0 4px 0;
+  line-height: 36px;
+  list-style: none;
+  font-weight: var(--fontWeightRegular);
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--colorGrey100);
+  }
+
+  @media (--viewportMedium) {
+    padding: 5px 0 2px 0;
+    line-height: 32px;
+  }
+}
+
+.detailLabel {
+  font-weight: var(--fontWeightSemiBold);
+  letter-spacing: -0.09px;
+}

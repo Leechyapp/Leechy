@@ -5,7 +5,12 @@ import isEmpty from 'lodash/isEmpty';
 import { types as sdkTypes, createImageVariantConfig } from '../../util/sdkLoader';
 import { findNextBoundary, getStartOf, monthIdString } from '../../util/dates';
 import { isTransactionsTransitionInvalidTransition, storableError } from '../../util/errors';
-import { chargeSecurityDeposit, fetchMessageFiles, transactionLineItems } from '../../util/api';
+import {
+  chargeSecurityDeposit,
+  fetchMessageFiles,
+  transactionLineItems,
+  updatePayoutSettings,
+} from '../../util/api';
 import * as log from '../../util/log';
 import {
   updatedEntities,
@@ -550,13 +555,23 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
   };
 
   if (transitionName === transitions.ACCEPT) {
-    return chargeSecurityDeposit({ transactionId: txId })
+    const onChargeSecurityDeposit = () => {
+      return chargeSecurityDeposit({ transactionId: txId })
+        .then(() => {
+          return onMakeTransition();
+        })
+        .catch(e => {
+          log.error(storableError(e), 'charge-security-deposit-failed');
+          return onMakeTransition();
+        });
+    };
+    return updatePayoutSettings({})
       .then(() => {
-        return onMakeTransition();
+        return onChargeSecurityDeposit();
       })
       .catch(e => {
-        log.error(storableError(e), 'charge-security-deposit-failed');
-        return onMakeTransition();
+        log.error(storableError(e), 'update-payout-settings-failed');
+        return onChargeSecurityDeposit();
       });
   } else {
     return onMakeTransition();
