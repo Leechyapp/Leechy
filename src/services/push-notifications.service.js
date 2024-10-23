@@ -1,20 +1,28 @@
 import { PushNotifications } from '@capacitor/push-notifications';
+import { updateFCMToken } from '../util/api';
 
 export default class PushNotificationService {
-  static registerPushNotifications = setNotifications => {
+  static registerPushNotifications = (setNotifications, showToast) => {
     console.log('registerPushNotifications');
 
     // Register with Apple / Google to receive push via APNS/FCM
     PushNotifications.register();
 
     // On success, we should be able to receive notifications
-    PushNotifications.addListener('registration', token => {
+    PushNotifications.addListener('registration', fcmToken => {
       showToast('Push registration success');
+      updateFCMToken({ fcmToken: fcmToken.value })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.error(err);
+        });
     });
 
     // Some issue with our setup and push will not work
     PushNotifications.addListener('registrationError', error => {
-      alert('Error on registration: ' + JSON.stringify(error));
+      console.error('Error on registration: ' + JSON.stringify(error));
     });
 
     // Show us the notification payload if the app is open on our device
