@@ -258,6 +258,27 @@ source="$(readlink -f "${source}")"
 Distribute to TestFlight & App Store from the list of Archive(s)
 
 ## Firebase Push Notifications
+
+### Android apps
+1. Go to https://console.firebase.google.com
+2. Select the applicable app project.
+3. Inside the project, click the Settings gear => Project settings
+4. Add app
+5. Select Android
+6. After creating the Android app, it should give you a <strong>google-account.json</strong> file.
+7. Follow Google's instructions on where in the project folder to paste (e.g. android/app folder).
+
+### Web apps: Node.js Firebase Admin
+
+Create the Google Services file in Firebase Console, and paste the <strong>service-account.json</strong> file you get from Google inside of server/api/module folder:
+```
+└── modules
+    ├── firebase-admin.js
+    └── service-account-development.json
+    └── service-account-production.json
+```
+
+#### SHA1 / SHA256 fingerprint
 Instructions to retrieve the SHA1 / SHA256 fingerprint.
 
 Navigate to the keystore folder:
