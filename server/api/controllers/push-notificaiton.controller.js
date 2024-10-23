@@ -6,7 +6,7 @@ const PushNotificationUtil = require('../utils/push-notification.util');
 class PushNotificationController {
   static async sendPushNotification(req, res, next) {
     try {
-      const { userId } = req;
+      const { userId, currentUser } = req;
       const { pushNotificationCode, transactionId, params } = req.body;
 
       const fcmToken = await FcmTokenService.getUserFcmToken(userId);
@@ -14,13 +14,15 @@ class PushNotificationController {
         return res.status(400).send('No FCM token found.');
       }
 
+      const { displayName } = currentUser.attributes.profile;
+
       let messageBody;
 
       switch (pushNotificationCode) {
         case PushNotificationCodeEnum.Message:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
-            `John D. sent you a message`,
+            `${displayName} sent you a message`,
             params.message,
             {
               transactionId,
@@ -30,7 +32,7 @@ class PushNotificationController {
         case PushNotificationCodeEnum.BookingAccepted:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
-            `John D. accepted your booking request`,
+            `${displayName} accepted your booking request`,
             ``,
             {
               transactionId,
@@ -39,7 +41,7 @@ class PushNotificationController {
         case PushNotificationCodeEnum.BookingDeclined:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
-            `John D. declined your booking request`,
+            `${displayName} declined your booking request`,
             ``,
             {
               transactionId,
@@ -48,7 +50,7 @@ class PushNotificationController {
         case PushNotificationCodeEnum.BookingRequested:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
-            `John D. sent you a booking request`,
+            `${displayName} sent you a booking request`,
             ``,
             {
               transactionId,
@@ -58,7 +60,7 @@ class PushNotificationController {
         case PushNotificationCodeEnum.ReviewByCustomer:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
-            `John D. left a review on your listing`,
+            `${displayName} left a review on your listing`,
             ``,
             {
               transactionId,
@@ -67,7 +69,7 @@ class PushNotificationController {
         case PushNotificationCodeEnum.ReviewByProvider:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
-            `John D. left a review`,
+            `${displayName} left a review`,
             ``,
             {
               transactionId,
