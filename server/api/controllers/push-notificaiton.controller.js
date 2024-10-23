@@ -38,6 +38,7 @@ class PushNotificationController {
               transactionId,
             }
           );
+          break;
         case PushNotificationCodeEnum.BookingDeclined:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
@@ -47,6 +48,7 @@ class PushNotificationController {
               transactionId,
             }
           );
+          break;
         case PushNotificationCodeEnum.BookingRequested:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
@@ -66,6 +68,7 @@ class PushNotificationController {
               transactionId,
             }
           );
+          break;
         case PushNotificationCodeEnum.ReviewByProvider:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
@@ -75,6 +78,7 @@ class PushNotificationController {
               transactionId,
             }
           );
+          break;
       }
 
       if (messageBody) {
