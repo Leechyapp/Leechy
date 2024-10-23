@@ -2,8 +2,6 @@
 
 # dependencies
 node_modules
-capacitor.env.ts
-keystore
 
 # testing
 coverage
@@ -17,6 +15,9 @@ build
 npm-debug.log
 yarn-error.log
 
+# Capacitor related
+capacitor.env.ts
+keystore
 # Google services (Node.js)
 server/api/modules/service-account-development.json
 server/api/modules/service-account-production.json
