@@ -246,17 +246,17 @@ const initNativePlatform = () => {
 const initPushNotifications = setNotifications => {
   if (isNativePlatform) {
     PushNotifications.checkPermissions().then(res => {
-      if (res.receive !== 'granted') {
+      if (res?.receive !== 'granted') {
         PushNotifications.requestPermissions().then(res => {
-          if (res.receive === 'denied') {
+          if (res?.receive === 'denied') {
             showToast('Push Notification permission denied');
           } else {
             showToast('Push Notification permission granted');
-            PushNotificationService.registerPushNotifications(setNotifications);
+            PushNotificationService.registerPushNotifications(setNotifications, showToast);
           }
         });
       } else {
-        register();
+        PushNotificationService.registerPushNotifications(setNotifications, showToast);
       }
     });
   }
