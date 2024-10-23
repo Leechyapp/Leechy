@@ -19,5 +19,7 @@ yarn-error.log
 
 # Google services (Node.js)
 server/api/modules/service-account-development.json
+server/api/modules/service-account-production.json
 # Google services (Android)
 android/app/google-services-debug.json
+android/app/google-services-release.json
