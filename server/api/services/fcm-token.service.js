@@ -5,7 +5,7 @@ class FcmTokenService {
     const tokenExists = await knexDB('FcmToken')
       .first()
       .count({ count: 'userId' })
-      .where({ fcmToken: fcmToken });
+      .where({ fcmToken });
     return tokenExists.count;
   }
 
@@ -30,8 +30,8 @@ class FcmTokenService {
 
   static async insertUserFcmToken(fcmToken, userId) {
     await knexDB('FcmToken').insert({
-      fcmToken: fcmToken,
-      userId: userId,
+      fcmToken,
+      userId,
       lastActive: knexDB.raw('CURRENT_TIMESTAMP()'),
     });
   }
