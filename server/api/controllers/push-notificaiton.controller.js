@@ -6,7 +6,13 @@ const PushNotificationUtil = require('../utils/push-notification.util');
 class PushNotificationController {
   static async sendPushNotification(req, res, next) {
     try {
-      const { pushNotificationCode } = req.body;
+      const { userId } = req;
+      const { pushNotificationCode, transactionId, params } = req.body;
+
+      const fcmToken = await FcmTokenService.getUserFcmToken(userId);
+      if (!fcmToken) {
+        return res.status(400).send('No FCM token found.');
+      }
 
       let messageBody;
 
@@ -15,22 +21,58 @@ class PushNotificationController {
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
             `John D. sent you a message`,
-            `message body`,
+            params.message,
             {
-              transactionId: '',
+              transactionId,
             }
           );
           break;
+        case PushNotificationCodeEnum.BookingAccepted:
+          messageBody = PushNotificationUtil.getFirebasePayload(
+            fcmToken,
+            `John D. accepted your booking request`,
+            ``,
+            {
+              transactionId,
+            }
+          );
+        case PushNotificationCodeEnum.BookingDeclined:
+          messageBody = PushNotificationUtil.getFirebasePayload(
+            fcmToken,
+            `John D. declined your booking request`,
+            ``,
+            {
+              transactionId,
+            }
+          );
         case PushNotificationCodeEnum.BookingRequested:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
             `John D. sent you a booking request`,
-            `message body`,
+            ``,
             {
-              transactionId: '',
+              transactionId,
             }
           );
           break;
+        case PushNotificationCodeEnum.ReviewByCustomer:
+          messageBody = PushNotificationUtil.getFirebasePayload(
+            fcmToken,
+            `John D. left a review on your listing`,
+            ``,
+            {
+              transactionId,
+            }
+          );
+        case PushNotificationCodeEnum.ReviewByProvider:
+          messageBody = PushNotificationUtil.getFirebasePayload(
+            fcmToken,
+            `John D. left a review`,
+            ``,
+            {
+              transactionId,
+            }
+          );
       }
 
       if (messageBody) {
