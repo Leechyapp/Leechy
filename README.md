@@ -257,6 +257,20 @@ source="$(readlink -f "${source}")"
 
 Distribute to TestFlight & App Store from the list of Archive(s)
 
+## Firebase Push Notifications
+Instructions to retrieve the SHA1 / SHA256 fingerprint.
+
+Navigate to the keystore folder:
+```
+cd keystore
+```
+
+To get the <strong>Debug</strong> certificate fingerprint (SHA1 / SHA256):
+```
+keytool -list -v -alias appname_debug_android_keystore -keystore ./appname_debug_android.keystore
+```
+---
+
 ## Merge upstream repo
 
 ```
