@@ -1,5 +1,6 @@
 const PushNotificationController = require('../controllers/push-notificaiton.controller');
 const { authMiddleware } = require('../middlewares/auth.middleware');
+const { authWithFcmToken } = require('../middlewares/authWithFcmToken.middleware');
 const BaseRoute = require('./base.route');
 
 class PushNotificationRoute extends BaseRoute {
@@ -10,11 +11,7 @@ class PushNotificationRoute extends BaseRoute {
       authMiddleware,
       PushNotificationController.sendPushNotification
     );
-    router.post(
-      this.ROOT_PATH + '/update-fcm-token',
-      authMiddleware,
-      PushNotificationController.updateFCMToken
-    );
+    router.post(this.ROOT_PATH + '/update-fcm-token', PushNotificationController.updateFCMToken);
   }
 }
 
