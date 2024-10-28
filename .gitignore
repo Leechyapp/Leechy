@@ -26,3 +26,7 @@ android/app/src/debug/google-services.json
 # Google services (Android)
 android/app/google-services-debug.json
 android/app/google-services-release.json
+android/keystore-debug.properties
+android/keystore-release.properties
+android/leechy_debug_android.keystore
+android/leechy_release_android.keystore
