@@ -10,6 +10,7 @@ import { propTypes } from '../../../util/types';
 import { Form, FieldTextInput, SecondaryButtonInline } from '../../../components';
 
 import css from './SendMessageForm.module.css';
+import { sendPushNotification } from '../../../util/api';
 
 const BLUR_TIMEOUT_MS = 100;
 
@@ -52,6 +53,19 @@ class SendMessageFormComponent extends Component {
     this.blurTimeoutId = window.setTimeout(() => {
       this.props.onBlur();
     }, BLUR_TIMEOUT_MS);
+  }
+
+  onSendPushNotification() {
+    sendPushNotification({
+      pushNotificationCode: 'message',
+      transactionId: '67044557-0836-49a3-87b6-015d02066de5',
+    })
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }
 
   render() {
@@ -103,6 +117,10 @@ class SendMessageFormComponent extends Component {
                   <IconSendMessage />
                   <FormattedMessage id="SendMessageForm.sendMessage" />
                 </SecondaryButtonInline>
+                <br />
+                <button onClick={() => this.onSendPushNotification()}>
+                  Test Push Notification
+                </button>
               </div>
             </Form>
           );
