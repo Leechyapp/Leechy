@@ -6,15 +6,20 @@ import { CapcaitorEnv } from './capacitor.env';
 
 let serverConfig: CapacitorConfig['server'];
 
-const ENV_MOBILE: string = 'prod';
+const ENV_MOBILE: string = CapcaitorEnv.REACT_CAPACITOR_ENV;
 
 switch (ENV_MOBILE) {
   case 'dev':
     serverConfig = {
-      // url: 'http://localhost:3020',
-      // allowNavigation: ['localhost:3020']
-      url: 'http://localhost:4000',
-      allowNavigation: ['localhost:4000'],
+      // url: 'http://127.0.0.1:3020',
+      // allowNavigation: ['127.0.0.1:3020'],
+      url: 'http://localhost:3020',
+      allowNavigation: ['localhost:3020'],
+      // url: 'http://localhost:4000',
+      // allowNavigation: ['localhost:4000'],
+      // allowNavigation: ['*'],
+      //** cleartext is not intended for use in production.**//
+      cleartext: true,
     };
     break;
   case 'staging':
@@ -64,6 +69,9 @@ const config: CapacitorConfig = {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
+    // CapacitorHttp: {
+    //   enabled: true,
+    // },
   },
 };
 
