@@ -1,6 +1,8 @@
 const PushNotificationCodeEnum = require('../enums/push-notification-code.enum');
 const FcmTokenService = require('../services/fcm-token.service');
 const PushNotificationService = require('../services/push-notification.service');
+const UserSyncService = require('../services/user-sync.service');
+const UserService = require('../services/user.service');
 const PushNotificationUtil = require('../utils/push-notification.util');
 
 class PushNotificationController {
@@ -82,9 +84,7 @@ class PushNotificationController {
       }
 
       if (messageBody) {
-        const pushNotification = await PushNotificationService.sendPushNotification(
-          newMessageParams
-        );
+        const pushNotification = await PushNotificationService.sendPushNotification(messageBody);
         res.send(pushNotification);
       } else {
         res.send('messageBody cannot be undefined.');
@@ -96,7 +96,15 @@ class PushNotificationController {
 
   static async updateFCMToken(req, res, next) {
     try {
-      const { fcmToken } = req.body;
+      const { fcmToken, userUUID } = req.body;
+
+      const userId = await UserService.searchIdWithUUID(userUUID);
+      if (userId) {
+        req.userId = userId;
+      } else {
+        const newUser = await UserSyncService.insert({}, userUUID);
+        req.userId = newUser[0];
+      }
 
       const insertUserWithFcmToken = async () => {
         await FcmTokenService.insertUserFcmToken(fcmToken, req.userId);
@@ -110,7 +118,6 @@ class PushNotificationController {
         if (userFcmTokenMatch) {
           await FcmTokenService.updateLastActiveUserFcmToken(fcmToken, req.userId);
         } else {
-          await FcmTokenService.deleteUserWithFcmToken(fcmToken);
           await insertUserWithFcmToken();
         }
       }
