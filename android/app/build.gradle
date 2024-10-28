@@ -1,5 +1,13 @@
 apply plugin: 'com.android.application'
 
+def keystoreDebugPropertiesFile = rootProject.file("keystore-debug.properties")
+def keystoreDebugProperties = new Properties()
+keystoreDebugProperties.load(new FileInputStream(keystoreDebugPropertiesFile))
+
+def keystoreReleasePropertiesFile = rootProject.file("keystore-release.properties")
+def keystoreReleaseProperties = new Properties()
+keystoreReleaseProperties.load(new FileInputStream(keystoreReleasePropertiesFile))
+
 android {
     namespace "com.leechy.app"
     compileSdk rootProject.ext.compileSdkVersion
@@ -16,10 +24,33 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        debug {
+            if(keystoreDebugPropertiesFile) {
+                keyAlias keystoreDebugProperties['keyAlias']
+                keyPassword keystoreDebugProperties['keyPassword']
+                storeFile rootProject.file(keystoreDebugProperties['storeFile'])
+                storePassword keystoreDebugProperties['storePassword']
+            }
+        }
+        release {
+            if(keystoreReleasePropertiesFile) {
+                keyAlias keystoreReleaseProperties['keyAlias']
+                keyPassword keystoreReleaseProperties['keyPassword']
+                storeFile rootProject.file(keystoreReleaseProperties['storeFile'])
+                storePassword keystoreReleaseProperties['storePassword']
+            }
+        }
+    }
     buildTypes {
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
@@ -45,10 +76,23 @@ dependencies {
 apply from: 'capacitor.build.gradle'
 
 try {
-    def servicesJSON = file('google-services.json')
-    if (servicesJSON.text) {
-        apply plugin: 'com.google.gms.google-services'
+    // def servicesJSON = file('google-services.json')
+    // if (servicesJSON.text) {
+    //     apply plugin: 'com.google.gms.google-services'
+    // }
+    def buildType = gradle.startParameter.taskNames.any{it.toLowerCase().contains("debug")}?"debug":"release"
+    if(buildType == "debug") {
+        def servicesJSON = file('google-services-debug.json')
+        if (servicesJSON.text) {
+            apply plugin: 'com.google.gms.google-services'
+        }
+    } else if(buildType == "release") {
+        def servicesJSON = file('google-services-release.json')
+        if (servicesJSON.text) {
+            apply plugin: 'com.google.gms.google-services'
+        }
     }
 } catch(Exception e) {
-    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+    def buildType = gradle.startParameter.taskNames.any{it.toLowerCase().contains("debug")}?"debug":"release"
+    logger.info(buildType + "google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
