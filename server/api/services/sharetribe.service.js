@@ -11,7 +11,7 @@ class SharetribeService {
         return res.data;
       })
       .catch(error => {
-        console.error(error);
+        console.error(error?.data?.errors);
         return null;
       });
   }
