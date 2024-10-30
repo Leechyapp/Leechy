@@ -59,6 +59,9 @@ class SendMessageFormComponent extends Component {
     sendPushNotification({
       pushNotificationCode: 'message',
       transactionId: '67044557-0836-49a3-87b6-015d02066de5',
+      params: {
+        message: 'Test',
+      },
     })
       .then(res => {
         console.log(res);
