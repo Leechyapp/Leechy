@@ -30,3 +30,7 @@ android/keystore-debug.properties
 android/keystore-release.properties
 android/leechy_debug_android.keystore
 android/leechy_release_android.keystore
+# Google services (IOS)
+ios/App/App/Firebase/Debug/GoogleService-Info.plist
+ios/App/App/Firebase/Release/GoogleService-Info.plist
+ios/App/GoogleService-Info.plist
