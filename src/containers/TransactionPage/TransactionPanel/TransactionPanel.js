@@ -31,6 +31,8 @@ import RefundSecurityDepositButtonMaybe from './RefundSecurityDepositButtonMaybe
 import ShippingFunctionButtonsMaybe from './ShippingFunctionButtonsMaybe/ShippingFunctionButtonsMaybe';
 import { DeliveryMethodEnum } from '../../../enums/delivery-method-enum';
 import { states, transitions } from '../../../transactions/transactionProcessBooking';
+import { PushNotificationCodeEnum } from '../../../enums/push-notification-code.enum';
+import { sendPushNotification } from '../../../util/api';
 
 // Helper function to get display names for different roles
 const displayNames = (currentUser, provider, customer, intl) => {
@@ -102,6 +104,19 @@ export class TransactionPanelComponent extends Component {
       .then(messageId => {
         form.reset();
         this.scrollToMessage(messageId);
+        sendPushNotification({
+          pushNotificationCode: PushNotificationCodeEnum.Message,
+          transactionId: transactionId.uuid,
+          params: {
+            message,
+          },
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.error(err);
+          });
       })
       .catch(e => {
         // Ignore, Redux handles the error
