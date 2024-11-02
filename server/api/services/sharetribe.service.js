@@ -42,6 +42,19 @@ class SharetribeService {
       });
   }
 
+  static async transactionsShow(req, res, params) {
+    const sdk = getSdk(req, res);
+    return await sdk.transactions
+      .show(params)
+      .then(res => {
+        return res;
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
   static async getUserStripeAccountId(req, res) {
     const sdk = getSdk(req, res);
     return sdk.stripeAccount
