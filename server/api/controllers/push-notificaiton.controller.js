@@ -1,17 +1,39 @@
 const PushNotificationCodeEnum = require('../enums/push-notification-code.enum');
 const FcmTokenService = require('../services/fcm-token.service');
 const PushNotificationService = require('../services/push-notification.service');
+const SharetribeService = require('../services/sharetribe.service');
 const UserSyncService = require('../services/user-sync.service');
 const UserService = require('../services/user.service');
 const PushNotificationUtil = require('../utils/push-notification.util');
+const { types } = require('sharetribe-flex-sdk');
+const { UUID } = types;
 
 class PushNotificationController {
   static async sendPushNotification(req, res, next) {
     try {
-      const { userId, currentUser } = req;
+      const { currentUser } = req;
       const { pushNotificationCode, transactionId, params } = req.body;
 
-      const fcmToken = await FcmTokenService.getUserFcmToken(userId);
+      const sharetribeTransactionRes = await SharetribeService.transactionsShow(req, res, {
+        id: new UUID(transactionId),
+        include: ['customer', 'provider'],
+      });
+      const transaction = sharetribeTransactionRes.data.data;
+      const { provider, customer } = transaction.relationships;
+
+      const providerUUID = provider.data.id.uuid;
+      const customerUUID = customer.data.id.uuid;
+
+      let sendToUserId;
+      if (req.userUUID === providerUUID) {
+        sendToUserId = await UserService.searchIdWithUUID(customerUUID);
+      } else if (req.userUUID === customerUUID) {
+        sendToUserId = await UserService.searchIdWithUUID(providerUUID);
+      } else {
+        return res.status(401).send('Could not set sendToUserId.');
+      }
+
+      const fcmToken = await FcmTokenService.getUserFcmToken(sendToUserId);
       if (!fcmToken) {
         return res.status(400).send('No FCM token found.');
       }
