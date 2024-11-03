@@ -11,7 +11,7 @@ import { func, shape } from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 const SectionReportBlockUser = props => {
-  const { profileUser } = props;
+  const { profileUser, setShowProfileMoreMenu } = props;
   if (!profileUser) {
     return null;
   }
@@ -41,6 +41,7 @@ const SectionReportBlockUser = props => {
     blockUser({ userToBlockUUID: profileUUID })
       .then(() => {
         dispatch(fetchCurrentUser());
+        setShowProfileMoreMenu(false);
       })
       .catch(error => {
         console.error(error);
