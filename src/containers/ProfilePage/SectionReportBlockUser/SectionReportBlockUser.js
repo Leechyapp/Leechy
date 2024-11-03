@@ -115,14 +115,14 @@ const SectionReportBlockUser = props => {
                   onClick={() => onReportProfile(3)}
                   type="button"
                 >
-                  <FormattedMessage id="SectionReportBlockUser.deceptiveContent.spam.button" />
+                  <FormattedMessage id="SectionReportBlockUser.report.deceptiveContent.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(4)}
                   type="button"
                 >
-                  <FormattedMessage id="SectionReportBlockUser.shouldBeRemoved.spam.button" />
+                  <FormattedMessage id="SectionReportBlockUser.report.shouldBeRemoved.button" />
                 </SecondaryButton>
               </form>
             </div>
