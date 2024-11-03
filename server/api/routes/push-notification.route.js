@@ -1,6 +1,5 @@
 const PushNotificationController = require('../controllers/push-notificaiton.controller');
 const { authMiddleware } = require('../middlewares/auth.middleware');
-const { authWithFcmToken } = require('../middlewares/authWithFcmToken.middleware');
 const BaseRoute = require('./base.route');
 
 class PushNotificationRoute extends BaseRoute {
