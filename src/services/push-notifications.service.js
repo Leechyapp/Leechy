@@ -9,14 +9,14 @@ export default class PushNotificationService {
 
     // On success, we should be able to receive notifications
     PushNotifications.addListener('registration', fcmToken => {
-      showToast('Push registration success');
-      console.log(`fcmToken`, fcmToken);
+      // showToast('Push registration success');
+      console.log(`pnToken`, fcmToken);
       onUpdateFCMToken(fcmToken.value);
     });
 
     // Some issue with our setup and push will not work
     PushNotifications.addListener('registrationError', error => {
-      alert('Error on registration: ' + JSON.stringify(error));
+      console.error('Error on registration: ' + JSON.stringify(error));
     });
 
     // Show us the notification payload if the app is open on our device

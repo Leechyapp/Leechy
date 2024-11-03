@@ -24,11 +24,9 @@ export const LandingPageComponent = props => {
   const { pageAssetsData, inProgress, error } = props;
 
   const [notifications, setNotifications] = useState([]);
-  console.log(`notifications`, notifications);
 
   const state = useSelector(state => state);
   const currentUser = state.user?.currentUser;
-  console.log(`currentUser`, currentUser);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -52,9 +50,9 @@ export const LandingPageComponent = props => {
         if (res?.receive !== 'granted') {
           PushNotifications.requestPermissions().then(res => {
             if (res?.receive === 'denied') {
-              showToast('Push Notification permission denied');
+              // showToast('Push Notification permission denied');
             } else {
-              showToast('Push Notification permission granted');
+              // showToast('Push Notification permission granted');
               PushNotificationService.registerPushNotifications(
                 setNotifications,
                 showToast,
