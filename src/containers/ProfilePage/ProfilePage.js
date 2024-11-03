@@ -198,7 +198,9 @@ const FollowersFollowingSection = props => {
           isOpen={followsModalOpen}
           onClose={() => setFollowsModalOpen(false)}
           usePortal
-          onManageDisableScrolling={onManageDisableScrolling}
+          onManageDisableScrolling={(componentId, disableScrolling) => {
+            onManageDisableScrolling('ProfilePage.followsModal', false);
+          }}
         >
           <FollowsListTabs
             currentTab={selectedFollowsTab}
