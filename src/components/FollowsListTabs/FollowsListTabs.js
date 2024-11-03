@@ -174,7 +174,7 @@ const FollowsListTabs = props => {
 
   return (
     currentTab && (
-      <>
+      <div className={css.container}>
         <div className={css.row}>
           <div className={css.col6}>
             {' '}
@@ -213,7 +213,7 @@ const FollowsListTabs = props => {
             )}
           </div>
         </div>
-      </>
+      </div>
     )
   );
 };
