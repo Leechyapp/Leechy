@@ -1,5 +1,7 @@
 const SharetribeService = require('../services/sharetribe.service');
 const { types } = require('sharetribe-flex-sdk');
+const UserService = require('../services/user.service');
+const FollowsService = require('../services/follows.service');
 const { UUID } = types;
 
 const ADMIN_EMAIL = 'contact@leechy.app';
@@ -30,7 +32,7 @@ class CurrentUserController {
       const currentUser = currentUserRes.data;
       const blockedUsersObj = currentUser?.attributes?.profile?.protectedData?.blockedUsers;
       const blockedUsers = blockedUsersObj ? blockedUsersObj : {};
-      const updateBlockedUsers = await SharetribeService.updateCurrentUser(req, res, {
+      await SharetribeService.updateCurrentUser(req, res, {
         protectedData: {
           blockedUsers: {
             ...blockedUsers,
@@ -38,6 +40,14 @@ class CurrentUserController {
           },
         },
       });
+      const profileId = await UserService.searchIdWithUUID(userToBlockUUID);
+      const followExists = await FollowsService.search({
+        followedUserId: req.userId,
+        followingUserId: profileId,
+      });
+      if (followExists && followExists.id) {
+        await FollowsService.delete({ id: followExists.id });
+      }
       res.send('User blocked');
     } catch (error) {
       next(error);
@@ -52,7 +62,7 @@ class CurrentUserController {
       const blockedUsersObj = currentUser?.attributes?.profile?.protectedData?.blockedUsers;
       const blockedUsers = blockedUsersObj ? blockedUsersObj : {};
       delete blockedUsers[userToUnblockUUID];
-      const updateBlockedUsers = await SharetribeService.updateCurrentUser(req, res, {
+      await SharetribeService.updateCurrentUser(req, res, {
         protectedData: {
           blockedUsers: {
             ...blockedUsers,
