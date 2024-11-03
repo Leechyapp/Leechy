@@ -236,6 +236,17 @@
         color: var(--marketplaceColor);
       }
     }
+
+    .unblockButton {
+      margin-top: 22px;
+      min-height: 30px;
+      float: left;
+      width: 100%;
+      max-width: 100%;
+      border: 2px solid var(--marketplaceColor);
+      background-color: 1px solid var(--colorWhite);
+      color: var(--marketplaceColor);
+    }
   }
 }
 

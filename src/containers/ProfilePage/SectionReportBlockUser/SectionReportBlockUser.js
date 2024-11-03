@@ -11,7 +11,7 @@ import { func, shape } from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 const SectionReportBlockUser = props => {
-  const { profileUser } = props;
+  const { profileUser, setShowProfileMoreMenu } = props;
   if (!profileUser) {
     return null;
   }
@@ -41,6 +41,7 @@ const SectionReportBlockUser = props => {
     blockUser({ userToBlockUUID: profileUUID })
       .then(() => {
         dispatch(fetchCurrentUser());
+        setShowProfileMoreMenu(false);
       })
       .catch(error => {
         console.error(error);
@@ -115,14 +116,14 @@ const SectionReportBlockUser = props => {
                   onClick={() => onReportProfile(3)}
                   type="button"
                 >
-                  <FormattedMessage id="SectionReportBlockUser.deceptiveContent.spam.button" />
+                  <FormattedMessage id="SectionReportBlockUser.report.deceptiveContent.button" />
                 </SecondaryButton>
                 <SecondaryButton
                   className={css.submitButton}
                   onClick={() => onReportProfile(4)}
                   type="button"
                 >
-                  <FormattedMessage id="SectionReportBlockUser.shouldBeRemoved.spam.button" />
+                  <FormattedMessage id="SectionReportBlockUser.report.shouldBeRemoved.button" />
                 </SecondaryButton>
               </form>
             </div>

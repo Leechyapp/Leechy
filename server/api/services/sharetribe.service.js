@@ -11,7 +11,7 @@ class SharetribeService {
         return res.data;
       })
       .catch(error => {
-        console.error(error);
+        console.error(error?.data?.errors);
         return null;
       });
   }
@@ -24,7 +24,7 @@ class SharetribeService {
         return res;
       })
       .catch(error => {
-        console.error(error);
+        console.error(error?.data?.errors);
         return null;
       });
   }
@@ -37,7 +37,20 @@ class SharetribeService {
         return res.data;
       })
       .catch(error => {
-        console.error(error);
+        console.error(error?.data?.errors);
+        return null;
+      });
+  }
+
+  static async transactionsShow(req, res, params) {
+    const sdk = getSdk(req, res);
+    return await sdk.transactions
+      .show(params)
+      .then(res => {
+        return res;
+      })
+      .catch(error => {
+        console.error(error?.data?.errors);
         return null;
       });
   }
@@ -50,7 +63,7 @@ class SharetribeService {
         return res.data.data.attributes.stripeAccountId;
       })
       .catch(error => {
-        console.error(error);
+        console.error(error?.data?.errors);
         return null;
       });
   }
@@ -63,7 +76,7 @@ class SharetribeService {
         return res.data;
       })
       .catch(error => {
-        console.error(error);
+        console.error(error?.data?.errors);
         return null;
       });
   }

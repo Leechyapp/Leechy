@@ -221,3 +221,10 @@ export const getFollowingList = body => {
 export const updatePayoutSettings = body => {
   return post('/api/stripe-account/update-payout-settings', body);
 };
+
+export const sendPushNotification = body => {
+  return post('/api/push-notification/send-push-notification', body);
+};
+export const updateFCMToken = body => {
+  return post('/api/push-notification/update-fcm-token', body);
+};

@@ -57,7 +57,7 @@ import { pathByRouteName } from '../../util/routes';
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
 const FollowersFollowingSection = props => {
-  const { profileUser, displayName, user, isCurrentUser } = props;
+  const { profileUser, displayName, user, isCurrentUser, profileBlocked, onUnblockUser } = props;
 
   const [showProfileMoreMenu, setShowProfileMoreMenu] = useState(false);
 
@@ -136,7 +136,7 @@ const FollowersFollowingSection = props => {
                 </H3>
               </div>
               <div className={css.colMenu}>
-                {isAuthenticated && !isCurrentUser && (
+                {isAuthenticated && !isCurrentUser && !profileBlocked && (
                   <div
                     className={css.profileMoreMenuIcon}
                     onClick={() => setShowProfileMoreMenu(true)}
@@ -146,50 +146,63 @@ const FollowersFollowingSection = props => {
                 )}
               </div>
             </div>
+
             <div className={css.row}>
-              <div
-                className={css.colFollowers}
-                onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowersTab)}
-              >
-                <div className={css.followsColumns}>
-                  <span className={css.value}>{followersCount}</span>{' '}
-                  <span className={css.title}>
-                    <FormattedMessage id="ProfilePage.followers.title" />
-                  </span>
-                </div>
-              </div>
-              <div
-                className={css.colFollowing}
-                onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowingTab)}
-              >
-                <div className={[css.followsColumns, css.divider].join(' ')}>
-                  <span className={css.value}>{followingCount}</span>{' '}
-                  <span className={css.title}>
-                    <FormattedMessage id="ProfilePage.following.title" />
-                  </span>
-                </div>
-              </div>
-              <div className={css.colFollowsButton}>
-                {isCurrentUser ? (
-                  <Button
-                    className={css.editProfileButton}
-                    onClick={() => redirectToProfileSettingsPage()}
+              {!profileBlocked && (
+                <>
+                  <div
+                    className={css.colFollowers}
+                    onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowersTab)}
                   >
-                    <FormattedMessage id="ProfilePage.editProfile.button.text" />
-                  </Button>
-                ) : (
-                  <Button
-                    className={isFollowing ? css.followingButton : css.followsButton}
-                    onClick={() => onFollowUnfollow()}
+                    <div className={css.followsColumns}>
+                      <span className={css.value}>{followersCount}</span>{' '}
+                      <span className={css.title}>
+                        <FormattedMessage id="ProfilePage.followers.title" />
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    className={css.colFollowing}
+                    onClick={() => onSetFollowsModalOpen(FollowsEnum.FollowingTab)}
                   >
-                    {isFollowing ? (
-                      <FormattedMessage id="ProfilePage.following.button.text" />
-                    ) : (
-                      <FormattedMessage id="ProfilePage.follow.button.text" />
-                    )}
+                    <div className={[css.followsColumns, css.divider].join(' ')}>
+                      <span className={css.value}>{followingCount}</span>{' '}
+                      <span className={css.title}>
+                        <FormattedMessage id="ProfilePage.following.title" />
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
+              {profileBlocked ? (
+                <div className={css.col12}>
+                  <Button className={css.unblockButton} onClick={() => onUnblockUser()}>
+                    <FormattedMessage id="ProfilePage.unblock.button.text" />
                   </Button>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className={css.colFollowsButton}>
+                  {isCurrentUser ? (
+                    <Button
+                      className={css.editProfileButton}
+                      onClick={() => redirectToProfileSettingsPage()}
+                    >
+                      <FormattedMessage id="ProfilePage.editProfile.button.text" />
+                    </Button>
+                  ) : (
+                    <Button
+                      className={isFollowing ? css.followingButton : css.followsButton}
+                      onClick={() => onFollowUnfollow()}
+                    >
+                      {isFollowing ? (
+                        <FormattedMessage id="ProfilePage.following.button.text" />
+                      ) : (
+                        <FormattedMessage id="ProfilePage.follow.button.text" />
+                      )}
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -214,7 +227,10 @@ const FollowersFollowingSection = props => {
           usePortal
           onManageDisableScrolling={onManageDisableScrolling}
         >
-          <SectionReportBlockUser profileUser={profileUser} />
+          <SectionReportBlockUser
+            profileUser={profileUser}
+            setShowProfileMoreMenu={setShowProfileMoreMenu}
+          />
         </Modal>
       </div>
     </>
@@ -404,24 +420,27 @@ export const MainContent = props => {
       });
   };
 
+  const followsSection = (
+    <FollowersFollowingSection
+      profileUser={profileUser}
+      displayName={displayName}
+      user={user}
+      isCurrentUser={isCurrentUser}
+      profileBlocked={profileBlocked}
+      onUnblockUser={onUnblockUser}
+    />
+  );
+
   return profileBlocked ? (
     <div>
-      <h3>User blocked</h3>
-      <SecondaryButton onClick={() => onUnblockUser()}>Unblock User</SecondaryButton>
+      <div className={css.followsSection}>{followsSection}</div>
+      <p>
+        <FormattedMessage id="ProfilePage.blockedUser.message" />
+      </p>
     </div>
   ) : (
     <div>
-      {/* <H3 as="h1" className={css.desktopHeading}>
-        <FormattedMessage id="ProfilePage.desktopHeading1" values={{ name: displayName }} />
-      </H3> */}
-      <div className={css.followsSection}>
-        <FollowersFollowingSection
-          profileUser={profileUser}
-          displayName={displayName}
-          user={user}
-          isCurrentUser={isCurrentUser}
-        />
-      </div>
+      <div className={css.followsSection}>{followsSection}</div>
       {hasBio ? <p className={css.bio}>{bio}</p> : null}
       <CustomUserFields
         publicData={publicData}

@@ -4,7 +4,8 @@ import { ensureStripeCustomer, ensureTransaction } from '../../util/data';
 import { minutesBetween } from '../../util/dates';
 import { formatMoney } from '../../util/currency';
 import { storeData } from './CheckoutPageSessionHelpers';
-import { saveSecurityDepositData } from '../../util/api';
+import { saveSecurityDepositData, sendPushNotification } from '../../util/api';
+import { PushNotificationCodeEnum } from '../../enums/push-notification-code.enum';
 
 /**
  * Extract relevant transaction type data from listing type
@@ -361,6 +362,30 @@ export const processCheckoutWithPayment = (orderParams, extraPaymentParams) => {
     }
   };
 
+  //////////////////////////////////////////////////////////
+  // Step 7: Send push notification //
+  //////////////////////////////////////////////////////////
+  const fnSendPushNotification = async fnParams => {
+    const orderId = fnParams?.orderId?.uuid;
+    const responseObj = { ...fnParams };
+    if (orderId) {
+      const response = await sendPushNotification({
+        pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
+        transactionId: orderId,
+        params: {},
+      })
+        .then(result => {
+          return responseObj;
+        })
+        .catch(error => {
+          return responseObj;
+        });
+      return Promise.resolve(response);
+    } else {
+      return Promise.resolve(responseObj);
+    }
+  };
+
   // Here we create promise calls in sequence
   // This is pretty much the same as:
   // fnRequestPayment({...initialParams})
@@ -374,7 +399,8 @@ export const processCheckoutWithPayment = (orderParams, extraPaymentParams) => {
     fnConfirmPayment,
     fnSendMessage,
     fnSavePaymentMethod,
-    fnSecurityDepositData
+    fnSecurityDepositData,
+    fnSendPushNotification
   );
 
   return handlePaymentIntentCreation(orderParams);

@@ -127,12 +127,26 @@ npx cap open android
 Once the android folder has been synced "npx cap sync android" and Android has been opened, push the
 play button on Android Studio (which should download the .apk and launch the app in your device)
 
+#### Errors:
+If you run any errors such as:
+```
+✖ copy android - failed!
+[error] Error: EACCES: permission denied, open '/home/[username]/Documents/GitHub/[YourRepo]/android/app/src/main/assets/capacitor.config.json'
+```
+then manually create an "assets" golder in "android/app/src/main" and grant access to the folder:
+```
+cd android/app/src/main
+sudo mkdir assets
+sudo chmod -R 777 assets
+```
+
 #### Port forwarding
 
 Navigate to chrome://inspect/#devices
 
 - Click "Port forwarding..."
-- Set port 3020 and localhost:3020
+- Set front-end port 3020 and localhost:3020
+- Set back-end port 3520 and localhost:3520
 
 #### Unable to connect (port forwarding)
 
@@ -146,6 +160,14 @@ adb start-server
 adb reverse tcp:8081  tcp:8081
 
 On Windows, add "./" in from of adb, so "./adb".
+
+Live reload documentation
+```
+npm install -g @ionic/cli native-run
+```
+https://capacitorjs.com/docs/guides/live-reload
+https://ionicframework.com/docs/cli/commands/capacitor-run
+
 ```
 
 #### Changing Asset Images (Icons)
@@ -234,6 +256,41 @@ source="$(readlink -f "${source}")"
 #### Step 3:
 
 Distribute to TestFlight & App Store from the list of Archive(s)
+
+## Firebase Push Notifications
+
+### Android apps
+1. Go to https://console.firebase.google.com
+2. Select the applicable app project.
+3. Inside the project, click the Settings gear => Project settings
+4. Add app
+5. Select Android
+6. After creating the Android app, it should give you a <strong>google-account.json</strong> file.
+7. Follow Google's instructions on where in the project folder to paste (e.g. android/app folder).
+
+### Web apps: Node.js Firebase Admin
+
+Create the Google Services file in Firebase Console, and paste the <strong>service-account.json</strong> file you get from Google inside of server/api/module folder:
+```
+└── modules
+    ├── firebase-admin.js
+    └── service-account-development.json
+    └── service-account-production.json
+```
+
+#### SHA1 / SHA256 fingerprint
+Instructions to retrieve the SHA1 / SHA256 fingerprint.
+
+Navigate to the keystore folder:
+```
+cd keystore
+```
+
+To get the <strong>Debug</strong> certificate fingerprint (SHA1 / SHA256):
+```
+keytool -list -v -alias appname_debug_android_keystore -keystore ./appname_debug_android.keystore
+```
+---
 
 ## Merge upstream repo
 

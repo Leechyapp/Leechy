@@ -2,8 +2,6 @@
 
 # dependencies
 node_modules
-capacitor.env.ts
-keystore
 
 # testing
 coverage
@@ -12,7 +10,27 @@ coverage
 build
 
 # misc
+other
 .DS_Store
 .env
 npm-debug.log
 yarn-error.log
+
+# Capacitor related
+capacitor.env.ts
+keystore
+# Google services (Node.js)
+server/api/modules/service-account-development.json
+server/api/modules/service-account-production.json
+android/app/src/debug/google-services.json
+# Google services (Android)
+android/app/google-services-debug.json
+android/app/google-services-release.json
+android/keystore-debug.properties
+android/keystore-release.properties
+android/leechy_debug_android.keystore
+android/leechy_release_android.keystore
+# Google services (IOS)
+ios/App/App/Firebase/Debug/GoogleService-Info.plist
+ios/App/App/Firebase/Release/GoogleService-Info.plist
+ios/App/GoogleService-Info.plist

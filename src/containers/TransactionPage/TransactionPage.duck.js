@@ -8,6 +8,7 @@ import { isTransactionsTransitionInvalidTransition, storableError } from '../../
 import {
   chargeSecurityDeposit,
   fetchMessageFiles,
+  sendPushNotification,
   transactionLineItems,
   updatePayoutSettings,
 } from '../../util/api';
@@ -26,6 +27,7 @@ import {
 import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { fetchCurrentUserNotifications } from '../../ducks/user.duck';
 import { transitions } from '../../transactions/transactionProcessBooking';
+import { PushNotificationCodeEnum } from '../../enums/push-notification-code.enum';
 
 const { UUID } = sdkTypes;
 
@@ -541,6 +543,26 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
         // Here, we make 1-2 delayed updates for the tx entity.
         // This way "leave a review" link should show up for the customer.
         refreshTransactionEntity(sdk, txId, dispatch);
+
+        let pushNotificationCode;
+        if (transitionName === transitions.ACCEPT) {
+          pushNotificationCode = PushNotificationCodeEnum.BookingAccepted;
+        } else if (transitionName === transitions.DECLINE) {
+          pushNotificationCode = PushNotificationCodeEnum.BookingDeclined;
+        }
+        if (pushNotificationCode) {
+          sendPushNotification({
+            pushNotificationCode,
+            transactionId: txId.uuid,
+            params: {},
+          })
+            .then(pushNotificationRes => {
+              console.log(pushNotificationRes);
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        }
 
         return response;
       })
