@@ -22,6 +22,7 @@ import {
 } from '../../../../components';
 // Import modules from this directory
 import css from './EditListingDetailsForm.module.css';
+import excludedTextFieldsSet from './excludedTextFieldsSet';
 
 const TITLE_MAX_LENGTH = 60;
 
@@ -253,20 +254,24 @@ const AddListingFields = props => {
     const isTargetListingType = isFieldForListingType(listingType, fieldConfig);
     const isTargetCategory = isFieldForCategory(targetCategoryIds, fieldConfig);
 
-    return isKnownSchemaType && isProviderScope && isTargetListingType && isTargetCategory
-      ? [
-          ...pickedFields,
-          <CustomExtendedDataField
-            key={namespacedKey}
-            name={namespacedKey}
-            fieldConfig={fieldConfig}
-            defaultRequiredMessage={intl.formatMessage({
-              id: 'EditListingDetailsForm.defaultRequiredMessage',
-            })}
-            formId={formId}
-          />,
-        ]
-      : pickedFields;
+    if (excludedTextFieldsSet.has(key)) {
+      return pickedFields;
+    } else {
+      return isKnownSchemaType && isProviderScope && isTargetListingType && isTargetCategory
+        ? [
+            ...pickedFields,
+            <CustomExtendedDataField
+              key={namespacedKey}
+              name={namespacedKey}
+              fieldConfig={fieldConfig}
+              defaultRequiredMessage={intl.formatMessage({
+                id: 'EditListingDetailsForm.defaultRequiredMessage',
+              })}
+              formId={formId}
+            />,
+          ]
+        : pickedFields;
+    }
   }, []);
 
   return <>{fields}</>;
@@ -304,7 +309,7 @@ const EditListingDetailsFormComponent = props => (
         values,
       } = formRenderProps;
 
-      const { listingType } = values;
+      const { listingType, transactionProcessAlias, unitType } = values;
       const [allCategoriesChosen, setAllCategoriesChosen] = useState(false);
 
       const titleRequiredMessage = intl.formatMessage({
@@ -328,7 +333,9 @@ const EditListingDetailsFormComponent = props => (
       const classes = classNames(css.root, className);
       const submitReady = (updated && pristine) || ready;
       const submitInProgress = updateInProgress;
-      const submitDisabled = invalid || disabled || submitInProgress;
+      const hasMandatoryListingTypeData = listingType && transactionProcessAlias && unitType;
+      const submitDisabled =
+        invalid || disabled || submitInProgress || !hasMandatoryListingTypeData;
 
       return (
         <Form className={classes} onSubmit={handleSubmit}>
@@ -446,7 +453,7 @@ EditListingDetailsFormComponent.propTypes = {
     })
   ).isRequired,
   hasExistingListingType: bool,
-  listingFieldsConfig: propTypes.listingFieldsConfig,
+  listingFieldsConfig: propTypes.listingFields,
 };
 
 export default compose(injectIntl)(EditListingDetailsFormComponent);
