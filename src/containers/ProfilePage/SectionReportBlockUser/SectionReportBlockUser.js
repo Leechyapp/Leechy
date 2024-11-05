@@ -62,20 +62,22 @@ const SectionReportBlockUser = props => {
     <div className={css.container}>
       <div className={css.rowUnsetMarginLR}>
         <div className={css.col12}>
-          <SecondaryButton
-            className={css.submitButton}
-            onClick={() => (isAuthenticated ? setReportProfileModalOpen(true) : onLoginUser())}
-            type="button"
-          >
-            <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
-          </SecondaryButton>
-          <SecondaryButton
-            className={css.submitButton}
-            onClick={() => (isAuthenticated ? onBlockUser() : onLoginUser())}
-            type="button"
-          >
-            <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
-          </SecondaryButton>
+          <form className={css.mobileMarginTop}>
+            <SecondaryButton
+              className={css.submitButton}
+              onClick={() => (isAuthenticated ? setReportProfileModalOpen(true) : onLoginUser())}
+              type="button"
+            >
+              <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
+            </SecondaryButton>
+            <SecondaryButton
+              className={css.submitButton}
+              onClick={() => (isAuthenticated ? onBlockUser() : onLoginUser())}
+              type="button"
+            >
+              <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
+            </SecondaryButton>
+          </form>
         </div>
       </div>
       <Modal
