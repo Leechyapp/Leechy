@@ -2,28 +2,16 @@
 @import '../../../styles/gridDefaults.scss';
 
 .container {
-  margin-top: 25px;
+  margin-top: 36px;
   margin-bottom: 10px;
-}
-
-.reportLink {
-  color: var(--marketplaceColor);
-  margin-bottom: 8px;
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.blockLink {
-  color: var(--marketplaceColor);
-  margin-top: unset;
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 .mobileMarginTop {
   @media (--viewportMaxSmall) {
     margin-top: 50px;
   }
+}
+
+.submitButton {
+  margin-bottom: 5px;
 }

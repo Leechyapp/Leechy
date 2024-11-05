@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import css from './SectionReportBlockUser.module.scss';
-import { Modal, NamedLink, SecondaryButton } from '../../../components';
+import { Modal, SecondaryButton } from '../../../components';
 import { isScrollingDisabled, manageDisableScrolling } from '../../../ducks/ui.duck';
 import { useDispatch, useSelector } from 'react-redux';
 import { blockUser, sendContactEmail } from '../../../util/api';
@@ -9,6 +9,9 @@ import { fetchCurrentUser } from '../../../ducks/user.duck';
 import { propTypes } from '../../../util/types';
 import { func, shape } from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { useRouteConfiguration } from '../../../context/routeConfigurationContext';
+import { pathByRouteName } from '../../../util/routes';
 
 const SectionReportBlockUser = props => {
   const { profileUser, setShowProfileMoreMenu } = props;
@@ -19,6 +22,9 @@ const SectionReportBlockUser = props => {
 
   const state = useSelector(state => state);
   const isAuthenticated = state?.auth?.isAuthenticated;
+
+  const history = useHistory();
+  const routeConfiguration = useRouteConfiguration();
 
   const scrollingDisabled = isScrollingDisabled(state);
   const dispatch = useDispatch();
@@ -48,34 +54,28 @@ const SectionReportBlockUser = props => {
       });
   };
 
+  const onLoginUser = () => {
+    history.push(pathByRouteName('LoginPage', routeConfiguration));
+  };
+
   return (
     <div className={css.container}>
       <div className={css.rowUnsetMarginLR}>
         <div className={css.col12}>
-          {isAuthenticated ? (
-            <p className={css.reportLink} onClick={() => setReportProfileModalOpen(true)}>
-              <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
-            </p>
-          ) : (
-            <p className={css.reportLink}>
-              <NamedLink name="LoginPage">
-                <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
-              </NamedLink>
-            </p>
-          )}
-        </div>
-        <div className={css.col12}>
-          {isAuthenticated ? (
-            <p className={css.blockLink} onClick={() => onBlockUser()}>
-              <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
-            </p>
-          ) : (
-            <p className={css.blockLink}>
-              <NamedLink name="LoginPage">
-                <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
-              </NamedLink>
-            </p>
-          )}
+          <SecondaryButton
+            className={css.submitButton}
+            onClick={() => (isAuthenticated ? setReportProfileModalOpen(true) : onLoginUser())}
+            type="button"
+          >
+            <FormattedMessage id="SectionReportBlockUser.reportProfile.button" />
+          </SecondaryButton>
+          <SecondaryButton
+            className={css.submitButton}
+            onClick={() => (isAuthenticated ? onBlockUser() : onLoginUser())}
+            type="button"
+          >
+            <FormattedMessage id="SectionReportBlockUser.blockUser.button" />
+          </SecondaryButton>
         </div>
       </div>
       <Modal
