@@ -135,12 +135,19 @@ const FollowersFollowingSection = props => {
                   />
                 </H3>
               </div>
-              <div className={css.colMenu}>
-                {isAuthenticated && !isCurrentUser && !profileBlocked && (
+              <div className={css.colMenuDesktop}>
+                {!isCurrentUser && !profileBlocked && (
                   <div
                     className={css.profileMoreMenuIcon}
                     onClick={() => setShowProfileMoreMenu(true)}
                   >
+                    <FontAwesomeIcon icon={faEllipsisVertical} />
+                  </div>
+                )}
+              </div>
+              <div className={css.colMenuMobile} onClick={() => setShowProfileMoreMenu(true)}>
+                {!isCurrentUser && !profileBlocked && (
+                  <div className={css.profileMoreMenuIcon}>
                     <FontAwesomeIcon icon={faEllipsisVertical} />
                   </div>
                 )}

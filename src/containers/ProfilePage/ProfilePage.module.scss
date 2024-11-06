@@ -152,27 +152,40 @@
       width: 90%;
     }
 
-    .colMenu {
+    .colMenuDesktop {
       flex: $flexColDefault;
       width: 10%;
+      display: none;
+      @media (--viewportLarge) {
+        display: block;
+      }
+    }
 
-      .profileMoreMenuIcon {
-        text-align: center;
-        border-radius: 50%;
-        float: right;
-        &:hover {
-          cursor: pointer;
-          background-color: var(--colorGrey75);
-        }
-        @media (--viewportMaxLarge) {
-          margin-top: 20px;
-        }
-        @media (--viewportLarge) {
-          margin-top: 25px;
-          margin-right: 20px;
-          width: 25px;
-          height: 25px;
-        }
+    .colMenuMobile {
+      flex: $flexColDefault;
+      width: 10%;
+      display: block;
+      @media (--viewportLarge) {
+        display: none;
+      }
+    }
+
+    .profileMoreMenuIcon {
+      text-align: center;
+      border-radius: 50%;
+      float: right;
+      &:hover {
+        cursor: pointer;
+        background-color: var(--colorGrey75);
+      }
+      @media (--viewportMaxLarge) {
+        margin-top: 20px;
+      }
+      @media (--viewportLarge) {
+        margin-top: 25px;
+        margin-right: 20px;
+        width: 25px;
+        height: 25px;
       }
     }
 
