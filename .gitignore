@@ -23,6 +23,7 @@ keystore
 server/api/modules/service-account-development.json
 server/api/modules/service-account-production.json
 android/app/src/debug/google-services.json
+android/app/src/release/google-services.json
 # Google services (Android)
 android/app/google-services-debug.json
 android/app/google-services-release.json
