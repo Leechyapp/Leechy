@@ -142,6 +142,8 @@ sudo chmod -R 777 assets
 
 #### Port forwarding
 
+Please ensure your build variant is set to "debug", not "release".
+
 Navigate to chrome://inspect/#devices
 
 - Click "Port forwarding..."
