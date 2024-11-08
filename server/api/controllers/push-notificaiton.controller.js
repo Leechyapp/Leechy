@@ -101,20 +101,10 @@ class PushNotificationController {
             }
           );
           break;
-        case PushNotificationCodeEnum.ReviewByCustomer:
+        case PushNotificationCodeEnum.Review:
           messageBody = PushNotificationUtil.getFirebasePayload(
             fcmToken,
-            `${displayName} left a review on your listing`,
-            ``,
-            {
-              transactionId,
-            }
-          );
-          break;
-        case PushNotificationCodeEnum.ReviewByProvider:
-          messageBody = PushNotificationUtil.getFirebasePayload(
-            fcmToken,
-            `${displayName} left a review`,
+            `${displayName} left you a review`,
             ``,
             {
               transactionId,

@@ -4,7 +4,6 @@ const PushNotificationCodeEnum = {
   BookingRequested: 'booking-request',
   BookingPayoutDetails: 'booking-payout-details',
   Message: 'message',
-  ReviewByCustomer: 'review-by-customer',
-  ReviewByProvider: 'review-by-provider',
+  Review: 'review',
 };
 module.exports = PushNotificationCodeEnum;
