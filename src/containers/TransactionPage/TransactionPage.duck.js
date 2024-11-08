@@ -544,24 +544,11 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
         // This way "leave a review" link should show up for the customer.
         refreshTransactionEntity(sdk, txId, dispatch);
 
-        const onSendPushNotification = pushNotificationCode => {
-          sendPushNotification({
-            pushNotificationCode,
-            transactionId: txId.uuid,
-            params: {},
-          })
-            .then(pushNotificationRes => {
-              console.log(pushNotificationRes);
-            })
-            .catch(err => {
-              console.error(err);
-            });
-        };
         if (transitionName === transitions.ACCEPT) {
-          onSendPushNotification(PushNotificationCodeEnum.BookingAccepted);
-          onSendPushNotification(PushNotificationCodeEnum.BookingPayoutDetails);
+          onSendPushNotification(PushNotificationCodeEnum.BookingAccepted, txId.uuid);
+          onSendPushNotification(PushNotificationCodeEnum.BookingPayoutDetails, txId.uuid);
         } else if (transitionName === transitions.DECLINE) {
-          onSendPushNotification(PushNotificationCodeEnum.BookingDeclined);
+          onSendPushNotification(PushNotificationCodeEnum.BookingDeclined, txId.uuid);
         }
 
         return response;
@@ -694,6 +681,10 @@ const sendReviewAsSecond = (txId, transition, params, dispatch, sdk, config) => 
       dispatch(sendReviewSuccess());
       return response;
     })
+    .then(response => {
+      onSendPushNotification(PushNotificationCodeEnum.Review, txId.uuid);
+      return response;
+    })
     .catch(e => {
       dispatch(sendReviewError(storableError(e)));
 
@@ -719,6 +710,10 @@ const sendReviewAsFirst = (txId, transition, params, dispatch, sdk, config) => {
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       dispatch(sendReviewSuccess());
+      return response;
+    })
+    .then(response => {
+      onSendPushNotification(PushNotificationCodeEnum.Review, txId.uuid);
       return response;
     })
     .catch(e => {
@@ -795,6 +790,20 @@ export const loadFileAttachments = txId => dispatch => {
     .catch(err => {
       console.error(err);
       return err;
+    });
+};
+
+const onSendPushNotification = (pushNotificationCode, transactionId) => {
+  sendPushNotification({
+    pushNotificationCode,
+    transactionId,
+    params: {},
+  })
+    .then(pushNotificationRes => {
+      console.log(pushNotificationRes);
+    })
+    .catch(err => {
+      console.error(err);
     });
 };
 
