@@ -544,13 +544,7 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
         // This way "leave a review" link should show up for the customer.
         refreshTransactionEntity(sdk, txId, dispatch);
 
-        let pushNotificationCode;
-        if (transitionName === transitions.ACCEPT) {
-          pushNotificationCode = PushNotificationCodeEnum.BookingAccepted;
-        } else if (transitionName === transitions.DECLINE) {
-          pushNotificationCode = PushNotificationCodeEnum.BookingDeclined;
-        }
-        if (pushNotificationCode) {
+        const onSendPushNotification = pushNotificationCode => {
           sendPushNotification({
             pushNotificationCode,
             transactionId: txId.uuid,
@@ -562,6 +556,12 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
             .catch(err => {
               console.error(err);
             });
+        };
+        if (transitionName === transitions.ACCEPT) {
+          onSendPushNotification(PushNotificationCodeEnum.BookingAccepted);
+          onSendPushNotification(PushNotificationCodeEnum.BookingPayoutDetails);
+        } else if (transitionName === transitions.DECLINE) {
+          onSendPushNotification(PushNotificationCodeEnum.BookingDeclined);
         }
 
         return response;

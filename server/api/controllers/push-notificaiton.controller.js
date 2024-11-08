@@ -25,10 +25,12 @@ class PushNotificationController {
       const customerUUID = customer.data.id.uuid;
 
       let sendToUserId;
+      const customerId = await UserService.searchIdWithUUID(customerUUID);
+      const providerId = await UserService.searchIdWithUUID(providerUUID);
       if (req.userUUID === providerUUID) {
-        sendToUserId = await UserService.searchIdWithUUID(customerUUID);
+        sendToUserId = customerId;
       } else if (req.userUUID === customerUUID) {
-        sendToUserId = await UserService.searchIdWithUUID(providerUUID);
+        sendToUserId = providerId;
       } else {
         return res.status(401).send('Could not set sendToUserId.');
       }
@@ -78,6 +80,22 @@ class PushNotificationController {
             fcmToken,
             `${displayName} sent you a booking request`,
             ``,
+            {
+              transactionId,
+            }
+          );
+          break;
+        case PushNotificationCodeEnum.BookingPayoutDetails:
+          // const { displayName: customerDisplayName } = customer.data.attributes.profile;
+          const providerFcmToken = await FcmTokenService.getUserFcmToken(providerId);
+          if (!providerFcmToken) {
+            return res.status(400).send('No FCM token found for provider.');
+          }
+
+          messageBody = PushNotificationUtil.getFirebasePayload(
+            providerFcmToken,
+            `Your payout is on the way!`,
+            `Your payout should reach your bank account within 3 to 14 days.`,
             {
               transactionId,
             }
