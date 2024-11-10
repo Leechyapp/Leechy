@@ -2,7 +2,7 @@
   "BookingPayoutDetails.BookingBreakdownTitle": "Here's the booking breakdown.",
   "BookingPayoutDetails.ContentForDaily": "Your payout of {currency} {amount,number,::.00} for the booking of {listingTitle} from {dateStart,date,::YYYYMMMd} to {dateEnd,date,::YYYYMMMd} by {customerDisplayName} should reach your bank account within 3 to 14 days.",
   "BookingPayoutDetails.Cta": "View order details",
-  "BookingPayoutDetails.FeeLabel": "Leechy fee",
+  "BookingPayoutDetails.FeeLabel": "{marketplaceName} fee",
   "BookingPayoutDetails.PayoutLabel": "You'll earn",
   "BookingPayoutDetails.PriceBreakdownDaily": "{currency} {amount,number,::.00} × {multiplier, number} {multiplier, plural, one {day} other {days}}",
   "BookingPayoutDetails.PriceBreakdownHourly": "{currency} {amount,number,::.00} × {multiplier, number} {multiplier, plural, one {hour} other {hours}}",
