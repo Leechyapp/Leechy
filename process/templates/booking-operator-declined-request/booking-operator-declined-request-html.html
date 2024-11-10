@@ -19,11 +19,11 @@
                   {{t "BookingOperatorDeclinedRequest.Title" "A booking for one of your listings was declined on your behalf"}}</h1>
                   <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848">
                     {{#eq "hour" protected-data.unitType}}
-                    {{t "BookingOperatorDeclinedRequest.ContentForHourly" "{marketplaceName} administrator declined a booking by {customerDisplayName} for {listingTitle} from {dateStart, date, ::jmmYYYYMMMd} to {dateEnd, date, ::jmmYYYYMMMd} on your behalf." marketplaceName=marketplace.name customerDisplayName=customer.display-name listingTitle=listing.title dateStart=booking.start dateEnd=booking.end}}
+                    {{t "BookingOperatorDeclinedRequest.ContentForHourly" "Leechy administrator declined a booking by {customerDisplayName} for {listingTitle} from {dateStart, date, ::jmmYYYYMMMd} to {dateEnd, date, ::jmmYYYYMMMd} on your behalf." marketplaceName=marketplace.name customerDisplayName=customer.display-name listingTitle=listing.title dateStart=booking.start dateEnd=booking.end}}
                     {{/ eq}}{{#eq "day" protected-data.unitType}}
-                    {{t "BookingOperatorDeclinedRequest.ContentForDaily" "{marketplaceName} administrator declined a booking by {customerDisplayName} for {listingTitle} from {dateStart, date, ::YYYYMMMd} to {dateEnd, date, ::YYYYMMMd} on your behalf." marketplaceName=marketplace.name customerDisplayName=customer.display-name listingTitle=listing.title dateStart=booking.start dateEnd=(date-transform booking.end days=-1)}}
+                    {{t "BookingOperatorDeclinedRequest.ContentForDaily" "Leechy administrator declined a booking by {customerDisplayName} for {listingTitle} from {dateStart, date, ::YYYYMMMd} to {dateEnd, date, ::YYYYMMMd} on your behalf." marketplaceName=marketplace.name customerDisplayName=customer.display-name listingTitle=listing.title dateStart=booking.start dateEnd=(date-transform booking.end days=-1)}}
                     {{/ eq}}{{#eq "night" protected-data.unitType}}
-                    {{t "BookingOperatorDeclinedRequest.ContentForNightly" "{marketplaceName} administrator declined a booking by {customerDisplayName} for {listingTitle} from {dateStart, date, ::YYYYMMMd} to {dateEnd, date, ::YYYYMMMd} on your behalf." marketplaceName=marketplace.name customerDisplayName=customer.display-name listingTitle=listing.title dateStart=booking.start dateEnd=booking.end}}
+                    {{t "BookingOperatorDeclinedRequest.ContentForNightly" "Leechy administrator declined a booking by {customerDisplayName} for {listingTitle} from {dateStart, date, ::YYYYMMMd} to {dateEnd, date, ::YYYYMMMd} on your behalf." marketplaceName=marketplace.name customerDisplayName=customer.display-name listingTitle=listing.title dateStart=booking.start dateEnd=booking.end}}
                     {{/ eq}}</p>
                 <table style="padding:16px 0 0" align="center" border="0" cellPadding="0" cellSpacing="0" role="presentation" width="100%">
                   <tbody>
@@ -36,11 +36,11 @@
                     </tr>
                   </tbody>
                 </table>
-                <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848">{{t "BookingOperatorDeclinedRequest.Disclaimer" "If you suspect this was a mistake, please contact {marketplaceName} team." marketplaceName=marketplace.name}}</p>
+                <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848">{{t "BookingOperatorDeclinedRequest.Disclaimer" "If you suspect this was a mistake, please contact Leechy team." marketplaceName=marketplace.name}}</p>
                 {{/with}}
                 <div>
                   <hr style="width:100%;border:none;border-top:1px solid #eaeaea;border-color:#E1E1E1;margin:20px 0" />
-                  <p style="font-size:12px;line-height:15px;margin:0 auto;color:#b7b7b7;text-align:left;margin-bottom:50px">{{t "TransactionEmails.MembershipParagraph" "You have received this email notification because you are a member of {marketplaceName}. If you no longer wish to receive these emails, please contact {marketplaceName} team." marketplaceName=marketplace.name }}</p>
+                  <p style="font-size:12px;line-height:15px;margin:0 auto;color:#b7b7b7;text-align:left;margin-bottom:50px">{{t "TransactionEmails.MembershipParagraph" "You have received this email notification because you are a member of Leechy. If you no longer wish to receive these emails, please contact Leechy team." marketplaceName=marketplace.name }}</p>
                 </div>
               </td>
             </tr>
