@@ -659,12 +659,12 @@ export const BookingDatesFormComponent = props => {
             />
             {startDate && (
               <>
-                <DeliveryMethodMaybe
+                {/* <DeliveryMethodMaybe
                   deliveryMethod={values?.deliveryMethod ? values.deliveryMethod : 'pickup'}
                   hasShippingFee={listing?.attributes?.publicData?.shippingFee}
                   formId={formId}
                   intl={intl}
-                />
+                /> */}
                 <InsuranceMethodMaybe
                   insuranceMethod={
                     values?.insuranceMethod ? values.insuranceMethod : InsuranceMethodEnum.Insurance

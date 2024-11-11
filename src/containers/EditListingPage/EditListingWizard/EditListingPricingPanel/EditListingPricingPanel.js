@@ -19,9 +19,12 @@ const { Money } = sdkTypes;
 const getInitialValues = params => {
   const { listing, marketplaceCurrency } = params;
   const { price, publicData } = listing?.attributes || {};
-  const { shippingFee } = publicData;
+  // const { shippingFee } = publicData;
 
-  return { price, shippingFee: shippingFee ? new Money(shippingFee, marketplaceCurrency) : null };
+  return {
+    price,
+    // shippingFee: shippingFee ? new Money(shippingFee, marketplaceCurrency) : null
+  };
 };
 
 const EditListingPricingPanel = props => {
@@ -69,14 +72,17 @@ const EditListingPricingPanel = props => {
           className={css.form}
           initialValues={initialValues}
           onSubmit={values => {
-            const { price, shippingFee } = values;
+            const {
+              price,
+              // shippingFee
+            } = values;
 
             // New values for listing attributes
             const updateValues = {
               price,
-              publicData: {
-                shippingFee: shippingFee ? shippingFee.amount : null,
-              },
+              // publicData: {
+              //   shippingFee: shippingFee ? shippingFee.amount : null,
+              // },
             };
             onSubmit(updateValues);
           }}

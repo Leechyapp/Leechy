@@ -118,7 +118,7 @@ export const EditListingPricingFormComponent = props => (
             validate={priceValidators}
           />
 
-          <FieldCurrencyInput
+          {/* <FieldCurrencyInput
             id={`${formId}shippingFee`}
             name="shippingFee"
             className={css.input}
@@ -132,7 +132,7 @@ export const EditListingPricingFormComponent = props => (
             })}
             currencyConfig={appSettings.getCurrencyFormatting(marketplaceCurrency)}
             validate={shippingFeeValidators}
-          />
+          /> */}
 
           <Button
             className={css.submitButton}
