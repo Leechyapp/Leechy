@@ -7,6 +7,7 @@ import BlockBuilder from '../../BlockBuilder';
 
 import SectionContainer from '../SectionContainer';
 import css from './SectionColumns.module.css';
+import isNativePlatform from '../../../../util/isNativePlatform';
 
 // The number of columns (numColumns) affects styling and responsive images
 const COLUMN_CONFIG = [
@@ -50,7 +51,7 @@ const SectionColumns = props => {
   const hasHeaderFields = hasDataInFields([title, description, callToAction], fieldOptions);
   const hasBlocks = blocks?.length > 0;
 
-  return (
+  return isNativePlatform && title?.content === 'Download the App' ? null : (
     <SectionContainer
       id={sectionId}
       className={className}
