@@ -11,5 +11,6 @@ excludedTextFieldsSet.add('books');
 excludedTextFieldsSet.add('workout');
 excludedTextFieldsSet.add('electronics');
 excludedTextFieldsSet.add('party');
+excludedTextFieldsSet.add('self-storage');
 
 export default excludedTextFieldsSet;
