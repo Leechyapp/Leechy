@@ -130,3 +130,73 @@ exports.convertDecimalJSToNumber = decimalValue => {
 
   return decimalValue.toNumber();
 };
+
+/**
+ * Converts given value to sub unit value and returns it as a number
+ *
+ * @param {Number|String} value
+ *
+ * @param {Decimal|Number|String} subUnitDivisor - should be something that can be converted to
+ * Decimal. (This is a ratio between currency's main unit and sub units.)
+ *
+ * @param {boolean} useComma - optional.
+ * Specify if return value should use comma as separator
+ *
+ * @return {number} converted value
+ */
+exports.convertUnitToSubUnit = (value, subUnitDivisor, useComma = false) => {
+  const subUnitDivisorAsDecimal = convertDivisorToDecimal(subUnitDivisor);
+
+  if (!(typeof value === 'string' || typeof value === 'number')) {
+    throw new TypeError('Value must be either number or string');
+  }
+
+  const val = typeof value === 'string' ? convertToDecimal(value, useComma) : new Decimal(value);
+  const amount = val.times(subUnitDivisorAsDecimal);
+
+  if (!isSafeNumber(amount)) {
+    throw new Error(
+      `Cannot represent money minor unit value ${amount.toString()} safely as a number`
+    );
+  } else if (amount.isInteger()) {
+    return amount.toNumber();
+  } else {
+    throw new Error(`value must divisible by ${subUnitDivisor}`);
+  }
+};
+
+/**
+ * Convert Money to a number
+ *
+ * @param {Money} value
+ *
+ * @return {Number} converted value
+ */
+exports.convertMoneyToNumber = value => {
+  if (!(value instanceof Money)) {
+    throw new Error('Value must be a Money type');
+  }
+  const subUnitDivisorAsDecimal = convertDivisorToDecimal(this.unitDivisor(value.currency));
+  let amount;
+
+  if (isGoogleMathLong(value.amount)) {
+    // TODO: temporarily also handle goog.math.Long values created by
+    // the Transit tooling in the Sharetribe JS SDK. This should be
+    // removed when the value.amount will be a proper Decimal type.
+
+    // eslint-disable-next-line no-console
+    console.warn('goog.math.Long value in money amount:', value.amount, value.amount.toString());
+
+    amount = new Decimal(value.amount.toString());
+  } else {
+    amount = new Decimal(value.amount);
+  }
+
+  if (!isSafeNumber(amount)) {
+    throw new Error(
+      `Cannot represent money minor unit value ${amount.toString()} safely as a number`
+    );
+  }
+
+  return amount.dividedBy(subUnitDivisorAsDecimal).toNumber();
+};
