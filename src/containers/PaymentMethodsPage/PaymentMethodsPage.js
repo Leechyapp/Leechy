@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { bool, func, object } from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -10,7 +10,14 @@ import { savePaymentMethod, deletePaymentMethod } from '../../ducks/paymentMetho
 import { handleCardSetup } from '../../ducks/stripe.duck';
 import { manageDisableScrolling, isScrollingDisabled } from '../../ducks/ui.duck';
 
-import { H3, SavedCardDetails, Page, UserNav, LayoutSideNavigation } from '../../components';
+import {
+  H3,
+  SavedCardDetails,
+  Page,
+  UserNav,
+  LayoutSideNavigation,
+  IconSpinner,
+} from '../../components';
 
 import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
 import FooterContainer from '../../containers/FooterContainer/FooterContainer';
@@ -20,11 +27,48 @@ import PaymentMethodsForm from './PaymentMethodsForm/PaymentMethodsForm';
 import { createStripeSetupIntent, stripeCustomer } from './PaymentMethodsPage.duck.js';
 
 import css from './PaymentMethodsPage.module.css';
-import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
+import CustomSavedCardDetails from '../../components/CustomSavedCardDetails/CustomSavedCardDetails.js';
+import CustomStripePaymentForm from '../../components/CustomStripePaymentForm/CustomStripePaymentForm.js';
+import {
+  attachPaymentMethod,
+  createSetupIntent,
+  detachPaymentMethod,
+  getPaymentMethodsList,
+} from '../../util/api.js';
 
 const PaymentMethodsPageComponent = props => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cardState, setCardState] = useState(null);
+
+  const [showCustomPaymentForm, setCustomPaymentForm] = useState(false);
+  const [customClientSecret, setCustomClientSecret] = useState(null);
+  const [rootPaymentAPI, setPaymentApiId] = useState(1);
+  const [customDefaultPaymentMethod, setCustomDefaultPaymentMethod] = useState(null);
+  const [customPaymentMethodList, setCustomPaymentMethodList] = useState([]);
+  const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
+  const [setupIntentLoading, setSetupIntentLoading] = useState(false);
+  const saveCardDetailsRef = useRef(null);
+
+  useEffect(() => {
+    if (rootPaymentAPI !== 2) {
+      handleChangePaymentAPI(2);
+    }
+    if (
+      showCustomPaymentForm &&
+      !customClientSecret &&
+      rootPaymentAPI === 2 &&
+      !customDefaultPaymentMethod &&
+      customPaymentMethodList.length === 0
+    ) {
+      getCustomClientSecretAndSetForm();
+    }
+  }, [
+    showCustomPaymentForm,
+    customClientSecret,
+    rootPaymentAPI,
+    customDefaultPaymentMethod,
+    customPaymentMethodList,
+  ]);
 
   const {
     currentUser,
@@ -43,6 +87,103 @@ const PaymentMethodsPageComponent = props => {
     intl,
     stripeCustomerFetched,
   } = props;
+
+  /****************** START CUSTOM STRIPE  ******************/
+  const handleChangePaymentAPI = pmId => {
+    setPaymentApiId(pmId);
+    if (pmId === 2) {
+      setPaymentMethodsLoading(true);
+      getPaymentMethodsList({})
+        .then(result => {
+          if (result && result.length > 0) {
+            setCustomPaymentMethodList(result);
+            setCustomDefaultPaymentMethod(result[0]);
+          } else {
+            getCustomClientSecretAndSetForm();
+          }
+          setPaymentMethodsLoading(false);
+        })
+        .catch(error => {
+          setPaymentMethodsLoading(false);
+          console.error(error);
+        });
+    } else {
+      setCustomClientSecret(null);
+      setCustomPaymentMethodList([]);
+      setCustomDefaultPaymentMethod(null);
+    }
+  };
+
+  const deleteCardPaymentMethod = paymentMethodId => {
+    detachPaymentMethod({ paymentMethodId })
+      .then(() => {
+        getPaymentMethodsList({})
+          .then(result => {
+            if (result && result.length > 0) {
+              setCustomClientSecret(null);
+              setCustomPaymentMethodList(result);
+              setCustomDefaultPaymentMethod(result[0]);
+            } else {
+              setCustomPaymentForm(true);
+              setCustomClientSecret(null);
+              setCustomDefaultPaymentMethod(null);
+              setCustomPaymentMethodList([]);
+            }
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  const changeCustomPaymentMethod = paymentMethod => {
+    setCustomPaymentForm(false);
+    setCustomDefaultPaymentMethod(paymentMethod);
+  };
+
+  const getCustomClientSecretAndSetForm = () => {
+    if (!customClientSecret) {
+      setSetupIntentLoading(true);
+      createSetupIntent({})
+        .then(setupIntentId => {
+          setCustomClientSecret(setupIntentId);
+          setCustomPaymentForm(true);
+          setSetupIntentLoading(false);
+        })
+        .catch(error => {
+          setSetupIntentLoading(false);
+          console.error(error);
+        });
+    } else {
+      setCustomPaymentForm(true);
+    }
+  };
+
+  const handleCustomPaymentSubmit = params => {
+    attachPaymentMethod(params)
+      .then(() => {
+        getPaymentMethodsList()
+          .then(result => {
+            if (result && result.length > 0) {
+              setCustomPaymentMethodList(result);
+              setCustomDefaultPaymentMethod(result[0]);
+              setCustomClientSecret(null);
+              setCustomPaymentForm(false);
+              saveCardDetailsRef.current.setActiveToDefault();
+            }
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+  /****************** END CUSTOM STRIPE  ******************/
 
   const getClientSecret = setupIntent => {
     return setupIntent && setupIntent.attributes ? setupIntent.attributes.clientSecret : null;
@@ -162,37 +303,66 @@ const PaymentMethodsPageComponent = props => {
           <H3 as="h1">
             <FormattedMessage id="PaymentMethodsPage.heading" />
           </H3>
-          {!stripeCustomerFetched ? null : (
+          {rootPaymentAPI === 1 ? (
+            !stripeCustomerFetched ? null : (
+              <>
+                {showCardDetails ? (
+                  <SavedCardDetails
+                    card={card}
+                    onManageDisableScrolling={onManageDisableScrolling}
+                    onChange={setCardState}
+                    onDeleteCard={handleRemovePaymentMethod}
+                    deletePaymentMethodInProgress={deletePaymentMethodInProgress}
+                  />
+                ) : null}
+                {showForm ? (
+                  <PaymentMethodsForm
+                    className={css.paymentForm}
+                    formId="PaymentMethodsForm"
+                    initialValues={initalValuesForStripePayment}
+                    onSubmit={handleCustomPaymentSubmit}
+                    handleRemovePaymentMethod={handleRemovePaymentMethod}
+                    hasDefaultPaymentMethod={hasDefaultPaymentMethod}
+                    addPaymentMethodError={addPaymentMethodError}
+                    deletePaymentMethodError={deletePaymentMethodError}
+                    createStripeCustomerError={createStripeCustomerError}
+                    handleCardSetupError={handleCardSetupError}
+                    inProgress={isSubmitting}
+                  />
+                ) : null}
+              </>
+            )
+          ) : paymentMethodsLoading || setupIntentLoading ? (
+            <IconSpinner />
+          ) : (
             <>
-              {showCardDetails ? (
-                <SavedCardDetails
-                  card={card}
-                  onManageDisableScrolling={onManageDisableScrolling}
-                  onChange={setCardState}
-                  onDeleteCard={handleRemovePaymentMethod}
-                  deletePaymentMethodInProgress={deletePaymentMethodInProgress}
+              {customDefaultPaymentMethod && customPaymentMethodList && (
+                <>
+                  <CustomSavedCardDetails
+                    onManageDisableScrolling={onManageDisableScrolling}
+                    customDefaultPaymentMethod={customDefaultPaymentMethod}
+                    customPaymentMethodList={customPaymentMethodList}
+                    onChange={getCustomClientSecretAndSetForm}
+                    onDeleteCardPaymentMethod={deleteCardPaymentMethod}
+                    changeCustomPaymentMethod={changeCustomPaymentMethod}
+                    ref={saveCardDetailsRef}
+                  />
+                  <br />
+                </>
+              )}
+              {showCustomPaymentForm && customClientSecret && (
+                <CustomStripePaymentForm
+                  clientSecret={customClientSecret}
+                  ctaButtonTxt="CustomStripePaymentForm.savePaymentMethodButton"
+                  handleCustomPaymentSubmit={handleCustomPaymentSubmit}
+                  currentUserEmail={currentUser.attributes.email}
+                  showInitialMessageInput={false}
                 />
-              ) : null}
-              {showForm ? (
-                <PaymentMethodsForm
-                  className={css.paymentForm}
-                  formId="PaymentMethodsForm"
-                  initialValues={initalValuesForStripePayment}
-                  onSubmit={handleSubmit}
-                  handleRemovePaymentMethod={handleRemovePaymentMethod}
-                  hasDefaultPaymentMethod={hasDefaultPaymentMethod}
-                  addPaymentMethodError={addPaymentMethodError}
-                  deletePaymentMethodError={deletePaymentMethodError}
-                  createStripeCustomerError={createStripeCustomerError}
-                  handleCardSetupError={handleCardSetupError}
-                  inProgress={isSubmitting}
-                />
-              ) : null}
+              )}
             </>
           )}
         </div>
       </LayoutSideNavigation>
-      <NativeBottomNavbar />
     </Page>
   );
 };
