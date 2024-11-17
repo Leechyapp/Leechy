@@ -16,6 +16,8 @@ import { loadData as PrivacyPolicyPageLoader } from './PrivacyPolicyPage/Privacy
 import { loadData as ProfilePageLoader } from './ProfilePage/ProfilePage.duck';
 import { loadData as SearchPageLoader } from './SearchPage/SearchPage.duck';
 import { loadData as StripePayoutPageLoader } from './StripePayoutPage/StripePayoutPage.duck';
+import { loadData as StripeExpressPayoutPageLoader } from './StripeExpressPayoutPage/StripeExpressPayoutPage.duck';
+import { loadData as StripeEarningsPageLoader } from './StripeEarningsPage/StripeEarningsPage.duck';
 import { loadData as TermsOfServicePageLoader } from './TermsOfServicePage/TermsOfServicePage.duck';
 import {
   loadData as TransactionPageLoader,
@@ -68,6 +70,12 @@ const getPageDataLoadingAPI = () => {
     },
     StripePayoutPage: {
       loadData: StripePayoutPageLoader,
+    },
+    StripeExpressPayoutPage: {
+      loadData: StripeExpressPayoutPageLoader,
+    },
+    StripeEarningsPage: {
+      loadData: StripeEarningsPageLoader,
     },
     TermsOfServicePage: {
       loadData: TermsOfServicePageLoader,
