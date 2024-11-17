@@ -34,6 +34,8 @@ const ProfileSettingsPage = loadable(() => import(/* webpackChunkName: "ProfileS
 const SearchPageWithMap = loadable(() => import(/* webpackChunkName: "SearchPageWithMap" */ /* webpackPrefetch: true */  '../containers/SearchPage/SearchPageWithMap'));
 const SearchPageWithGrid = loadable(() => import(/* webpackChunkName: "SearchPageWithGrid" */ /* webpackPrefetch: true */  '../containers/SearchPage/SearchPageWithGrid'));
 const StripePayoutPage = loadable(() => import(/* webpackChunkName: "StripePayoutPage" */ '../containers/StripePayoutPage/StripePayoutPage'));
+const StripeExpressPayoutPage = loadable(() => import(/* webpackChunkName: "StripeExpressPayoutPage" */ '../containers/StripeExpressPayoutPage/StripeExpressPayoutPage'));
+const StripeEarningsPage = loadable(() => import(/* webpackChunkName: "StripeEarningsPage" */ '../containers/StripeEarningsPage/StripeEarningsPage'));
 const TermsOfServicePage = loadable(() => import(/* webpackChunkName: "TermsOfServicePage" */ '../containers/TermsOfServicePage/TermsOfServicePage'));
 const TransactionPage = loadable(() => import(/* webpackChunkName: "TransactionPage" */ '../containers/TransactionPage/TransactionPage'));
 
@@ -44,6 +46,8 @@ export const ACCOUNT_SETTINGS_PAGES = [
   'ContactDetailsPage',
   'PasswordChangePage',
   'StripePayoutPage',
+  'StripeExpressPayoutPage',
+  'StripeEarningsPage',
   'PaymentMethodsPage',
   'SecurityPage',
 ];
@@ -290,6 +294,22 @@ const routeConfiguration = (layoutConfig) => {
       authPage: 'LoginPage',
       component: StripePayoutPage,
       loadData: pageDataLoadingAPI.StripePayoutPage.loadData,
+    },
+    {
+      path: '/account/payouts',
+      name: 'StripeExpressPayoutPage',
+      auth: true,
+      authPage: 'LoginPage',
+      component: StripeExpressPayoutPage,
+      loadData: pageDataLoadingAPI.StripeExpressPayoutPage.loadData,
+    },
+    {
+      path: '/account/earnings',
+      name: 'StripeEarningsPage',
+      auth: true,
+      authPage: 'LoginPage',
+      component: StripeEarningsPage,
+      loadData: pageDataLoadingAPI.StripeEarningsPage.loadData,
     },
     {
       path: '/account/payment-methods',
