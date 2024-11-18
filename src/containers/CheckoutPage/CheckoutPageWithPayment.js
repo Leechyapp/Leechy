@@ -601,6 +601,25 @@ export const CheckoutPageWithPayment = props => {
     const bookingEnd = booking.attributes.end;
     const displayStart = booking.attributes.displayStart;
     const displayEnd = booking.attributes.displayEnd;
+
+    const insuranceMethod = pageData.orderData?.insuranceMethod;
+    const insuranceMethodMaybe = insuranceMethod ? { insuranceMethod } : {};
+    let securityDepositMaybe = {};
+    if (speculatedTransaction && insuranceMethod === InsuranceMethodEnum.SecurityDeposit) {
+      const {
+        securityDepositPercentageValue,
+        totalPlusSecurityDepositPrice,
+        securityDepositAmount,
+        securityDepositTransferAmount,
+      } = speculatedTransaction.attributes.protectedData;
+      securityDepositMaybe = {
+        securityDepositPercentageValue,
+        totalPlusSecurityDepositPrice,
+        securityDepositAmount,
+        securityDepositTransferAmount,
+      };
+    }
+
     setTrxSubmitInProgress(true);
     createBookingRequest({
       initialMessage,
@@ -625,6 +644,8 @@ export const CheckoutPageWithPayment = props => {
             payoutTotal,
             timeZone,
           }),
+          ...insuranceMethodMaybe,
+          ...securityDepositMaybe,
         },
       },
     })
