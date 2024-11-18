@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { arrayOf, bool, func, object, oneOfType, shape, string } from 'prop-types';
 
 // Import contexts and util modules
@@ -11,7 +11,7 @@ import { isTransactionInitiateListingNotFoundError } from '../../util/errors';
 import { getProcess, isBookingProcessAlias } from '../../transactions/transaction';
 
 // Import shared components
-import { H3, H4, NamedLink, OrderBreakdown, Page } from '../../components';
+import { H3, H4, Heading, IconSpinner, NamedLink, OrderBreakdown, Page } from '../../components';
 
 import {
   bookingDatesMaybe,
@@ -35,6 +35,24 @@ import MobileOrderBreakdown from './MobileOrderBreakdown';
 
 import css from './CheckoutPage.module.css';
 import { InsuranceMethodEnum } from '../../enums/insurance-method.enum.js';
+
+import stripePaymentFormCSS from './StripePaymentForm/StripePaymentForm.module.css';
+import CustomStripePaymentForm from '../../components/CustomStripePaymentForm/CustomStripePaymentForm.js';
+import {
+  createBookingRequest,
+  createSetupIntent,
+  detachPaymentMethod,
+  getPaymentMethodsList,
+} from '../../util/api.js';
+import CustomSavedCardDetails from '../../components/CustomSavedCardDetails/CustomSavedCardDetails.js';
+import { useDispatch } from 'react-redux';
+import { manageDisableScrolling } from '../../ducks/ui.duck.js';
+import {
+  parseLineItems,
+  parsePayTotal,
+  parseSharetribeCompatibleEmailData,
+} from '../../util/priceBreakdownParser.js';
+import PriceBreakdownFormatTypeEnum from '../../enums/price-breakdown-format-type.enum.js';
 
 // Stripe PaymentIntent statuses, where user actions are already completed
 // https://stripe.com/docs/payments/payment-intents/status
@@ -333,6 +351,18 @@ export const CheckoutPageWithPayment = props => {
   // Initialized stripe library is saved to state - if it's needed at some point here too.
   const [stripe, setStripe] = useState(null);
 
+  // Custom Stripe Integration states
+  const [showCustomPaymentForm, setCustomPaymentForm] = useState(false);
+  const [customClientSecret, setCustomClientSecret] = useState(null);
+  const [rootPaymentAPI, setPaymentApiId] = useState(1);
+  const [customDefaultPaymentMethod, setCustomDefaultPaymentMethod] = useState(null);
+  const [customPaymentMethodList, setCustomPaymentMethodList] = useState([]);
+  const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
+  const [setupIntentLoading, setSetupIntentLoading] = useState(false);
+  const [trxSubmitInProgress, setTrxSubmitInProgress] = useState(false);
+  const [initialMessage, setInitialMessage] = useState();
+  const saveCardDetailsRef = useRef(null);
+
   const {
     scrollingDisabled,
     speculateTransactionError,
@@ -454,6 +484,176 @@ export const CheckoutPageWithPayment = props => {
     orderData?.deliveryMethod === 'shipping' &&
     !hasTransactionPassedPendingPayment(existingTransaction, process);
 
+  /****************** START CUSTOM STRIPE  ******************/
+  useEffect(() => {
+    if (rootPaymentAPI !== 2) {
+      handleChangePaymentAPI(2);
+    }
+    if (
+      showCustomPaymentForm &&
+      !customClientSecret &&
+      rootPaymentAPI === 2 &&
+      !customDefaultPaymentMethod &&
+      customPaymentMethodList.length === 0
+    ) {
+      getCustomClientSecretAndSetForm();
+    }
+  }, [
+    showCustomPaymentForm,
+    customClientSecret,
+    rootPaymentAPI,
+    customDefaultPaymentMethod,
+    customPaymentMethodList,
+  ]);
+
+  const dispatch = useDispatch();
+  const onManageDisableScrolling = (componentId, disableScrolling) => {
+    dispatch(manageDisableScrolling(componentId, disableScrolling));
+  };
+
+  const handleChangePaymentAPI = pmId => {
+    setPaymentApiId(pmId);
+    if (pmId === 2) {
+      setPaymentMethodsLoading(true);
+      getPaymentMethodsList({})
+        .then(result => {
+          if (result && result.length > 0) {
+            setCustomPaymentMethodList(result);
+            setCustomDefaultPaymentMethod(result[0]);
+          } else {
+            getCustomClientSecretAndSetForm();
+          }
+          setPaymentMethodsLoading(false);
+        })
+        .catch(error => {
+          console.error(error);
+          setPaymentMethodsLoading(false);
+        });
+    } else {
+      setCustomClientSecret(null);
+      setCustomPaymentMethodList([]);
+      setCustomDefaultPaymentMethod(null);
+    }
+  };
+
+  const deleteCardPaymentMethod = paymentMethodId => {
+    detachPaymentMethod({ paymentMethodId })
+      .then(() => {
+        getPaymentMethodsList({})
+          .then(result => {
+            if (result && result.length > 0) {
+              setCustomClientSecret(null);
+              setCustomPaymentMethodList(result);
+              setCustomDefaultPaymentMethod(result[0]);
+            } else {
+              setCustomPaymentForm(true);
+              setCustomClientSecret(null);
+              setCustomDefaultPaymentMethod(null);
+              setCustomPaymentMethodList([]);
+            }
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  const changeCustomPaymentMethod = paymentMethod => {
+    setCustomPaymentForm(false);
+    setCustomDefaultPaymentMethod(paymentMethod);
+  };
+
+  const getCustomClientSecretAndSetForm = () => {
+    if (!customClientSecret) {
+      setSetupIntentLoading(true);
+      createSetupIntent({})
+        .then(setupIntentId => {
+          setCustomClientSecret(setupIntentId);
+          setCustomPaymentForm(true);
+          setSetupIntentLoading(false);
+        })
+        .catch(error => {
+          setSetupIntentLoading(false);
+          console.error(error);
+        });
+    } else {
+      setCustomPaymentForm(true);
+    }
+  };
+
+  const handleCustomPaymentSubmit = params => {
+    const { stripePaymentMethodId } = params;
+    const { booking, attributes } = speculatedTransaction;
+    const { lineItems, payinTotal, payoutTotal } = attributes;
+    const bookingStart = booking.attributes.start;
+    const bookingEnd = booking.attributes.end;
+    const displayStart = booking.attributes.displayStart;
+    const displayEnd = booking.attributes.displayEnd;
+    setTrxSubmitInProgress(true);
+    createBookingRequest({
+      initialMessage,
+      orderParams: {
+        listingId: listing.id,
+        bookingStart,
+        bookingEnd,
+        displayStart,
+        displayEnd,
+        protectedData: {
+          stripePaymentMethodId,
+          lineItems: parseLineItems(lineItems, PriceBreakdownFormatTypeEnum.Json),
+          payinTotal: parsePayTotal(payinTotal, PriceBreakdownFormatTypeEnum.Json),
+          payoutTotal: parsePayTotal(payoutTotal, PriceBreakdownFormatTypeEnum.Json),
+          emailData: parseSharetribeCompatibleEmailData({
+            bookingStart,
+            bookingEnd,
+            displayStart,
+            displayEnd,
+            lineItems,
+            payinTotal,
+            payoutTotal,
+            timeZone,
+          }),
+        },
+      },
+    })
+      .then(({ transactionId }) => {
+        redirectToOrderDetailsPage(transactionId);
+      })
+      .catch(err => {
+        setTrxSubmitInProgress(false);
+        console.error(err);
+      });
+  };
+
+  const redirectToOrderDetailsPage = transactionId => {
+    const { routeConfiguration, history } = props;
+    history.push(
+      pathByRouteName('OrderDetailsPage', routeConfiguration, {
+        id: transactionId.uuid,
+      })
+    );
+  };
+
+  const authorDisplayName = listing?.author?.attributes?.profile?.displayName;
+
+  const messagePlaceholder = intl.formatMessage(
+    { id: 'StripePaymentForm.messagePlaceholder' },
+    { name: authorDisplayName }
+  );
+
+  const messageOptionalText = intl.formatMessage({
+    id: 'StripePaymentForm.messageOptionalText',
+  });
+
+  const initialMessageLabel = intl.formatMessage(
+    { id: 'StripePaymentForm.messageLabel' },
+    { messageOptionalText: messageOptionalText }
+  );
+  /****************** END CUSTOM STRIPE  ******************/
+
   return (
     <Page title={title} scrollingDisabled={scrollingDisabled}>
       <CustomTopbar intl={intl} linkToExternalSite={config?.topbar?.logoLink} />
@@ -479,51 +679,120 @@ export const CheckoutPageWithPayment = props => {
             breakdown={breakdown}
           />
 
-          <section className={css.paymentContainer}>
-            {errorMessages.initiateOrderErrorMessage}
-            {errorMessages.listingNotFoundErrorMessage}
-            {errorMessages.speculateErrorMessage}
-            {errorMessages.retrievePaymentIntentErrorMessage}
-            {errorMessages.paymentExpiredMessage}
+          {rootPaymentAPI === 1 ? (
+            <section className={css.paymentContainer}>
+              {errorMessages.initiateOrderErrorMessage}
+              {errorMessages.listingNotFoundErrorMessage}
+              {errorMessages.speculateErrorMessage}
+              {errorMessages.retrievePaymentIntentErrorMessage}
+              {errorMessages.paymentExpiredMessage}
 
-            {showPaymentForm ? (
-              <StripePaymentForm
-                className={css.paymentForm}
-                onSubmit={values =>
-                  handleSubmit(values, process, props, stripe, submitting, setSubmitting)
-                }
-                inProgress={submitting}
-                formId="CheckoutPagePaymentForm"
-                authorDisplayName={listing?.author?.attributes?.profile?.displayName}
-                showInitialMessageInput={showInitialMessageInput}
-                initialValues={initalValuesForStripePayment}
-                initiateOrderError={initiateOrderError}
-                confirmCardPaymentError={confirmCardPaymentError}
-                confirmPaymentError={confirmPaymentError}
-                hasHandledCardPayment={hasPaymentIntentUserActionsDone}
-                loadingData={!stripeCustomerFetched}
-                defaultPaymentMethod={
-                  hasDefaultPaymentMethod(stripeCustomerFetched, currentUser)
-                    ? currentUser.stripeCustomer.defaultPaymentMethod
-                    : null
-                }
-                paymentIntent={paymentIntent}
-                onStripeInitialized={stripe => {
-                  setStripe(stripe);
-                  return onStripeInitialized(stripe, process, props);
-                }}
-                askShippingDetails={askShippingDetails}
-                showPickUplocation={orderData?.deliveryMethod === 'pickup'}
-                listingLocation={listing?.attributes?.publicData?.location}
-                totalPrice={totalPrice}
-                locale={config.localization.locale}
-                stripePublishableKey={config.stripe.publishableKey}
-                marketplaceName={config.marketplaceName}
-                isBooking={isBookingProcessAlias(transactionProcessAlias)}
-                isFuzzyLocation={config.maps.fuzzy.enabled}
+              {showPaymentForm ? (
+                <StripePaymentForm
+                  className={css.paymentForm}
+                  onSubmit={values =>
+                    handleSubmit(values, process, props, stripe, submitting, setSubmitting)
+                  }
+                  inProgress={submitting}
+                  formId="CheckoutPagePaymentForm"
+                  authorDisplayName={listing?.author?.attributes?.profile?.displayName}
+                  showInitialMessageInput={showInitialMessageInput}
+                  initialValues={initalValuesForStripePayment}
+                  initiateOrderError={initiateOrderError}
+                  confirmCardPaymentError={confirmCardPaymentError}
+                  confirmPaymentError={confirmPaymentError}
+                  hasHandledCardPayment={hasPaymentIntentUserActionsDone}
+                  loadingData={!stripeCustomerFetched}
+                  defaultPaymentMethod={
+                    hasDefaultPaymentMethod(stripeCustomerFetched, currentUser)
+                      ? currentUser.stripeCustomer.defaultPaymentMethod
+                      : null
+                  }
+                  paymentIntent={paymentIntent}
+                  onStripeInitialized={stripe => {
+                    setStripe(stripe);
+                    return onStripeInitialized(stripe, process, props);
+                  }}
+                  askShippingDetails={askShippingDetails}
+                  showPickUplocation={orderData?.deliveryMethod === 'pickup'}
+                  listingLocation={listing?.attributes?.publicData?.location}
+                  totalPrice={totalPrice}
+                  locale={config.localization.locale}
+                  stripePublishableKey={config.stripe.publishableKey}
+                  marketplaceName={config.marketplaceName}
+                  isBooking={isBookingProcessAlias(transactionProcessAlias)}
+                  isFuzzyLocation={config.maps.fuzzy.enabled}
+                />
+              ) : null}
+            </section>
+          ) : (
+            <section className={css.paymentContainer}>
+              <Heading as="h3" rootClassName={stripePaymentFormCSS.heading}>
+                <FormattedMessage id="StripePaymentForm.messageHeading" />
+              </Heading>
+              <label for="CheckoutPagePaymentForm-message">{initialMessageLabel}</label>
+              <textarea
+                id="CheckoutPagePaymentForm-message"
+                type="textarea"
+                name="initialMessage"
+                placeholder={messagePlaceholder}
+                value={initialMessage}
+                onChange={e => setInitialMessage(e.target.value)}
+                className={[stripePaymentFormCSS.message, css.initialMessageTextArea].join(' ')}
               />
-            ) : null}
-          </section>
+              <Heading as="h3" rootClassName={stripePaymentFormCSS.heading}>
+                <FormattedMessage id="StripePaymentForm.payWithHeading" />
+              </Heading>
+              {paymentMethodsLoading || setupIntentLoading ? (
+                <IconSpinner />
+              ) : (
+                <>
+                  {customDefaultPaymentMethod && customPaymentMethodList && (
+                    <>
+                      <CustomSavedCardDetails
+                        onManageDisableScrolling={onManageDisableScrolling}
+                        customDefaultPaymentMethod={customDefaultPaymentMethod}
+                        customPaymentMethodList={customPaymentMethodList}
+                        onChange={getCustomClientSecretAndSetForm}
+                        onDeleteCardPaymentMethod={deleteCardPaymentMethod}
+                        changeCustomPaymentMethod={changeCustomPaymentMethod}
+                        ref={saveCardDetailsRef}
+                      />
+                      <br />
+                      {!showCustomPaymentForm && (
+                        <div className={stripePaymentFormCSS.submitContainer}>
+                          <PrimaryButton
+                            className={stripePaymentFormCSS.submitButton}
+                            type="button"
+                            inProgress={trxSubmitInProgress}
+                            onClick={() =>
+                              handleCustomPaymentSubmit({
+                                stripePaymentMethodId: customDefaultPaymentMethod.id,
+                                initialMessage,
+                              })
+                            }
+                          >
+                            <FormattedMessage id="StripePaymentForm.submitCustomStripePaymentInfo" />
+                          </PrimaryButton>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {showCustomPaymentForm && customClientSecret && (
+                    <CustomStripePaymentForm
+                      authorDisplayName={authorDisplayName}
+                      clientSecret={customClientSecret}
+                      ctaButtonTxt="CustomStripePaymentForm.submitBookingRequest"
+                      handleCustomPaymentSubmit={handleCustomPaymentSubmit}
+                      currentUserEmail={currentUser.attributes.email}
+                      showInitialMessageInput={false}
+                      trxSubmitInProgress={trxSubmitInProgress}
+                    />
+                  )}
+                </>
+              )}
+            </section>
+          )}
         </div>
 
         <DetailsSideCard
