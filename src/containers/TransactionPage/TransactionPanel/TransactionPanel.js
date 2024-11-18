@@ -9,7 +9,7 @@ import { userDisplayNameAsString } from '../../../util/data';
 import { isMobileSafari } from '../../../util/userAgent';
 import { createSlug } from '../../../util/urlHelpers';
 
-import { AvatarLarge, NamedLink, UserDisplayName } from '../../../components';
+import { AvatarLarge, Modal, NamedLink, UserDisplayName } from '../../../components';
 
 import { stateDataShape } from '../TransactionPage.stateData';
 import SendMessageForm from '../SendMessageForm/SendMessageForm';
@@ -33,6 +33,7 @@ import { DeliveryMethodEnum } from '../../../enums/delivery-method-enum';
 import { states, transitions } from '../../../transactions/transactionProcessBooking';
 import { PushNotificationCodeEnum } from '../../../enums/push-notification-code.enum';
 import { sendPushNotification } from '../../../util/api';
+import StripeExpressStatusBox from '../../../components/StripeExpressStatusBox/StripeExpressStatusBox';
 
 // Helper function to get display names for different roles
 const displayNames = (currentUser, provider, customer, intl) => {
@@ -67,6 +68,7 @@ export class TransactionPanelComponent extends Component {
     super(props);
     this.state = {
       sendMessageFormFocused: false,
+      showStripeExpressModal: false,
     };
     this.isMobSaf = false;
     this.sendMessageFormName = 'TransactionPanel.SendMessageForm';
@@ -79,6 +81,18 @@ export class TransactionPanelComponent extends Component {
 
   componentDidMount() {
     this.isMobSaf = isMobileSafari();
+  }
+
+  componentDidUpdate(prevProps) {
+    // Update focusedInput in case a new value for it is
+    // passed in the props. This may occur if the focus
+    // is manually set to the date picker.
+    if (
+      this.props.stripePayoutsDisabled &&
+      this.props.stripePayoutsDisabled !== prevProps.stripePayoutsDisabled
+    ) {
+      this.setState({ showStripeExpressModal: !this.state.showStripeExpressModal });
+    }
   }
 
   onSendMessageFormFocus() {
@@ -140,7 +154,6 @@ export class TransactionPanelComponent extends Component {
       className,
       currentUser,
       transactionRole,
-      lastTransition,
       booking,
       listing,
       customer,
@@ -164,6 +177,8 @@ export class TransactionPanelComponent extends Component {
       orderPanel,
       config,
       transactionId,
+      lastTransition,
+      onManageDisableScrolling,
     } = this.props;
 
     console.log(`TransactionPanel protectedData`, protectedData);
@@ -432,6 +447,17 @@ export class TransactionPanelComponent extends Component {
             </div>
           </div>
         </div>
+        <Modal
+          id="TransactionPanel.stripeExpressModal"
+          isOpen={this.state.showStripeExpressModal}
+          onClose={() => {
+            this.setState({ showStripeExpressModal: false });
+          }}
+          usePortal={true}
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <StripeExpressStatusBox transactionId={transactionId} />
+        </Modal>
       </div>
     );
   }

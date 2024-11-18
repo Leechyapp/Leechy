@@ -126,6 +126,7 @@ export const TransactionPageComponent = props => {
     lineItems,
     fetchLineItemsInProgress,
     fetchLineItemsError,
+    stripePayoutsDisabled,
   } = props;
 
   const { listing, provider, customer, booking } = transaction || {};
@@ -456,6 +457,8 @@ export const TransactionPageComponent = props => {
       isInquiryProcess={processName === INQUIRY_PROCESS_NAME}
       config={config}
       {...orderBreakdownMaybe}
+      stripePayoutsDisabled={stripePayoutsDisabled}
+      onManageDisableScrolling={onManageDisableScrolling}
       orderPanel={
         <OrderPanel
           className={css.orderPanel}
@@ -628,6 +631,7 @@ const mapStateToProps = state => {
     lineItems,
     fetchLineItemsInProgress,
     fetchLineItemsError,
+    stripePayoutsDisabled,
   } = state.TransactionPage;
   const { currentUser } = state.user;
 
@@ -657,6 +661,7 @@ const mapStateToProps = state => {
     lineItems,
     fetchLineItemsInProgress,
     fetchLineItemsError,
+    stripePayoutsDisabled,
   };
 };
 
