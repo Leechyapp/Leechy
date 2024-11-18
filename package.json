@@ -97,6 +97,7 @@
     "stripe": "^17.2.1",
     "unified": "^9.2.2",
     "url": "^0.11.0",
+    "uuid": "^11.0.3",
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {
