@@ -247,9 +247,6 @@ export const getStripeAccountBalanceDetails = () => {
 export const createStripeAccountPayout = () => {
   return post('/api/stripe-account/create-payout', {});
 };
-export const updatePayoutSettings = body => {
-  return post('/api/stripe-account/update-payout-settings', body);
-};
 
 export const createSetupIntent = (body = {}) => {
   return post('/api/setup-intent/get-client-secret', body);
