@@ -1,3 +1,4 @@
+const SharetribeService = require('../services/sharetribe.service');
 const StripeService = require('../services/stripe.service');
 const { REACT_APP_MARKETPLACE_ROOT_URL } = process.env;
 
