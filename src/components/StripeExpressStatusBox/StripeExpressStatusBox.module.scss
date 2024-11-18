@@ -1,0 +1,8 @@
+button.stripeConnectCtaButton {
+  background-color: var(--marketplaceColor);
+  color: white;
+
+  &:hover {
+    background-color: var(--marketplaceColorDark);
+  }
+}
