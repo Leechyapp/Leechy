@@ -20,7 +20,7 @@ class BookingController {
         params: orderParams,
       });
       if (initialTransition?.data?.errors) {
-        res.status(500).send(initialTransition?.data?.errors);
+        return res.status(500).send(initialTransition?.data?.errors);
       }
 
       const transactionId = initialTransition.data.data.id;
