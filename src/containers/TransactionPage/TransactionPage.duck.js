@@ -613,7 +613,7 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
         });
     };
 
-    return acceptBookingRequest({ transactionId: txId })
+    return acceptBookingRequest({ transactionId: txId.uuid })
       .then(() => {
         return onChargeSecurityDeposit();
       })
