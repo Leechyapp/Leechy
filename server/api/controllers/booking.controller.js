@@ -14,14 +14,16 @@ class BookingController {
       const { stripeCustomerId } = req.currentUser.attributes.profile.privateData;
       orderParams.protectedData.stripeCustomerId = stripeCustomerId;
 
-      const result = await SharetribeService.transactionsInitiateDynamic(req, {
+      const initialTransition = await SharetribeService.transactionsInitiateDynamic(req, {
         processAlias: ProcessAliasEnum.DefaultBookingRelease1,
         transition: TransitionEnum.RequestPayment,
         params: orderParams,
       });
-      if (result?.data?.errors) {
-        res.status(500).send(result?.data?.errors);
+      if (initialTransition?.data?.errors) {
+        res.status(500).send(initialTransition?.data?.errors);
       }
+
+      const transactionId = initialTransition.data.data.id;
 
       const transitionConfirmPaymentRes = await SharetribeService.transitionTransaction(req, res, {
         id: new UUID(transactionId.uuid),
@@ -31,8 +33,6 @@ class BookingController {
       if (transitionConfirmPaymentRes?.data?.errors) {
         return res.status(500).send(transitionConfirmPaymentRes?.data?.errors);
       }
-
-      const transactionId = result.data.data.id;
 
       if (initialMessage && transactionId) {
         await SharetribeService.sendMessage(req, res, transactionId.uuid, initialMessage);
@@ -69,7 +69,7 @@ class BookingController {
         payment_method_types: ['card'],
         customer: stripeCustomerId,
         payment_method: stripePaymentMethodId,
-        description: `Booking (ID: ${transactionId})`,
+        description: `Transaction (ID: ${transactionId})`,
         transfer_data: {
           amount: payoutTotal.amount,
           destination: stripeAccountId,
