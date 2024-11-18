@@ -1,4 +1,3 @@
-const SharetribeIntegrationService = require('../services/sharetribe-integration.service');
 const StripeService = require('../services/stripe.service');
 const { REACT_APP_MARKETPLACE_ROOT_URL } = process.env;
 
@@ -132,24 +131,13 @@ class StripeAccountController {
         const { available } = balance;
         const stripeAccountPayout = await StripeService.createPayout(
           stripeAccountId,
-          available[0].amount
+          available[0].amount,
+          available[0].currency
         );
         res.send(stripeAccountPayout);
       } else {
         res.send('Available balance not found');
       }
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async updatePayoutSettings(req, res, next) {
-    try {
-      const stripeAccountId = await SharetribeIntegrationService.searchStripeAccountId(
-        req.userUUID
-      );
-      await StripeService.updateAccountToAutomaticPayouts(stripeAccountId);
-      res.send('Payout settings updated');
     } catch (error) {
       next(error);
     }
