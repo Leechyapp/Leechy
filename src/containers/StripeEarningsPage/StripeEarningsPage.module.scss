@@ -32,5 +32,26 @@ $fontSize: 14px;
 
 .stripeBalanceContainer {
   border: 1px solid var(--colorGrey100);
-  padding: 10px;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.payoutButton {
+  margin-top: 15px;
+}
+
+.colAvatar {
+  width: 25%;
+  flex: $flexColDefault;
+  @media (--viewportSmall) {
+    width: 10%;
+  }
+}
+
+.colStripeAccountContents {
+  width: 75%;
+  flex: $flexColDefault;
+  @media (--viewportSmall) {
+    width: 90%;
+  }
 }

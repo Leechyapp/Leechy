@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import css from './StripeEarningsPage.module.scss';
-import { Button, H3, IconSpinner, LayoutSideNavigation, Page, UserNav } from '../../components';
+import {
+  Avatar,
+  Button,
+  H3,
+  IconSpinner,
+  LayoutSideNavigation,
+  Page,
+  UserNav,
+} from '../../components';
 import TopbarContainer from '../TopbarContainer/TopbarContainer';
 import FooterContainer from '../FooterContainer/FooterContainer';
-import { createStripeAccountPayout } from '../../util/api';
+import { createStripeAccountPayout, createStripeDashboardLink } from '../../util/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadData } from './StripeEarningsPage.duck';
 import { types as sdkTypes } from '../../util/sdkLoader';
@@ -17,10 +25,15 @@ export const StripeEarningsPage = injectIntl(props => {
   const dispatch = useDispatch();
 
   const state = useSelector(state => state);
+
+  const currentUser = state?.user?.currentUser;
+  const displayName = currentUser?.attributes?.profile?.displayName;
+
   const { stripeBalance, stripeBalanceLoading, stripeBalanceError } = state.StripeEarningsPage;
   const [pendingAmount, setPendingAmount] = useState();
   const [availableAmount, setAvailableAmount] = useState();
   const [stripeAccountPayoutInProgress, setStripeAccountPayoutInProgress] = useState(null);
+  const [dashboardLinkInProgress, setDashboardLinkInProgress] = useState(false);
 
   useEffect(() => {
     if (stripeBalance) {
@@ -58,6 +71,23 @@ export const StripeEarningsPage = injectIntl(props => {
     return '--';
   };
 
+  const getStripeConnectExpressDashboardLink = () => {
+    setDashboardLinkInProgress(true);
+    createStripeDashboardLink({})
+      .then(link => {
+        if (link) {
+          window.open(link, '_blank');
+          setDashboardLinkInProgress(false);
+        } else {
+          setDashboardLinkInProgress(false);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        setDashboardLinkInProgress(false);
+      });
+  };
+
   return (
     <Page title={title} scrollingDisabled={scrollingDisabled}>
       <LayoutSideNavigation
@@ -89,6 +119,19 @@ export const StripeEarningsPage = injectIntl(props => {
             <>
               <div className={css.stripeBalanceContainer}>
                 <div className={css.rowUnsetMarginLR}>
+                  <div className={css.colAvatar}>
+                    <Avatar className={css.avatar} user={currentUser} />
+                  </div>
+                  <div className={css.colStripeAccountContents}>
+                    <span>{displayName}</span>
+                    <br />
+                    <a onClick={() => getStripeConnectExpressDashboardLink()}>
+                      View Stripe dashboard
+                    </a>
+                  </div>
+                </div>
+                <br />
+                <div className={css.rowUnsetMarginLR}>
                   <div className={css.col6}>
                     <label>
                       <FormattedMessage id="StripeEarningsPage.balance.pending.title" />
@@ -101,18 +144,16 @@ export const StripeEarningsPage = injectIntl(props => {
                     </label>
                     <span>{availableAmount ? availableAmount : '--'}</span>
                   </div>
-                </div>
-              </div>
-              <br />
-              <div className={css.rowUnsetMarginLR}>
-                <div className={css.col12}>
-                  <Button
-                    onClick={() => onCreateStripeAccountPayout()}
-                    inProgress={stripeAccountPayoutInProgress}
-                    disabled={!availableAmount || availableAmount === '--'}
-                  >
-                    <FormattedMessage id="StripeEarningsPage.payoutButton" />
-                  </Button>
+                  <div className={css.col12}>
+                    <Button
+                      className={css.payoutButton}
+                      onClick={() => onCreateStripeAccountPayout()}
+                      inProgress={stripeAccountPayoutInProgress}
+                      disabled={!availableAmount || availableAmount === '--'}
+                    >
+                      <FormattedMessage id="StripeEarningsPage.payoutButton" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
