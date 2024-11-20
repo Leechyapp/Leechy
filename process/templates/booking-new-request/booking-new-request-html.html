@@ -40,7 +40,7 @@
                               </td>
                             </tr>
                           </tbody>
-                        </table>{{#each tx-line-items}}{{#eq "line-item/hour" code}}
+                        </table>{{#each protected-data.emailData.lineItems}}{{#eq "line-item/hour" code}}
                         <table align="center" border="0" cellPadding="0" cellSpacing="0" role="presentation" width="100%">
                           <tbody>
                             <tr>
@@ -128,17 +128,17 @@
                           </tbody>
                         </table>
                         {{/eq}}{{/each}}
-                        {{#each tx-line-items}}{{#contains include-for "provider"}}{{#eq "line-item/hour" code}}{{#if seats}}
+                        {{#each protected-data.emailData.lineItems}}{{#contains includeFor "provider"}}{{#eq "line-item/hour" code}}{{#if seats}}
                         <table align="center" border="0" cellPadding="0" cellSpacing="0" role="presentation" width="100%">
                           <tbody>
                             <tr>
                               <td>
                                 <td>
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForHoursQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {hour} other {hours}}" amount=unit-price.amount currency=unit-price.currency units=units}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForHoursQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {hour} other {hours}}" amount=unitPrice.amount currency=unitPrice.currency units=units}}</p>
                                   <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848">{{t "BookingNewRequest.SeatsQuantity" "Seats × {seats, number}" seats=seats}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=line-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=lineTotal}}</p>
                                 </td>
                               </td>
                             </tr>
@@ -150,10 +150,10 @@
                             <tr>
                               <td>
                                 <td>
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForHoursQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {hour} other {hours}}" amount=unit-price.amount currency=unit-price.currency units=quantity}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForHoursQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {hour} other {hours}}" amount=unitPrice.amount currency=unitPrice.currency units=quantity}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=line-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=lineTotal}}</p>
                                 </td>
                               </td>
                             </tr>
@@ -165,11 +165,11 @@
                             <tr>
                               <td>
                                 <td>
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForDaysQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {day} other {days}}" amount=unit-price.amount currency=unit-price.currency units=quantity}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForDaysQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {day} other {days}}" amount=unitPrice.amount currency=unitPrice.currency units=quantity}}</p>
                                   <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.SeatsQuantity" "Seats × {seats, number}" seats=seats}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=line-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=lineTotal}}</p>
                                 </td>
                               </td>
                             </tr>
@@ -181,10 +181,10 @@
                             <tr>
                               <td>
                                 <td>
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForDaysQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {day} other {days}}" amount=unit-price.amount currency=unit-price.currency units=quantity}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForDaysQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {day} other {days}}" amount=unitPrice.amount currency=unitPrice.currency units=quantity}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=line-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=lineTotal}}</p>
                                 </td>
                               </td>
                             </tr>
@@ -196,11 +196,11 @@
                             <tr>
                               <td>
                                 <td>
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForNightsQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {night} other {nights}}" amount=unit-price.amount currency=unit-price.currency units=units}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForNightsQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {night} other {nights}}" amount=unitPrice.amount currency=unitPrice.currency units=units}}</p>
                                   <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.SeatsQuantity" "Seats × {seats, number}" seats=seats}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=line-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=lineTotal}}</p>
                                 </td>
                               </td>
                             </tr>
@@ -212,10 +212,10 @@
                             <tr>
                               <td>
                                 <td>
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForNightsQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {night} other {nights}}" amount=unit-price.amount currency=unit-price.currency units=quantity}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{t "BookingNewRequest.PriceForNightsQuantity" "{amount, number, ::.00} {currency} × {units, number} {units, plural, one {night} other {nights}}" amount=unitPrice.amount currency=unitPrice.currency units=quantity}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=line-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-bottom:1px">{{> format-money money=lineTotal}}</p>
                                 </td>
                               </td>
                             </tr>
@@ -230,7 +230,7 @@
                                   <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-top:1px">{{t "BookingNewRequest.MarketplaceFeeLabel" "{marketplaceName} fee" marketplaceName=marketplace.name}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-top:1px">{{> format-money money=line-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-top:1px">{{> format-money money=lineTotal}}</p>
                                 </td>
                               </td>
                             </tr>
@@ -246,7 +246,7 @@
                                   <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-top:1px;font-weight:700">{{t "BookingNewRequest.EarningLabel" "You'll earn"}}</p>
                                 </td>
                                 <td style="text-align:right">
-                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-top:1px;font-weight:700">{{> format-money money=payout-total}}</p>
+                                  <p style="font-size:16px;line-height:1.4;margin:16px 0;color:#484848;margin-top:1px;font-weight:700">{{> format-money money=protected-data.emailData.payoutTotal}}</p>
                                 </td>
                               </td>
                             </tr>
