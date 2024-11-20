@@ -42,7 +42,7 @@ class StripeAccountController {
           settings: {
             payouts: {
               schedule: {
-                interval: 'manual',
+                interval: 'automatic',
               },
             },
           },
