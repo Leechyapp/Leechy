@@ -230,7 +230,11 @@ export const StripeEarningsPage = injectIntl(props => {
                         className={css.payoutButton}
                         onClick={() => onCreateStripeAccountPayout()}
                         inProgress={stripeAccountPayoutInProgress}
-                        disabled={!availableAmount || availableAmount === emptyDash}
+                        disabled={
+                          !availableAmount ||
+                          availableAmount === emptyDash ||
+                          stripeBalance?.availableAmount?.amount === 0
+                        }
                         type="button"
                       >
                         <FormattedMessage id="StripeEarningsPage.payoutButton" />
