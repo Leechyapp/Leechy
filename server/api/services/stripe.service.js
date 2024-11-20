@@ -73,6 +73,19 @@ class StripeService {
     return account;
   }
 
+  static async updateAccountPayoutInterval(stripeAccountId, interval) {
+    const account = await stripe.accounts.update(stripeAccountId, {
+      settings: {
+        payouts: {
+          schedule: {
+            interval,
+          },
+        },
+      },
+    });
+    return account;
+  }
+
   static async createRefund(dataObj) {
     return await stripe.refunds.create(dataObj);
   }

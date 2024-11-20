@@ -39,13 +39,6 @@ class StripeAccountController {
             card_payments: { requested: true },
             transfers: { requested: true },
           },
-          settings: {
-            payouts: {
-              schedule: {
-                interval: 'automatic',
-              },
-            },
-          },
         });
         stripeAccountId = account.id;
 
@@ -139,6 +132,19 @@ class StripeAccountController {
       } else {
         res.send('Available balance not found');
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateStripeAccountPayoutInterval(req, res, next) {
+    try {
+      const stripeAccountId = req.currentUser.attributes.profile.privateData?.stripeAccountId;
+      if (!stripeAccountId) {
+        return res.status(404).send({ message: 'Not Found: Stripe Account ID' });
+      }
+      await StripeService.updateAccountPayoutInterval(stripeAccountId, req.body.interval);
+      res.send('Stripe Account payout interval updated.');
     } catch (error) {
       next(error);
     }

@@ -30,6 +30,11 @@ class StripeAccountRoute extends BaseRoute {
       authMiddleware,
       StripeAccountController.createStripeAccountPayout
     );
+    router.post(
+      this.ROOT_PATH + '/update-payout-interval',
+      authMiddleware,
+      StripeAccountController.updateStripeAccountPayoutInterval
+    );
   }
 }
 module.exports = StripeAccountRoute;

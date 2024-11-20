@@ -7,23 +7,41 @@ import {
   H3,
   IconSpinner,
   LayoutSideNavigation,
+  Modal,
   Page,
   UserNav,
 } from '../../components';
 import TopbarContainer from '../TopbarContainer/TopbarContainer';
 import FooterContainer from '../FooterContainer/FooterContainer';
-import { createStripeAccountPayout, createStripeDashboardLink } from '../../util/api';
+import {
+  createStripeAccountPayout,
+  createStripeDashboardLink,
+  updateStripeAccountPayoutInterval,
+} from '../../util/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadData } from './StripeEarningsPage.duck';
 import { types as sdkTypes } from '../../util/sdkLoader';
 import { formatMoney } from '../../util/currency';
 import { fetchStripeExpress } from '../StripeExpressPayoutPage/StripeExpressPayoutPage.duck';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { manageDisableScrolling } from '../../ducks/ui.duck';
 const { Money } = sdkTypes;
+
+const emptyDash = '--';
+
+const PayoutIntervalEnum = {
+  Daily: 'daily',
+  Manual: 'manual',
+};
 
 export const StripeEarningsPage = injectIntl(props => {
   const { intl, title, scrollingDisabled } = props;
 
   const dispatch = useDispatch();
+  const onManageDisableScrolling = (componentId, disableScrolling) => {
+    dispatch(manageDisableScrolling(componentId, disableScrolling));
+  };
 
   const state = useSelector(state => state);
 
@@ -40,6 +58,9 @@ export const StripeEarningsPage = injectIntl(props => {
   const [availableAmount, setAvailableAmount] = useState();
   const [stripeAccountPayoutInProgress, setStripeAccountPayoutInProgress] = useState(null);
   const [dashboardLinkInProgress, setDashboardLinkInProgress] = useState(false);
+  const [payoutIntervalModalOpen, setPayoutIntervalModalOpen] = useState(false);
+  const [selectedPayoutInterval, setSelectedPayoutInterval] = useState(payoutInterval);
+  const [updatePayoutIntervalInProgress, setUpdatePayoutIntervalInProgress] = useState(false);
 
   useEffect(() => {
     if (stripeBalance) {
@@ -75,8 +96,10 @@ export const StripeEarningsPage = injectIntl(props => {
     if (amount && currency) {
       const formattedAmount = formatMoney(intl, new Money(amount, currency));
       return formattedAmount;
+    } else {
+      const formattedAmount = formatMoney(intl, new Money(0, currency));
+      return formattedAmount;
     }
-    return '--';
   };
 
   const getStripeConnectExpressDashboardLink = () => {
@@ -93,6 +116,23 @@ export const StripeEarningsPage = injectIntl(props => {
       .catch(error => {
         console.error(error);
         setDashboardLinkInProgress(false);
+      });
+  };
+
+  const onUpdatePayoutInterval = () => {
+    setUpdatePayoutIntervalInProgress(true);
+    updateStripeAccountPayoutInterval({
+      interval: selectedPayoutInterval,
+    })
+      .then(() => {
+        dispatch(fetchStripeExpress()).then(() => {
+          setUpdatePayoutIntervalInProgress(false);
+          setPayoutIntervalModalOpen(false);
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        setUpdatePayoutIntervalInProgress(false);
       });
   };
 
@@ -151,25 +191,47 @@ export const StripeEarningsPage = injectIntl(props => {
                 </div>
                 <br />
                 <div className={css.rowUnsetMarginLR}>
-                  <div className={css.col6}>
-                    <label>
+                  <div className={css.colBalance}>
+                    <label className={css.colBalanceTitle}>
                       <FormattedMessage id="StripeEarningsPage.balance.pending.title" />
                     </label>
-                    <span>{pendingAmount ? pendingAmount : '--'}</span>
+                    <span>{pendingAmount ? pendingAmount : emptyDash}</span>
                   </div>
-                  <div className={css.col6}>
-                    <label>
+                  <div className={css.colBalance}>
+                    <label className={css.colBalanceTitle}>
                       <FormattedMessage id="StripeEarningsPage.balance.available.title" />
                     </label>
-                    <span>{availableAmount ? availableAmount : '--'}</span>
+                    <span>{availableAmount ? availableAmount : emptyDash}</span>
                   </div>
-                  {payoutInterval === 'manual' && (
+                  <div className={css.colBalance}>
+                    <label className={css.colBalanceTitle}>
+                      <FormattedMessage id="StripeEarningsPage.payoutInteval.title" />
+                    </label>
+                    <span>
+                      {payoutInterval ? (
+                        <span>
+                          <FormattedMessage
+                            id={`StripeEarningsPage.payoutInteval.${payoutInterval}`}
+                          />
+                          <span className={css.editPayoutIntervalIcon}>
+                            <a onClick={() => setPayoutIntervalModalOpen(true)}>
+                              <FontAwesomeIcon icon={faPenToSquare} />
+                            </a>
+                          </span>
+                        </span>
+                      ) : (
+                        emptyDash
+                      )}
+                    </span>
+                  </div>
+                  {payoutInterval === PayoutIntervalEnum.Manual && (
                     <div className={css.col12}>
                       <Button
                         className={css.payoutButton}
                         onClick={() => onCreateStripeAccountPayout()}
                         inProgress={stripeAccountPayoutInProgress}
-                        disabled={!availableAmount || availableAmount === '--'}
+                        disabled={!availableAmount || availableAmount === emptyDash}
+                        type="button"
                       >
                         <FormattedMessage id="StripeEarningsPage.payoutButton" />
                       </Button>
@@ -179,6 +241,56 @@ export const StripeEarningsPage = injectIntl(props => {
               </div>
             </>
           )}
+          <Modal
+            id="StripeEarningsPage.payoutIntervalModal"
+            isOpen={payoutIntervalModalOpen}
+            onClose={() => setPayoutIntervalModalOpen(false)}
+            usePortal={true}
+            onManageDisableScrolling={onManageDisableScrolling}
+          >
+            <form>
+              <h5>
+                <FormattedMessage id="StripeEarningsPage.payoutIntervalModal.title" />
+              </h5>
+              <div className={css.payoutIntervalRadio}>
+                <label for={PayoutIntervalEnum.Daily}>
+                  <input
+                    type="radio"
+                    id={PayoutIntervalEnum.Daily}
+                    value={PayoutIntervalEnum.Daily}
+                    checked={selectedPayoutInterval === PayoutIntervalEnum.Daily}
+                    onChange={e => setSelectedPayoutInterval(e.target.value)}
+                  />
+                  <FormattedMessage
+                    id={`StripeEarningsPage.payoutInteval.${PayoutIntervalEnum.Daily}`}
+                  />
+                </label>
+              </div>
+              <div className={css.payoutIntervalRadio}>
+                <label for={PayoutIntervalEnum.Manual}>
+                  <input
+                    type="radio"
+                    id={PayoutIntervalEnum.Manual}
+                    value={PayoutIntervalEnum.Manual}
+                    checked={selectedPayoutInterval === PayoutIntervalEnum.Manual}
+                    onChange={e => setSelectedPayoutInterval(e.target.value)}
+                  />
+                  <FormattedMessage
+                    id={`StripeEarningsPage.payoutInteval.${PayoutIntervalEnum.Manual}`}
+                  />
+                </label>
+              </div>
+              <Button
+                className={css.updatePayoutIntervalButton}
+                onClick={() => onUpdatePayoutInterval()}
+                inProgress={updatePayoutIntervalInProgress}
+                disabled={!payoutInterval || payoutInterval === selectedPayoutInterval}
+                type="button"
+              >
+                <FormattedMessage id="StripeEarningsPage.updatePayoutIntervalButton" />
+              </Button>
+            </form>
+          </Modal>
         </div>
       </LayoutSideNavigation>
     </Page>
