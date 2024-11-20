@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadData } from './StripeEarningsPage.duck';
 import { types as sdkTypes } from '../../util/sdkLoader';
 import { formatMoney } from '../../util/currency';
+import { fetchStripeExpress } from '../StripeExpressPayoutPage/StripeExpressPayoutPage.duck';
 const { Money } = sdkTypes;
 
 export const StripeEarningsPage = injectIntl(props => {
@@ -28,6 +29,10 @@ export const StripeEarningsPage = injectIntl(props => {
 
   const currentUser = state?.user?.currentUser;
   const displayName = currentUser?.attributes?.profile?.displayName;
+
+  const stripeExpressPayoutPage = state?.StripeExpressPayoutPage;
+  const stripeExpress = stripeExpressPayoutPage?.stripeExpress;
+  const payouts_enabled = stripeExpress?.payouts_enabled;
 
   const { stripeBalance, stripeBalanceLoading, stripeBalanceError } = state.StripeEarningsPage;
   const [pendingAmount, setPendingAmount] = useState();
@@ -47,6 +52,7 @@ export const StripeEarningsPage = injectIntl(props => {
         setAvailableAmount(formattedAmount);
       }
     } else {
+      dispatch(fetchStripeExpress());
       dispatch(loadData());
     }
   }, [stripeBalance]);
@@ -55,6 +61,7 @@ export const StripeEarningsPage = injectIntl(props => {
     setStripeAccountPayoutInProgress(true);
     createStripeAccountPayout({ transactionId })
       .then(() => {
+        dispatch(loadData());
         setStripeAccountPayoutInProgress(false);
       })
       .catch(error => {
@@ -123,11 +130,22 @@ export const StripeEarningsPage = injectIntl(props => {
                     <Avatar className={css.avatar} user={currentUser} />
                   </div>
                   <div className={css.colStripeAccountContents}>
-                    <span>{displayName}</span>
-                    <br />
-                    <a onClick={() => getStripeConnectExpressDashboardLink()}>
-                      View Stripe dashboard
-                    </a>
+                    <span className={css.displayName}>{displayName}</span>
+                    {stripeExpress && payouts_enabled ? (
+                      <p>
+                        {dashboardLinkInProgress ? (
+                          <IconSpinner />
+                        ) : (
+                          <a onClick={() => getStripeConnectExpressDashboardLink()}>
+                            <FormattedMessage id="StripeEarningsPage.stripeDashboardLink" />
+                          </a>
+                        )}
+                      </p>
+                    ) : (
+                      <p className={css.disabledViewStripeDashboard}>
+                        <FormattedMessage id="StripeEarningsPage.stripeDashboardLink" />
+                      </p>
+                    )}
                   </div>
                 </div>
                 <br />

@@ -36,6 +36,10 @@ $fontSize: 14px;
   padding: 12px;
 }
 
+.disabledViewStripeDashboard {
+  color: var(--colorGrey200);
+}
+
 .payoutButton {
   margin-top: 15px;
 }
@@ -44,7 +48,11 @@ $fontSize: 14px;
   width: 25%;
   flex: $flexColDefault;
   @media (--viewportSmall) {
-    width: 10%;
+    width: 15%;
+  }
+  .avatar {
+    width: 50px;
+    height: 50px;
   }
 }
 
@@ -52,6 +60,11 @@ $fontSize: 14px;
   width: 75%;
   flex: $flexColDefault;
   @media (--viewportSmall) {
-    width: 90%;
+    width: 85%;
+  }
+  .displayName {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
   }
 }

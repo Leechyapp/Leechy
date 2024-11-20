@@ -905,6 +905,7 @@
   "StripeEarningsPage.heading": "Earnings",
   "StripeEarningsPage.balance.available.title": "Funds (available)",
   "StripeEarningsPage.balance.pending.title": "Funds (pending)",
+  "StripeEarningsPage.stripeDashboardLink": "View Stripe Dashboard",
   "StripeEarningsPage.payoutButton": "Payout now",
   "StripeExpressStatusBox.connected.label": "Stripe Account",
   "StripeExpressStatusBox.connected.button": "View Stripe Dashboard",
