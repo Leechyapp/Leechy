@@ -33,6 +33,7 @@ export const StripeEarningsPage = injectIntl(props => {
   const stripeExpressPayoutPage = state?.StripeExpressPayoutPage;
   const stripeExpress = stripeExpressPayoutPage?.stripeExpress;
   const payouts_enabled = stripeExpress?.payouts_enabled;
+  const payoutInterval = stripeExpress?.settings?.payouts?.schedule?.interval;
 
   const { stripeBalance, stripeBalanceLoading, stripeBalanceError } = state.StripeEarningsPage;
   const [pendingAmount, setPendingAmount] = useState();
@@ -162,16 +163,18 @@ export const StripeEarningsPage = injectIntl(props => {
                     </label>
                     <span>{availableAmount ? availableAmount : '--'}</span>
                   </div>
-                  <div className={css.col12}>
-                    <Button
-                      className={css.payoutButton}
-                      onClick={() => onCreateStripeAccountPayout()}
-                      inProgress={stripeAccountPayoutInProgress}
-                      disabled={!availableAmount || availableAmount === '--'}
-                    >
-                      <FormattedMessage id="StripeEarningsPage.payoutButton" />
-                    </Button>
-                  </div>
+                  {payoutInterval === 'manual' && (
+                    <div className={css.col12}>
+                      <Button
+                        className={css.payoutButton}
+                        onClick={() => onCreateStripeAccountPayout()}
+                        inProgress={stripeAccountPayoutInProgress}
+                        disabled={!availableAmount || availableAmount === '--'}
+                      >
+                        <FormattedMessage id="StripeEarningsPage.payoutButton" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </>
