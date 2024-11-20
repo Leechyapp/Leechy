@@ -1000,6 +1000,7 @@
   "TopbarMobileMenu.logoutLink": "Log out",
   "TopbarMobileMenu.newListingLink": "Post a new listing",
   "TopbarMobileMenu.profileSettingsLink": "Profile settings",
+  "TopbarMobileMenu.earningsLink": "Earnings",
   "TopbarMobileMenu.securitySettingsLink": "Security settings",
   "TopbarMobileMenu.signupLink": "Sign up",
   "TopbarMobileMenu.signupOrLogin": "{signup} or {login}",

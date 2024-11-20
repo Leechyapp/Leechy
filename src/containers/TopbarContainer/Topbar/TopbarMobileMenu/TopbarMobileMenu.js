@@ -173,6 +173,12 @@ const TopbarMobileMenu = props => {
           </NamedLink>
           <NamedLink
             className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
+            name="StripeEarningsPage"
+          >
+            <FormattedMessage id="TopbarMobileMenu.earningsLink" />
+          </NamedLink>
+          <NamedLink
+            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
             name="SecurityPage"
           >
             <FormattedMessage id="TopbarMobileMenu.securitySettingsLink" />
