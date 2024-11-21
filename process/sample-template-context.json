@@ -228,7 +228,70 @@
       }
     },
     "protected-data": {
-      "customerPhoneNumber": "123456"
+      "customerPhoneNumber": "123456",
+      "unitType": "day",
+      "emailData": {
+        "lineItems": [
+          {
+            "attendees": 50,
+            "code": "line-item/day",
+            "includeFor": ["customer", "provider"],
+            "lineTotal": {
+              "amount": 50000,
+              "currency": "USD"
+            },
+            "percentage": null,
+            "quantity": 1,
+            "reversal": false,
+            "unitPrice": {
+              "amount": 100000,
+              "currency": "USD"
+            }
+          },
+          {
+            "code": "line-item/provider-commission",
+            "includeFor": ["provider"],
+            "lineTotal": {
+              "amount": -5000,
+              "currency": "USD"
+            },
+            "percentage": {
+              "val": "-10"
+            },
+            "quantity": null,
+            "reversal": false,
+            "unitPrice": {
+              "amount": 50000,
+              "currency": "USD"
+            }
+          },
+          {
+            "code": "line-item/customer-commission",
+            "includeFor": ["customer"],
+            "lineTotal": {
+              "amount": 2500,
+              "currency": "USD"
+            },
+            "percentage": {
+              "val": "5"
+            },
+            "quantity": null,
+            "reversal": false,
+            "unitPrice": {
+              "amount": 50000,
+              "currency": "USD"
+            }
+          }
+        ],
+        "payinTotal": {
+          "amount": 52500,
+          "currency": "USD"
+        },
+        "payoutTotal": {
+          "amount": 45000,
+          "currency": "USD"
+        }
+      }
     },
     "metadata": {
       "discountCode": "abc-123"

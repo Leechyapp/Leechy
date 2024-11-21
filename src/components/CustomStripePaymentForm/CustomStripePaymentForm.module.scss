@@ -1,0 +1,11 @@
+.initialMessageTextArea {
+  overflow: hidden;
+  overflow-wrap: break-word;
+  resize: none;
+  height: 42px;
+  border-bottom-color: var(--colorSuccess);
+}
+
+.cardHolderName {
+  margin-bottom: 15px;
+}

@@ -6,11 +6,11 @@ import { types as sdkTypes, createImageVariantConfig } from '../../util/sdkLoade
 import { findNextBoundary, getStartOf, monthIdString } from '../../util/dates';
 import { isTransactionsTransitionInvalidTransition, storableError } from '../../util/errors';
 import {
+  acceptBookingRequest,
   chargeSecurityDeposit,
   fetchMessageFiles,
   sendPushNotification,
   transactionLineItems,
-  updatePayoutSettings,
 } from '../../util/api';
 import * as log from '../../util/log';
 import {
@@ -28,6 +28,8 @@ import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { fetchCurrentUserNotifications } from '../../ducks/user.duck';
 import { transitions } from '../../transactions/transactionProcessBooking';
 import { PushNotificationCodeEnum } from '../../enums/push-notification-code.enum';
+import PriceBreakdownFormatTypeEnum from '../../enums/price-breakdown-format-type.enum';
+import { parseLineItems, parsePayTotal } from '../../util/priceBreakdownParser';
 
 const { UUID } = sdkTypes;
 
@@ -72,6 +74,8 @@ export const FETCH_LINE_ITEMS_ERROR = 'app/TransactionPage/FETCH_LINE_ITEMS_ERRO
 
 export const FETCH_FILES_SUCCESS = 'app/TransactionPage/FETCH_FILES_SUCCESS';
 export const UPDATE_FILES_SUCCESS = 'app/TransactionPage/UPDATE_FILES_SUCCESS';
+
+export const SET_STRIPE_PAYOUTS_DISABLED = 'app/TransactionPage/SET_STRIPE_PAYOUTS_DISABLED';
 
 // ================ Reducer ================ //
 
@@ -248,6 +252,9 @@ export default function transactionPageReducer(state = initialState, action = {}
         },
       };
 
+    case SET_STRIPE_PAYOUTS_DISABLED:
+      return { ...state, stripePayoutsDisabled: payload.stripePayoutsDisabled };
+
     default:
       return state;
   }
@@ -281,6 +288,7 @@ const fetchTransitionsError = e => ({ type: FETCH_TRANSITIONS_ERROR, error: true
 
 const transitionRequest = transitionName => ({ type: TRANSITION_REQUEST, payload: transitionName });
 const transitionSuccess = () => ({ type: TRANSITION_SUCCESS });
+const transitionPause = () => ({ type: TRANSITION_SUCCESS });
 const transitionError = e => ({ type: TRANSITION_ERROR, error: true, payload: e });
 
 const fetchMessagesRequest = () => ({ type: FETCH_MESSAGES_REQUEST });
@@ -330,6 +338,11 @@ export const fetchFilesSuccess = files => ({
 export const updateFilesSuccess = uploadedFile => ({
   type: UPDATE_FILES_SUCCESS,
   payload: uploadedFile,
+});
+
+export const setStripePayoutsDisabled = stripePayoutsDisabled => ({
+  type: SET_STRIPE_PAYOUTS_DISABLED,
+  payload: { stripePayoutsDisabled },
 });
 
 // ================ Thunks ================ //
@@ -472,7 +485,32 @@ export const fetchTransaction = (id, txRole, config) => (dispatch, getState, sdk
     .then(response => {
       const listingFields = config?.listing?.listingFields;
       const sanitizeConfig = { listingFields };
-
+      try {
+        const protectedData = txResponse.data.data.attributes.protectedData;
+        const lineItems = protectedData?.lineItems;
+        const payinTotal = protectedData?.payinTotal;
+        const payoutTotal = protectedData?.payoutTotal;
+        if (lineItems) {
+          txResponse.data.data.attributes.lineItems = parseLineItems(
+            lineItems,
+            PriceBreakdownFormatTypeEnum.Sharetribe
+          );
+        }
+        if (payinTotal) {
+          txResponse.data.data.attributes.payinTotal = parsePayTotal(
+            payinTotal,
+            PriceBreakdownFormatTypeEnum.Sharetribe
+          );
+        }
+        if (payoutTotal) {
+          txResponse.data.data.attributes.payoutTotal = parsePayTotal(
+            payoutTotal,
+            PriceBreakdownFormatTypeEnum.Sharetribe
+          );
+        }
+      } catch (error) {
+        console.error(`Error merging data`, error);
+      }
       dispatch(addMarketplaceEntities(txResponse, sanitizeConfig));
       dispatch(addMarketplaceEntities(response, sanitizeConfig));
       dispatch(fetchTransactionSuccess(txResponse));
@@ -574,13 +612,27 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
           return onMakeTransition();
         });
     };
-    return updatePayoutSettings({})
+
+    return acceptBookingRequest({ transactionId: txId.uuid })
       .then(() => {
         return onChargeSecurityDeposit();
       })
-      .catch(e => {
-        log.error(storableError(e), 'update-payout-settings-failed');
-        return onChargeSecurityDeposit();
+      .catch(error => {
+        if (
+          error?.message === 'stripe_account_not_found' ||
+          error?.message === 'stripe_payouts_disabled'
+        ) {
+          dispatch(transitionPause());
+          dispatch(setStripePayoutsDisabled(true));
+          return null;
+        } else {
+          dispatch(transitionError(storableError(error)));
+          log.error(error, `${transitionName}-failed`, {
+            txId,
+            transition: transitionName,
+          });
+          throw error;
+        }
       });
   } else {
     return onMakeTransition();

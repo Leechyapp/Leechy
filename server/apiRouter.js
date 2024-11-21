@@ -28,6 +28,9 @@ const ShippingRoute = require('./api/routes/shipping.route');
 const PushNotificationRoute = require('./api/routes/push-notification.route');
 const FollowsRoute = require('./api/routes/follows.route');
 const StripeAccountRoute = require('./api/routes/stripe-account.route');
+const SetupIntentRoute = require('./api/routes/setup-intent.route');
+const PaymentMethodRoute = require('./api/routes/payment-method.route');
+const BookingRoute = require('./api/routes/booking.route');
 
 const router = express.Router();
 
@@ -96,5 +99,8 @@ new ShippingRoute(router);
 new PushNotificationRoute(router);
 new FollowsRoute(router);
 new StripeAccountRoute(router);
+new BookingRoute(router);
+new SetupIntentRoute(router);
+new PaymentMethodRoute(router);
 
 module.exports = router;

@@ -218,13 +218,52 @@ export const getFollowingList = body => {
   return post('/api/follows/get-following-list', body);
 };
 
-export const updatePayoutSettings = body => {
-  return post('/api/stripe-account/update-payout-settings', body);
-};
-
 export const sendPushNotification = body => {
   return post('/api/push-notification/send-push-notification', body);
 };
 export const updateFCMToken = body => {
   return post('/api/push-notification/update-fcm-token', body);
+};
+
+export const createBookingRequest = body => {
+  return post('/api/booking/create-booking-request', body);
+};
+export const acceptBookingRequest = body => {
+  return post('/api/booking/accept-booking-request', body);
+};
+
+export const retrieveStripeAccount = (body = {}) => {
+  return post('/api/stripe-account/retrieve-stripe-account', body);
+};
+export const connectStripeAccount = (body = {}) => {
+  return post('/api/stripe-account/connect-stripe-account', body);
+};
+export const createStripeDashboardLink = body => {
+  return post('/api/stripe-account/create-stripe-account-dashboard-link', body);
+};
+export const getStripeAccountBalanceDetails = () => {
+  return post('/api/stripe-account/get-balance', {});
+};
+export const createStripeAccountPayout = () => {
+  return post('/api/stripe-account/create-payout', {});
+};
+export const updateStripeAccountPayoutInterval = body => {
+  return post('/api/stripe-account/update-payout-interval', body);
+};
+
+export const createSetupIntent = (body = {}) => {
+  return post('/api/setup-intent/get-client-secret', body);
+};
+
+export const getPaymentMethodsList = (body = {}) => {
+  return post('/api/payment-method/list', body);
+};
+export const retrievePaymentMethod = body => {
+  return post('/api/payment-method/retrieve', body);
+};
+export const attachPaymentMethod = body => {
+  return post('/api/payment-method/attach', body);
+};
+export const detachPaymentMethod = body => {
+  return post('/api/payment-method/detach', body);
 };

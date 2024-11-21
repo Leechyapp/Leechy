@@ -2,14 +2,25 @@ import React from 'react';
 import classNames from 'classnames';
 import { FormattedMessage } from '../../util/reactIntl';
 import { IconEdit, IconSuccess, PrimaryButton, InlineTextButton } from '../../components';
-import css from './StripeConnectAccountStatusBox.module.css';
+import css from './StripeConnectAccountStatusBox.module.scss';
+import { getSupportedCountryCodes } from '../StripeBankAccountTokenInputField/StripeBankAccountTokenInputField.util';
+import { supportedCountries } from '../../config/configStripe';
 
 const STATUS_VERIFICATION_NEEDED = 'verificationNeeded';
 const STATUS_VERIFICATION_SUCCESS = 'verificationSuccess';
 const STATUS_VERIFICATION_ERROR = 'verificationError';
+const STATUS_VERIFICATION_NOT_STARTED = 'verificationNotStarted';
 
 const StripeConnectAccountStatusBox = props => {
-  const { type, onGetStripeConnectAccountLink, inProgress, disabled } = props;
+  const {
+    intl,
+    type,
+    onGetStripeConnectAccountLink,
+    inProgress,
+    disabled,
+    onChangeCountryCode,
+    countryCode,
+  } = props;
 
   if (type === STATUS_VERIFICATION_NEEDED) {
     return (
@@ -85,6 +96,58 @@ const StripeConnectAccountStatusBox = props => {
         >
           <FormattedMessage id="StripeConnectAccountStatusBox.getVerifiedButton" />
         </PrimaryButton>
+      </div>
+    );
+  } else if (type === STATUS_VERIFICATION_NOT_STARTED) {
+    return (
+      <div className={classNames(css.verificiationBox, css.verficiationNeededBox)}>
+        <div className={css.rowMarginLR}>
+          <div className={css.col12}>
+            <div className={css.verificationNotStartedTitle}>
+              <FormattedMessage id="StripeConnectAccountStatusBox.verificationNotStartedTitle" />
+            </div>
+            <div className={css.verificationNotStartedText}>
+              <FormattedMessage id="StripeConnectAccountStatusBox.verificationNotStartedText" />
+            </div>
+          </div>
+          <form>
+            <div className={css.col12}>
+              <div className={css.selectCountry}>
+                <label>{intl.formatMessage({ id: 'StripeConnectAccountForm.countryLabel' })}</label>
+                <select
+                  id="country"
+                  name="country"
+                  disabled={false}
+                  autoComplete="country"
+                  onChange={e => onChangeCountryCode(e.target.value)}
+                  required={true}
+                  value={countryCode}
+                >
+                  <option disabled value={''}>
+                    {intl.formatMessage({ id: 'StripeConnectAccountForm.countryPlaceholder' })}
+                  </option>
+                  {getSupportedCountryCodes(supportedCountries).map(c => (
+                    <option key={c} value={c}>
+                      {intl.formatMessage({ id: `StripeConnectAccountForm.countryNames.${c}` })}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className={css.col12}>
+              <PrimaryButton
+                className={css.connectToStripeButton}
+                spinnerClassName={css.spinner}
+                type="button"
+                inProgress={inProgress}
+                disabled={!countryCode}
+                onClick={onGetStripeConnectAccountLink}
+              >
+                <FormattedMessage id="StripeConnectAccountStatusBox.connectToStripeButton" />
+              </PrimaryButton>
+            </div>
+          </form>
+        </div>
       </div>
     );
   } else {

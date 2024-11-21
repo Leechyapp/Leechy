@@ -13,14 +13,13 @@ class SecurityDepositController {
       const stripeAccountId = await SharetribeService.getUserStripeAccountId(req, res);
       const transactionRes = await SharetribeService.showTransaction(req, res, transactionId.uuid);
       const transaction = await transactionRes.data;
-      console.log(`transaction`, transaction);
 
       const insuranceMethod = transaction?.attributes?.protectedData?.insuranceMethod;
       if (insuranceMethod !== InsuranceMethodEnum.SecurityDeposit) {
         return res.send('Security deposit was not selected as a rental protection method.');
       }
 
-      const payinTotal = transaction.attributes.payinTotal;
+      const payinTotal = transaction.attributes.protectedData.payinTotal;
       const payinTotalCurrency = payinTotal.currency;
 
       const securityDepositPercentageValue =
@@ -55,11 +54,9 @@ class SecurityDepositController {
           },
           confirm: true,
         };
-        console.log(`paymentIntentObject`, paymentIntentObject);
         const paymentIntent = await StripeService.createPaymentIntent(paymentIntentObject);
-        console.log(`paymentIntent`, paymentIntent);
 
-        const updatedTransaction = await SharetribeIntegrationService.updateMetadata({
+        await SharetribeIntegrationService.updateMetadata({
           id: new UUID(transactionId.uuid),
           metadata: {
             stripePaymentIntentId: paymentIntent.id,
@@ -69,7 +66,7 @@ class SecurityDepositController {
             securityDepositTransferAmount,
           },
         });
-        console.log(`updatedTransaction`, updatedTransaction);
+
         res.send('Ok');
       } else {
         res.send('No security deposit charged.');
@@ -103,7 +100,7 @@ class SecurityDepositController {
         return res.status(400).send(`Stripe Customer ID does not exists.`);
       }
 
-      const updatedTransaction = await SharetribeIntegrationService.updateMetadata({
+      await SharetribeIntegrationService.updateMetadata({
         id: new UUID(transactionId),
         metadata: {
           stripeCustomerId,
@@ -111,7 +108,6 @@ class SecurityDepositController {
           securityDepositStatus: 'pending',
         },
       });
-      console.log(`updatedTransaction`, updatedTransaction);
 
       res.send('Ok');
     } catch (e) {

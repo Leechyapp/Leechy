@@ -6,9 +6,34 @@ class StripeAccountRoute extends BaseRoute {
   constructor(router) {
     super('stripe-account');
     router.post(
-      this.ROOT_PATH + '/update-payout-settings',
+      this.ROOT_PATH + '/retrieve-stripe-account',
       authMiddleware,
-      StripeAccountController.updatePayoutSettings
+      StripeAccountController.retrieveStripeAccount
+    );
+    router.post(
+      this.ROOT_PATH + '/connect-stripe-account',
+      authMiddleware,
+      StripeAccountController.connectStripeAccount
+    );
+    router.post(
+      this.ROOT_PATH + '/create-stripe-account-dashboard-link',
+      authMiddleware,
+      StripeAccountController.createStripeDashboardLink
+    );
+    router.post(
+      this.ROOT_PATH + '/get-balance',
+      authMiddleware,
+      StripeAccountController.getStripeAccountBalance
+    );
+    router.post(
+      this.ROOT_PATH + '/create-payout',
+      authMiddleware,
+      StripeAccountController.createStripeAccountPayout
+    );
+    router.post(
+      this.ROOT_PATH + '/update-payout-interval',
+      authMiddleware,
+      StripeAccountController.updateStripeAccountPayoutInterval
     );
   }
 }

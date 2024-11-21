@@ -104,12 +104,28 @@ const LayoutWrapperAccountSettingsSideNavComponent = props => {
         name: 'PasswordChangePage',
       },
     },
+    // {
+    //   text: <FormattedMessage id="LayoutWrapperAccountSettingsSideNav.paymentsTabTitle" />,
+    //   selected: currentPage === 'StripePayoutPage',
+    //   id: 'StripePayoutPageTab',
+    //   linkProps: {
+    //     name: 'StripePayoutPage',
+    //   },
+    // },
     {
-      text: <FormattedMessage id="LayoutWrapperAccountSettingsSideNav.paymentsTabTitle" />,
-      selected: currentPage === 'StripePayoutPage',
-      id: 'StripePayoutPageTab',
+      text: <FormattedMessage id="LayoutWrapperAccountSettingsSideNav.stripeExpressTabTitle" />,
+      selected: currentPage === 'StripeExpressPayoutPage',
+      id: 'StripeExpressPayoutPageTab',
       linkProps: {
-        name: 'StripePayoutPage',
+        name: 'StripeExpressPayoutPage',
+      },
+    },
+    {
+      text: <FormattedMessage id="LayoutWrapperAccountSettingsSideNav.stripeEarningsTabTitle" />,
+      selected: currentPage === 'StripeEarningsPage',
+      id: 'StripeEarningsPageTab',
+      linkProps: {
+        name: 'StripeEarningsPage',
       },
     },
     {
