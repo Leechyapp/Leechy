@@ -5,6 +5,7 @@ import { H3, LayoutSideNavigation, Page, UserNav } from '../../components';
 import StripeExpressStatusBox from '../../components/StripeExpressStatusBox/StripeExpressStatusBox';
 import TopbarContainer from '../TopbarContainer/TopbarContainer';
 import FooterContainer from '../../containers/FooterContainer/FooterContainer';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 export const StripeExpressPayoutPage = injectIntl(props => {
   const { title, scrollingDisabled } = props;
@@ -37,6 +38,7 @@ export const StripeExpressPayoutPage = injectIntl(props => {
           </div>
         </div>
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 });

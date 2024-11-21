@@ -35,6 +35,7 @@ import {
   detachPaymentMethod,
   getPaymentMethodsList,
 } from '../../util/api.js';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 
 const PaymentMethodsPageComponent = props => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -363,6 +364,7 @@ const PaymentMethodsPageComponent = props => {
           )}
         </div>
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 };

@@ -26,6 +26,7 @@ import { fetchStripeExpress } from '../StripeExpressPayoutPage/StripeExpressPayo
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { manageDisableScrolling } from '../../ducks/ui.duck';
+import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 const { Money } = sdkTypes;
 
 const emptyDash = '--';
@@ -297,6 +298,7 @@ export const StripeEarningsPage = injectIntl(props => {
           </Modal>
         </div>
       </LayoutSideNavigation>
+      <NativeBottomNavbar />
     </Page>
   );
 });
