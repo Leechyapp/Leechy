@@ -28,7 +28,7 @@ const NativeBottomNavbar = injectIntl(props => {
     return null;
   }
 
-  const { intl, currentPage = 'LandingPage' } = props;
+  const { currentPage = 'LandingPage' } = props;
 
   const state = useSelector(state => state);
   const { currentUser, currentUserNotificationCount: notificationCount } = state.user;
@@ -110,16 +110,21 @@ const NativeBottomNavbar = injectIntl(props => {
         </p>
         {notificationDot}
       </NamedLink>
-      <NamedLink
-        name="ProfileSettingsPage"
-        params={{ tab: currentUserHasListings ? 'sales' : 'orders' }}
-        className={css.blocIcon}
-      >
-        <FontAwesomeIcon className={css.icon} icon={'fas fa-user-circle'} />
-        <p className={css.text}>
-          <FormattedMessage id="NativeBottomNavbar.menuItem.profile" />
-        </p>
-      </NamedLink>
+      {isAuthenticated && currentUser?.id?.uuid ? (
+        <NamedLink name="ProfilePage" params={{ id: currentUser.id.uuid }} className={css.blocIcon}>
+          <FontAwesomeIcon className={css.icon} icon={'fas fa-user-circle'} />
+          <p className={css.text}>
+            <FormattedMessage id="NativeBottomNavbar.menuItem.profile" />
+          </p>
+        </NamedLink>
+      ) : (
+        <NamedLink name="LoginPage" className={css.blocIcon}>
+          <FontAwesomeIcon className={css.icon} icon={'fas fa-user-circle'} />
+          <p className={css.text}>
+            <FormattedMessage id="NativeBottomNavbar.menuItem.profile" />
+          </p>
+        </NamedLink>
+      )}
       <a onClick={() => setIsMobileMenuOpen(true)} className={css.blocIcon}>
         <FontAwesomeIcon className={css.icon} icon="fa-solid fa-bars" />
         <p className={css.text}>
