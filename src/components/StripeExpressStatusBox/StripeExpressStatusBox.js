@@ -7,6 +7,7 @@ import { propTypes } from '../../util/types';
 import Button from '../Button/Button';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { IconSpinner } from '..';
+import isNativePlatform from '../../util/isNativePlatform';
 
 const StripeExpressStatusBox = injectIntl(props => {
   const { intl, transactionId, isCustomOffer } = props;
@@ -28,8 +29,9 @@ const StripeExpressStatusBox = injectIntl(props => {
     connectStripeAccount({ transactionId: transactionId?.uuid, countryCode })
       .then(link => {
         if (link) {
-          window.open(link, linkTarget);
-          if (linkTarget === '_blank') {
+          const target = isNativePlatform ? '_self' : linkTarget;
+          window.open(link, target);
+          if (target === '_blank') {
             setAccountLinkInProgress(false);
           }
         } else {
@@ -48,7 +50,8 @@ const StripeExpressStatusBox = injectIntl(props => {
     createStripeDashboardLink({})
       .then(link => {
         if (link) {
-          window.open(link, '_blank');
+          const target = isNativePlatform ? '_self' : '_blank';
+          window.open(link, target);
           setDashboardLinkInProgress(false);
         } else {
           setDashboardLinkInProgress(false);

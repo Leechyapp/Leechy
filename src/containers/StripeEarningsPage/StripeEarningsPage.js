@@ -27,6 +27,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { manageDisableScrolling } from '../../ducks/ui.duck';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
+import isNativePlatform from '../../util/isNativePlatform';
 const { Money } = sdkTypes;
 
 const emptyDash = '--';
@@ -108,7 +109,8 @@ export const StripeEarningsPage = injectIntl(props => {
     createStripeDashboardLink({})
       .then(link => {
         if (link) {
-          window.open(link, '_blank');
+          const target = isNativePlatform ? '_self' : '_blank';
+          window.open(link, target);
           setDashboardLinkInProgress(false);
         } else {
           setDashboardLinkInProgress(false);
