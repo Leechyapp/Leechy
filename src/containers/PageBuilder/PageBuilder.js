@@ -90,6 +90,7 @@ const PageBuilder = props => {
     schemaType,
     options,
     currentPage,
+    hideMobileBackButton,
     ...pageProps
   } = props;
 
@@ -108,6 +109,9 @@ const PageBuilder = props => {
     main
     footer
   `;
+
+  const finalHideMobileBackButton = hideMobileBackButton ? hideMobileBackButton : false;
+
   return (
     <StaticPage {...pageMetaProps} {...pageProps}>
       <LayoutComposer areas={layoutAreas} className={css.layout}>
@@ -116,7 +120,10 @@ const PageBuilder = props => {
           return (
             <>
               <Topbar as="header" className={css.topbar}>
-                <TopbarContainer currentPage={currentPage} />
+                <TopbarContainer
+                  currentPage={currentPage}
+                  hideMobileBackButton={finalHideMobileBackButton}
+                />
               </Topbar>
               <Main as="main" className={css.main}>
                 {sections.length === 0 && inProgress ? (

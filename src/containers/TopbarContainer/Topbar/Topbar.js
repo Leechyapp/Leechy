@@ -225,6 +225,7 @@ class TopbarComponent extends Component {
       routeConfiguration,
       includeAndroid,
       hideMobileSearchIcon,
+      hideMobileBackButton,
     } = this.props;
 
     // if (isAndroidPlatform && !includeAndroid) {
@@ -309,11 +310,11 @@ class TopbarComponent extends Component {
         <div className={classNames(mobileRootClassName || css.container, mobileClassName)}>
           <Button
             rootClassName={css.menu}
-            onClick={() => handleMenuOrBackButtonClick()}
+            onClick={() => (hideMobileBackButton ? () => {} : handleMenuOrBackButtonClick())}
             title={intl.formatMessage({ id: 'Topbar.menuIcon' })}
           >
             {isNativePlatform ? (
-              <IOSBackButton />
+              !hideMobileBackButton && <IOSBackButton />
             ) : (
               <>
                 <MenuIcon className={css.menuIcon} />
@@ -416,6 +417,7 @@ TopbarComponent.defaultProps = {
   sendVerificationEmailError: null,
   authScopes: [],
   includeAndroid: false,
+  hideMobileBackButton: false,
 };
 
 TopbarComponent.propTypes = {
@@ -439,6 +441,7 @@ TopbarComponent.propTypes = {
   sendVerificationEmailError: propTypes.error,
   showGenericError: bool.isRequired,
   includeAndroid: bool,
+  hideMobileBackButton: bool,
 
   // These are passed from Page to keep Topbar rendering aware of location changes
   history: shape({
