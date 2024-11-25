@@ -52,6 +52,7 @@ import {
   createSetupIntent,
   detachPaymentMethod,
   getPaymentMethodsList,
+  sendPushNotification,
 } from '../../util/api.js';
 import CustomSavedCardDetails from '../../components/CustomSavedCardDetails/CustomSavedCardDetails.js';
 import { useDispatch } from 'react-redux';
@@ -62,6 +63,7 @@ import {
   parseSharetribeCompatibleEmailData,
 } from '../../util/priceBreakdownParser.js';
 import PriceBreakdownFormatTypeEnum from '../../enums/price-breakdown-format-type.enum.js';
+import { PushNotificationCodeEnum } from '../../enums/push-notification-code.enum.js';
 
 // Stripe PaymentIntent statuses, where user actions are already completed
 // https://stripe.com/docs/payments/payment-intents/status
@@ -650,6 +652,17 @@ export const CheckoutPageWithPayment = props => {
       },
     })
       .then(({ transactionId }) => {
+        sendPushNotification({
+          pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
+          transactionId: transactionId.uuid,
+          params: {},
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.error(err);
+          });
         redirectToOrderDetailsPage(transactionId);
       })
       .catch(err => {
