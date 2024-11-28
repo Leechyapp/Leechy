@@ -4,12 +4,14 @@ import css from './StripeEarningsPage.module.scss';
 import {
   Avatar,
   Button,
+  FieldRadioButton,
   H3,
   IconSpinner,
   LayoutSideNavigation,
   Modal,
   Page,
   UserNav,
+  Form,
 } from '../../components';
 import TopbarContainer from '../TopbarContainer/TopbarContainer';
 import FooterContainer from '../FooterContainer/FooterContainer';
@@ -28,6 +30,7 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { manageDisableScrolling } from '../../ducks/ui.duck';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 import isNativePlatform from '../../util/isNativePlatform';
+import { Form as FinalForm } from 'react-final-form';
 const { Money } = sdkTypes;
 
 const emptyDash = '--';
@@ -255,48 +258,50 @@ export const StripeEarningsPage = injectIntl(props => {
             usePortal={true}
             onManageDisableScrolling={onManageDisableScrolling}
           >
-            <form>
-              <h5>
-                <FormattedMessage id="StripeEarningsPage.payoutIntervalModal.title" />
-              </h5>
-              <div className={css.payoutIntervalRadio}>
-                <label for={PayoutIntervalEnum.Daily}>
-                  <input
-                    type="radio"
-                    id={PayoutIntervalEnum.Daily}
-                    value={PayoutIntervalEnum.Daily}
-                    checked={selectedPayoutInterval === PayoutIntervalEnum.Daily}
-                    onChange={e => setSelectedPayoutInterval(e.target.value)}
-                  />
-                  <FormattedMessage
-                    id={`StripeEarningsPage.payoutInteval.${PayoutIntervalEnum.Daily}`}
-                  />
-                </label>
-              </div>
-              <div className={css.payoutIntervalRadio}>
-                <label for={PayoutIntervalEnum.Manual}>
-                  <input
-                    type="radio"
-                    id={PayoutIntervalEnum.Manual}
-                    value={PayoutIntervalEnum.Manual}
-                    checked={selectedPayoutInterval === PayoutIntervalEnum.Manual}
-                    onChange={e => setSelectedPayoutInterval(e.target.value)}
-                  />
-                  <FormattedMessage
-                    id={`StripeEarningsPage.payoutInteval.${PayoutIntervalEnum.Manual}`}
-                  />
-                </label>
-              </div>
-              <Button
-                className={css.updatePayoutIntervalButton}
-                onClick={() => onUpdatePayoutInterval()}
-                inProgress={updatePayoutIntervalInProgress}
-                disabled={!payoutInterval || payoutInterval === selectedPayoutInterval}
-                type="button"
-              >
-                <FormattedMessage id="StripeEarningsPage.updatePayoutIntervalButton" />
-              </Button>
-            </form>
+            <FinalForm
+              {...props}
+              onSubmit={() => null}
+              render={() => {
+                return (
+                  <Form>
+                    <h5>
+                      <FormattedMessage id="StripeEarningsPage.payoutIntervalModal.title" />
+                    </h5>
+                    <FieldRadioButton
+                      id={PayoutIntervalEnum.Daily}
+                      name={PayoutIntervalEnum.Daily}
+                      rootClassName={css.cancelTypeFields}
+                      label={intl.formatMessage({
+                        id: `StripeEarningsPage.payoutInteval.${PayoutIntervalEnum.Daily}`,
+                      })}
+                      value={PayoutIntervalEnum.Daily}
+                      onChange={e => setSelectedPayoutInterval(e.target.value)}
+                      checked={selectedPayoutInterval === PayoutIntervalEnum.Daily}
+                    />
+                    <FieldRadioButton
+                      id={PayoutIntervalEnum.Manual}
+                      name={PayoutIntervalEnum.Manual}
+                      rootClassName={css.cancelTypeFields}
+                      label={intl.formatMessage({
+                        id: `StripeEarningsPage.payoutInteval.${PayoutIntervalEnum.Manual}`,
+                      })}
+                      value={PayoutIntervalEnum.Manual}
+                      onChange={e => setSelectedPayoutInterval(e.target.value)}
+                      checked={selectedPayoutInterval === PayoutIntervalEnum.Manual}
+                    />
+                    <Button
+                      className={css.updatePayoutIntervalButton}
+                      onClick={() => onUpdatePayoutInterval()}
+                      inProgress={updatePayoutIntervalInProgress}
+                      disabled={!payoutInterval || payoutInterval === selectedPayoutInterval}
+                      type="button"
+                    >
+                      <FormattedMessage id="StripeEarningsPage.updatePayoutIntervalButton" />
+                    </Button>
+                  </Form>
+                );
+              }}
+            />
           </Modal>
         </div>
       </LayoutSideNavigation>
