@@ -198,15 +198,16 @@ export const ListingPageComponent = props => {
   const currentAuthor = authorAvailable ? currentListing.author : null;
   const ensuredAuthor = ensureUser(currentAuthor);
   const noPayoutDetailsSetWithOwnListing =
-    isOwnListing && (processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected);
-  const payoutDetailsWarning = noPayoutDetailsSetWithOwnListing ? (
-    <div>
-      <FormattedMessage id="ListingPage.payoutDetailsWarning" values={{ processType }} />
-      <NamedLink name="StripePayoutPage">
-        <FormattedMessage id="ListingPage.payoutDetailsWarningLink" />
-      </NamedLink>
-    </div>
-  ) : null;
+    isOwnListing && processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected;
+  const payoutDetailsWarning = noPayoutDetailsSetWithOwnListing
+    ? // <div>
+      //   <FormattedMessage id="ListingPage.payoutDetailsWarning" values={{ processType }} />
+      //   <NamedLink name="StripePayoutPage">
+      //     <FormattedMessage id="ListingPage.payoutDetailsWarningLink" />
+      //   </NamedLink>
+      // </div>
+      null
+    : null;
 
   // When user is banned or deleted the listing is also deleted.
   // Because listing can be never showed with banned or deleted user we don't have to provide
@@ -554,11 +555,6 @@ const mapDispatchToProps = dispatch => ({
 // lifecycle hook.
 //
 // See: https://github.com/ReactTraining/react-router/issues/4671
-const ListingPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(EnhancedListingPage);
+const ListingPage = compose(connect(mapStateToProps, mapDispatchToProps))(EnhancedListingPage);
 
 export default ListingPage;

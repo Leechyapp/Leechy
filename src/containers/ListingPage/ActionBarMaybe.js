@@ -31,15 +31,16 @@ export const ActionBarMaybe = props => {
 
   if (isOwnListing && showNoPayoutDetailsSet) {
     return (
-      <div className={classes}>
-        <p className={classNames(css.ownListingText, css.missingPayoutDetailsText)}>
-          <FormattedMessage id="ListingPage.addPayoutDetailsMessage" />
-        </p>
-        <NamedLink className={css.addPayoutDetails} name="StripePayoutPage">
-          <EditIcon className={css.editIcon} />
-          <FormattedMessage id="ListingPage.addPayoutDetails" />
-        </NamedLink>
-      </div>
+      // <div className={classes}>
+      //   <p className={classNames(css.ownListingText, css.missingPayoutDetailsText)}>
+      //     <FormattedMessage id="ListingPage.addPayoutDetailsMessage" />
+      //   </p>
+      //   <NamedLink className={css.addPayoutDetails} name="StripePayoutPage">
+      //     <EditIcon className={css.editIcon} />
+      //     <FormattedMessage id="ListingPage.addPayoutDetails" />
+      //   </NamedLink>
+      // </div>
+      null
     );
   } else if (isOwnListing) {
     let ownListingTextTranslationId = 'ListingPage.ownListing';
