@@ -79,6 +79,7 @@ export const LandingPageComponent = props => {
 
   return (
     <PageBuilder
+      assetName={ASSET_NAME}
       pageAssetsData={pageAssetsData?.[camelize(ASSET_NAME)]?.data}
       inProgress={inProgress}
       error={error}
