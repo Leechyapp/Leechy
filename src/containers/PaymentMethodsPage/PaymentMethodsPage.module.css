@@ -1,6 +1,10 @@
 @import '../../styles/customMediaQueries.css';
 
 .content {
+  @media (--viewportMaxSmall) {
+    min-height: 50vh;
+  }
+  
   @media (--viewportMedium) {
     margin: 32px auto 0 auto;
     width: 100%;
