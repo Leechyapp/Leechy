@@ -27,7 +27,6 @@ import {
   Reviews,
   ButtonTabNavHorizontal,
   LayoutSideNavigation,
-  SecondaryButton,
   Button,
   Modal,
   H3,
@@ -49,10 +48,11 @@ import FollowsListTabs from '../../components/FollowsListTabs/FollowsListTabs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { FollowsEnum } from '../../enums/follows.enum';
-import { fetchFollowersCountSuccess, fetchIsFollowingSuccess } from './ProfilePage.duck';
+import { fetchFollowersCountSuccess, fetchIsFollowingSuccess, loadData } from './ProfilePage.duck';
 import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { pathByRouteName } from '../../util/routes';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 
@@ -493,6 +493,11 @@ export const ProfilePageComponent = props => {
   const schemaTitleVars = { name: displayName, marketplaceName: config.marketplaceName };
   const schemaTitle = intl.formatMessage({ id: 'ProfilePage.schemaTitle' }, schemaTitleVars);
 
+  const dispatch = useDispatch();
+  const refreshData = () => {
+    dispatch(loadData({ id: user.id.uuid }, null, config));
+  };
+
   if (userShowError && userShowError.status === 404) {
     return <NotFoundPage />;
   }
@@ -520,19 +525,21 @@ export const ProfilePageComponent = props => {
         }
         footer={<FooterContainer />}
       >
-        <MainContent
-          bio={bio}
-          displayName={displayName}
-          userShowError={userShowError}
-          publicData={publicData}
-          metadata={metadata}
-          userFieldConfig={userFields}
-          intl={intl}
-          isCurrentUser={isCurrentUser}
-          profileUser={profileUser}
-          user={user}
-          {...rest}
-        />
+        <PullToRefresh refreshData={refreshData}>
+          <MainContent
+            bio={bio}
+            displayName={displayName}
+            userShowError={userShowError}
+            publicData={publicData}
+            metadata={metadata}
+            userFieldConfig={userFields}
+            intl={intl}
+            isCurrentUser={isCurrentUser}
+            profileUser={profileUser}
+            user={user}
+            {...rest}
+          />
+        </PullToRefresh>
       </LayoutSideNavigation>
       <NativeBottomNavbar />
     </Page>
