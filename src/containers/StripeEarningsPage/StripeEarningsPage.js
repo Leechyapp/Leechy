@@ -21,7 +21,7 @@ import {
   updateStripeAccountPayoutInterval,
 } from '../../util/api';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadData } from './StripeEarningsPage.duck';
+import { fetchStripeAccountBalance, loadData } from './StripeEarningsPage.duck';
 import { types as sdkTypes } from '../../util/sdkLoader';
 import { formatMoney } from '../../util/currency';
 import { fetchStripeExpress } from '../StripeExpressPayoutPage/StripeExpressPayoutPage.duck';
@@ -31,6 +31,7 @@ import { manageDisableScrolling } from '../../ducks/ui.duck';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 import isNativePlatform from '../../util/isNativePlatform';
 import { Form as FinalForm } from 'react-final-form';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh';
 const { Money } = sdkTypes;
 
 const emptyDash = '--';
@@ -145,169 +146,177 @@ export const StripeEarningsPage = injectIntl(props => {
       });
   };
 
+  const refreshData = () => {
+    dispatch(fetchStripeAccountBalance());
+  };
+
   return (
-    <Page title={title} scrollingDisabled={true}>
-      <LayoutSideNavigation
-        topbar={
-          <>
-            <TopbarContainer
-              desktopClassName={css.desktopTopbar}
-              mobileClassName={css.mobileTopbar}
-            />
-            <UserNav currentPage="StripeEarningsPage" />
-          </>
-        }
-        sideNav={null}
-        useAccountSettingsNav
-        currentPage="StripeEarningsPage"
-        footer={<FooterContainer />}
-      >
-        <div className={css.content}>
-          <H3 as="h1" className={css.heading}>
-            <FormattedMessage id="StripeEarningsPage.heading" />
-          </H3>
-          {stripeBalanceLoading ? (
-            <div className={css.rowUnsetMarginLR}>
-              <div className={css.col12}>
-                <IconSpinner />
-              </div>
-            </div>
-          ) : (
+    <>
+      <Page title={title} scrollingDisabled={true}>
+        <LayoutSideNavigation
+          topbar={
             <>
-              <div className={css.stripeBalanceContainer}>
-                <div className={css.rowUnsetMarginLR}>
-                  <div className={css.colAvatar}>
-                    <Avatar className={css.avatar} user={currentUser} />
-                  </div>
-                  <div className={css.colStripeAccountContents}>
-                    <span className={css.displayName}>{displayName}</span>
-                    {stripeExpress && payouts_enabled ? (
-                      <p>
-                        {dashboardLinkInProgress ? (
-                          <IconSpinner />
-                        ) : (
-                          <a onClick={() => getStripeConnectExpressDashboardLink()}>
-                            <FormattedMessage id="StripeEarningsPage.stripeDashboardLink" />
-                          </a>
-                        )}
-                      </p>
-                    ) : (
-                      <p className={css.disabledViewStripeDashboard}>
-                        <FormattedMessage id="StripeEarningsPage.stripeDashboardLink" />
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <br />
-                <div className={css.rowUnsetMarginLR}>
-                  <div className={css.colBalance}>
-                    <label className={css.colBalanceTitle}>
-                      <FormattedMessage id="StripeEarningsPage.balance.pending.title" />
-                    </label>
-                    <span>{pendingAmount ? pendingAmount : emptyDash}</span>
-                  </div>
-                  <div className={css.colBalance}>
-                    <label className={css.colBalanceTitle}>
-                      <FormattedMessage id="StripeEarningsPage.balance.available.title" />
-                    </label>
-                    <span>{availableAmount ? availableAmount : emptyDash}</span>
-                  </div>
-                  <div className={css.colBalance}>
-                    <label className={css.colBalanceTitle}>
-                      <FormattedMessage id="StripeEarningsPage.payoutInterval.title" />
-                    </label>
-                    <span>
-                      {payoutInterval ? (
-                        <span>
-                          <FormattedMessage
-                            id={`StripeEarningsPage.payoutInterval.${payoutInterval}`}
-                          />
-                          <span className={css.editPayoutIntervalIcon}>
-                            <a onClick={() => setPayoutIntervalModalOpen(true)}>
-                              <FontAwesomeIcon icon={faPenToSquare} />
-                            </a>
-                          </span>
-                        </span>
-                      ) : (
-                        emptyDash
-                      )}
-                    </span>
-                  </div>
-                  {payoutInterval === PayoutIntervalEnum.Manual && (
-                    <div className={css.col12}>
-                      <Button
-                        className={css.payoutButton}
-                        onClick={() => onCreateStripeAccountPayout()}
-                        inProgress={stripeAccountPayoutInProgress}
-                        disabled={
-                          !availableAmount ||
-                          availableAmount === emptyDash ||
-                          stripeBalance?.availableAmount?.amount === 0
-                        }
-                        type="button"
-                      >
-                        <FormattedMessage id="StripeEarningsPage.payoutButton" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <TopbarContainer
+                desktopClassName={css.desktopTopbar}
+                mobileClassName={css.mobileTopbar}
+              />
+              <UserNav currentPage="StripeEarningsPage" />
             </>
-          )}
-        </div>
-      </LayoutSideNavigation>
-      <NativeBottomNavbar />
-      <Modal
-        id="StripeEarningsPage.payoutIntervalModal"
-        isOpen={payoutIntervalModalOpen}
-        onClose={() => setPayoutIntervalModalOpen(false)}
-        usePortal
-        onManageDisableScrolling={onManageDisableScrolling}
-      >
-        <FinalForm
-          {...props}
-          onSubmit={() => null}
-          render={() => {
-            return (
-              <Form className={css.payoutIntervalForm}>
-                <h5>
-                  <FormattedMessage id="StripeEarningsPage.payoutIntervalModal.title" />
-                </h5>
-                <FieldRadioButton
-                  id={PayoutIntervalEnum.Daily}
-                  rootClassName={css.cancelTypeFields}
-                  label={intl.formatMessage({
-                    id: `StripeEarningsPage.payoutInterval.${PayoutIntervalEnum.Daily}`,
-                  })}
-                  value={PayoutIntervalEnum.Daily}
-                  onChange={e => setSelectedPayoutInterval(e.target.value)}
-                  checked={selectedPayoutInterval === PayoutIntervalEnum.Daily}
-                />
-                <FieldRadioButton
-                  id={PayoutIntervalEnum.Manual}
-                  rootClassName={css.cancelTypeFields}
-                  label={intl.formatMessage({
-                    id: `StripeEarningsPage.payoutInterval.${PayoutIntervalEnum.Manual}`,
-                  })}
-                  value={PayoutIntervalEnum.Manual}
-                  onChange={e => setSelectedPayoutInterval(e.target.value)}
-                  checked={selectedPayoutInterval === PayoutIntervalEnum.Manual}
-                />
-                <Button
-                  className={css.updatePayoutIntervalButton}
-                  onClick={() => onUpdatePayoutInterval()}
-                  inProgress={updatePayoutIntervalInProgress}
-                  disabled={!payoutInterval || payoutInterval === selectedPayoutInterval}
-                  type="button"
-                >
-                  <FormattedMessage id="StripeEarningsPage.updatePayoutIntervalButton" />
-                </Button>
-              </Form>
-            );
-          }}
-        />
-      </Modal>
-    </Page>
+          }
+          sideNav={null}
+          useAccountSettingsNav
+          currentPage="StripeEarningsPage"
+          footer={<FooterContainer />}
+        >
+          <PullToRefresh refreshData={refreshData}>
+            <div className={css.content}>
+              <H3 as="h1" className={css.heading}>
+                <FormattedMessage id="StripeEarningsPage.heading" />
+              </H3>
+              {stripeBalanceLoading ? (
+                <div className={css.rowUnsetMarginLR}>
+                  <div className={css.col12}>
+                    <IconSpinner />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className={css.stripeBalanceContainer}>
+                    <div className={css.rowUnsetMarginLR}>
+                      <div className={css.colAvatar}>
+                        <Avatar className={css.avatar} user={currentUser} />
+                      </div>
+                      <div className={css.colStripeAccountContents}>
+                        <span className={css.displayName}>{displayName}</span>
+                        {stripeExpress && payouts_enabled ? (
+                          <p>
+                            {dashboardLinkInProgress ? (
+                              <IconSpinner />
+                            ) : (
+                              <a onClick={() => getStripeConnectExpressDashboardLink()}>
+                                <FormattedMessage id="StripeEarningsPage.stripeDashboardLink" />
+                              </a>
+                            )}
+                          </p>
+                        ) : (
+                          <p className={css.disabledViewStripeDashboard}>
+                            <FormattedMessage id="StripeEarningsPage.stripeDashboardLink" />
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <br />
+                    <div className={css.rowUnsetMarginLR}>
+                      <div className={css.colBalance}>
+                        <label className={css.colBalanceTitle}>
+                          <FormattedMessage id="StripeEarningsPage.balance.pending.title" />
+                        </label>
+                        <span>{pendingAmount ? pendingAmount : emptyDash}</span>
+                      </div>
+                      <div className={css.colBalance}>
+                        <label className={css.colBalanceTitle}>
+                          <FormattedMessage id="StripeEarningsPage.balance.available.title" />
+                        </label>
+                        <span>{availableAmount ? availableAmount : emptyDash}</span>
+                      </div>
+                      <div className={css.colBalance}>
+                        <label className={css.colBalanceTitle}>
+                          <FormattedMessage id="StripeEarningsPage.payoutInterval.title" />
+                        </label>
+                        <span>
+                          {payoutInterval ? (
+                            <span>
+                              <FormattedMessage
+                                id={`StripeEarningsPage.payoutInterval.${payoutInterval}`}
+                              />
+                              <span className={css.editPayoutIntervalIcon}>
+                                <a onClick={() => setPayoutIntervalModalOpen(true)}>
+                                  <FontAwesomeIcon icon={faPenToSquare} />
+                                </a>
+                              </span>
+                            </span>
+                          ) : (
+                            emptyDash
+                          )}
+                        </span>
+                      </div>
+                      {payoutInterval === PayoutIntervalEnum.Manual && (
+                        <div className={css.col12}>
+                          <Button
+                            className={css.payoutButton}
+                            onClick={() => onCreateStripeAccountPayout()}
+                            inProgress={stripeAccountPayoutInProgress}
+                            disabled={
+                              !availableAmount ||
+                              availableAmount === emptyDash ||
+                              stripeBalance?.availableAmount?.amount === 0
+                            }
+                            type="button"
+                          >
+                            <FormattedMessage id="StripeEarningsPage.payoutButton" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </PullToRefresh>
+        </LayoutSideNavigation>
+        <NativeBottomNavbar />
+        <Modal
+          id="StripeEarningsPage.payoutIntervalModal"
+          isOpen={payoutIntervalModalOpen}
+          onClose={() => setPayoutIntervalModalOpen(false)}
+          usePortal
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <FinalForm
+            {...props}
+            onSubmit={() => null}
+            render={() => {
+              return (
+                <Form className={css.payoutIntervalForm}>
+                  <h5>
+                    <FormattedMessage id="StripeEarningsPage.payoutIntervalModal.title" />
+                  </h5>
+                  <FieldRadioButton
+                    id={PayoutIntervalEnum.Daily}
+                    rootClassName={css.cancelTypeFields}
+                    label={intl.formatMessage({
+                      id: `StripeEarningsPage.payoutInterval.${PayoutIntervalEnum.Daily}`,
+                    })}
+                    value={PayoutIntervalEnum.Daily}
+                    onChange={e => setSelectedPayoutInterval(e.target.value)}
+                    checked={selectedPayoutInterval === PayoutIntervalEnum.Daily}
+                  />
+                  <FieldRadioButton
+                    id={PayoutIntervalEnum.Manual}
+                    rootClassName={css.cancelTypeFields}
+                    label={intl.formatMessage({
+                      id: `StripeEarningsPage.payoutInterval.${PayoutIntervalEnum.Manual}`,
+                    })}
+                    value={PayoutIntervalEnum.Manual}
+                    onChange={e => setSelectedPayoutInterval(e.target.value)}
+                    checked={selectedPayoutInterval === PayoutIntervalEnum.Manual}
+                  />
+                  <Button
+                    className={css.updatePayoutIntervalButton}
+                    onClick={() => onUpdatePayoutInterval()}
+                    inProgress={updatePayoutIntervalInProgress}
+                    disabled={!payoutInterval || payoutInterval === selectedPayoutInterval}
+                    type="button"
+                  >
+                    <FormattedMessage id="StripeEarningsPage.updatePayoutIntervalButton" />
+                  </Button>
+                </Form>
+              );
+            }}
+          />
+        </Modal>
+      </Page>
+    </>
   );
 });
 
