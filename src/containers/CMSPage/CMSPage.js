@@ -21,6 +21,7 @@ export const CMSPageComponent = props => {
 
   return (
     <PageBuilder
+      assetName="cms-page"
       pageAssetsData={pageAssetsData?.[pageId]?.data}
       inProgress={inProgress}
       schemaType="Article"
@@ -44,9 +45,6 @@ const mapStateToProps = state => {
 // lifecycle hook.
 //
 // See: https://github.com/ReactTraining/react-router/issues/4671
-const CMSPage = compose(
-  withRouter,
-  connect(mapStateToProps)
-)(CMSPageComponent);
+const CMSPage = compose(withRouter, connect(mapStateToProps))(CMSPageComponent);
 
 export default CMSPage;
