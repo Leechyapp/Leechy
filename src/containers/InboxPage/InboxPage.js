@@ -1,7 +1,7 @@
 import React from 'react';
 import { arrayOf, bool, number, oneOf, shape, string } from 'prop-types';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import { useConfiguration } from '../../context/configurationContext';
@@ -48,6 +48,11 @@ import NotFoundPage from '../../containers/NotFoundPage/NotFoundPage';
 import { stateDataShape, getStateData } from './InboxPage.stateData';
 import css from './InboxPage.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh';
+import { loadData } from './InboxPage.duck';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { useRouteConfiguration } from '../../context/routeConfigurationContext';
+import { pathByRouteName } from '../../util/routes';
 
 // Check if the transaction line-items use booking-related units
 const getUnitLineItem = lineItems => {
@@ -290,6 +295,19 @@ export const InboxPageComponent = props => {
     },
   ];
 
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const routeConfiguration = useRouteConfiguration();
+  const refreshData = () => {
+    dispatch(loadData({ tab }, { page: 1 })).then(() => {
+      history.push(
+        pathByRouteName('InboxPage', routeConfiguration, {
+          tab,
+        })
+      );
+    });
+  };
+
   return (
     <Page title={title} scrollingDisabled={scrollingDisabled}>
       <LayoutSideNavigation
@@ -310,35 +328,37 @@ export const InboxPageComponent = props => {
         }
         footer={<FooterContainer />}
       >
-        {fetchOrdersOrSalesError ? (
-          <p className={css.error}>
-            <FormattedMessage id="InboxPage.fetchFailed" />
-          </p>
-        ) : null}
-        <ul className={css.itemList}>
-          {!fetchInProgress ? (
-            transactions.map(toTxItem)
-          ) : (
-            <li className={css.listItemsLoading}>
-              <IconSpinner />
-            </li>
-          )}
-          {hasNoResults ? (
-            <li key="noResults" className={css.noResults}>
-              <FormattedMessage
-                id={isOrders ? 'InboxPage.noOrdersFound' : 'InboxPage.noSalesFound'}
-              />
-            </li>
+        <PullToRefresh refreshData={refreshData}>
+          {fetchOrdersOrSalesError ? (
+            <p className={css.error}>
+              <FormattedMessage id="InboxPage.fetchFailed" />
+            </p>
           ) : null}
-        </ul>
-        {hasTransactions && pagination && pagination.totalPages > 1 ? (
-          <PaginationLinks
-            className={css.pagination}
-            pageName="InboxPage"
-            pagePathParams={params}
-            pagination={pagination}
-          />
-        ) : null}
+          <ul className={css.itemList}>
+            {!fetchInProgress ? (
+              transactions.map(toTxItem)
+            ) : (
+              <li className={css.listItemsLoading}>
+                <IconSpinner />
+              </li>
+            )}
+            {hasNoResults ? (
+              <li key="noResults" className={css.noResults}>
+                <FormattedMessage
+                  id={isOrders ? 'InboxPage.noOrdersFound' : 'InboxPage.noSalesFound'}
+                />
+              </li>
+            ) : null}
+          </ul>
+          {hasTransactions && pagination && pagination.totalPages > 1 ? (
+            <PaginationLinks
+              className={css.pagination}
+              pageName="InboxPage"
+              pagePathParams={params}
+              pagination={pagination}
+            />
+          ) : null}
+        </PullToRefresh>
       </LayoutSideNavigation>
       <NativeBottomNavbar />
     </Page>
