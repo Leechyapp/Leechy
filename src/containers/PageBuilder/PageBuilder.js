@@ -11,6 +11,7 @@ import StaticPage from './StaticPage.js';
 
 import css from './PageBuilder.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
 
 const getMetadata = (meta, schemaType, fieldOptions) => {
   const { pageTitle, pageDescription, socialSharing } = meta;
@@ -91,8 +92,12 @@ const PageBuilder = props => {
     options,
     currentPage,
     hideMobileBackButton,
+    refreshData,
     ...pageProps
   } = props;
+
+  const assetName = props?.assetName;
+  const excludePullToRefresh = assetName !== 'landing-page' && assetName !== 'cms-page';
 
   if (!pageAssetsData && fallbackPage && !inProgress && error) {
     return fallbackPage;
@@ -129,7 +134,12 @@ const PageBuilder = props => {
                 {sections.length === 0 && inProgress ? (
                   <LoadingSpinner />
                 ) : (
-                  <SectionBuilder sections={sections} options={options} />
+                  <PullToRefresh
+                    refreshData={refreshData}
+                    excludePullToRefresh={excludePullToRefresh}
+                  >
+                    <SectionBuilder sections={sections} options={options} />
+                  </PullToRefresh>
                 )}
               </Main>
               <Footer>

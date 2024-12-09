@@ -3,10 +3,11 @@ import loadable from '@loadable/component';
 
 import { bool, object } from 'prop-types';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import NotFoundPage from '../../containers/NotFoundPage/NotFoundPage';
+import { loadData } from './CMSPage.duck';
 const PageBuilder = loadable(() =>
   import(/* webpackChunkName: "PageBuilder" */ '../PageBuilder/PageBuilder')
 );
@@ -19,12 +20,18 @@ export const CMSPageComponent = props => {
     return <NotFoundPage />;
   }
 
+  const dispatch = useDispatch();
+  const refreshData = () => {
+    dispatch(loadData({ pageId }));
+  };
+
   return (
     <PageBuilder
       assetName="cms-page"
       pageAssetsData={pageAssetsData?.[pageId]?.data}
       inProgress={inProgress}
       schemaType="Article"
+      refreshData={refreshData}
     />
   );
 };

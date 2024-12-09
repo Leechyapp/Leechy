@@ -3,13 +3,13 @@ import loadable from '@loadable/component';
 
 import { bool, object } from 'prop-types';
 import { compose } from 'redux';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 
 import { camelize } from '../../util/string';
 import { propTypes } from '../../util/types';
 
 import FallbackPage from './FallbackPage';
-import { ASSET_NAME } from './LandingPage.duck';
+import { ASSET_NAME, loadData } from './LandingPage.duck';
 import isNativePlatform from '../../util/isNativePlatform';
 import { PushNotifications } from '@capacitor/push-notifications';
 import PushNotificationService from '../../services/push-notifications.service';
@@ -77,6 +77,11 @@ export const LandingPageComponent = props => {
     });
   };
 
+  const dispatch = useDispatch();
+  const refreshData = () => {
+    dispatch(loadData());
+  };
+
   return (
     <PageBuilder
       assetName={ASSET_NAME}
@@ -85,6 +90,7 @@ export const LandingPageComponent = props => {
       error={error}
       fallbackPage={<FallbackPage error={error} />}
       hideMobileBackButton={true}
+      refreshData={refreshData}
     />
   );
 };
