@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { array, arrayOf, bool, func, shape, string, oneOf, object } from 'prop-types';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 
 // Contexts
@@ -57,6 +57,7 @@ import {
   setInitialValues,
   fetchTimeSlots,
   fetchTransactionLineItems,
+  loadData,
 } from './ListingPage.duck';
 
 import {
@@ -77,6 +78,7 @@ import SectionGallery from './SectionGallery';
 import CustomListingFields from './CustomListingFields';
 
 import css from './ListingPage.module.css';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
 
@@ -278,6 +280,11 @@ export const ListingPageComponent = props => {
   const schemaAvailability =
     currentStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
 
+  const dispatch = useDispatch();
+  const refreshData = () => {
+    dispatch(loadData({ id: rawParams.id }, null, config));
+  };
+
   return (
     <Page
       title={schemaTitle}
@@ -303,67 +310,70 @@ export const ListingPageComponent = props => {
       <LayoutSingleColumn className={css.pageRoot} topbar={topbar} footer={<FooterContainer />}>
         <div className={css.contentWrapperForProductLayout}>
           <div className={css.mainColumnForProductLayout}>
-            {currentListing.id && noPayoutDetailsSetWithOwnListing ? (
-              <ActionBarMaybe
-                className={css.actionBarForProductLayout}
-                isOwnListing={isOwnListing}
+            <PullToRefresh refreshData={refreshData}>
+              {currentListing.id && noPayoutDetailsSetWithOwnListing ? (
+                <ActionBarMaybe
+                  className={css.actionBarForProductLayout}
+                  isOwnListing={isOwnListing}
+                  listing={currentListing}
+                  showNoPayoutDetailsSet={noPayoutDetailsSetWithOwnListing}
+                />
+              ) : null}
+              {currentListing.id ? (
+                <ActionBarMaybe
+                  className={css.actionBarForProductLayout}
+                  isOwnListing={isOwnListing}
+                  listing={currentListing}
+                  editParams={{
+                    id: listingId.uuid,
+                    slug: listingSlug,
+                    type: listingPathParamType,
+                    tab: listingTab,
+                  }}
+                />
+              ) : null}
+              <SectionGallery
                 listing={currentListing}
-                showNoPayoutDetailsSet={noPayoutDetailsSetWithOwnListing}
+                variantPrefix={config.layout.listingImage.variantPrefix}
               />
-            ) : null}
-            {currentListing.id ? (
-              <ActionBarMaybe
-                className={css.actionBarForProductLayout}
-                isOwnListing={isOwnListing}
+              <div className={css.mobileHeading}>
+                <H4 as="h1" className={css.orderPanelTitle}>
+                  <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+                </H4>
+              </div>
+              <SectionTextMaybe text={description} showAsIngress />
+
+              <CustomListingFields
+                publicData={publicData}
+                metadata={metadata}
+                listingFieldConfigs={listingConfig.listingFields}
+                categoryConfiguration={config.categoryConfiguration}
+                intl={intl}
+              />
+
+              <SectionMapMaybe
+                geolocation={geolocation}
+                publicData={publicData}
+                listingId={currentListing.id}
+                mapsConfig={config.maps}
+              />
+              <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} />
+              <SectionAuthorMaybe
+                title={title}
                 listing={currentListing}
-                editParams={{
-                  id: listingId.uuid,
-                  slug: listingSlug,
-                  type: listingPathParamType,
-                  tab: listingTab,
-                }}
+                authorDisplayName={authorDisplayName}
+                onContactUser={onContactUser}
+                isInquiryModalOpen={isAuthenticated && inquiryModalOpen}
+                onCloseInquiryModal={() => setInquiryModalOpen(false)}
+                sendInquiryError={sendInquiryError}
+                sendInquiryInProgress={sendInquiryInProgress}
+                onSubmitInquiry={onSubmitInquiry}
+                currentUser={currentUser}
+                onManageDisableScrolling={onManageDisableScrolling}
               />
-            ) : null}
-            <SectionGallery
-              listing={currentListing}
-              variantPrefix={config.layout.listingImage.variantPrefix}
-            />
-            <div className={css.mobileHeading}>
-              <H4 as="h1" className={css.orderPanelTitle}>
-                <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
-              </H4>
-            </div>
-            <SectionTextMaybe text={description} showAsIngress />
-
-            <CustomListingFields
-              publicData={publicData}
-              metadata={metadata}
-              listingFieldConfigs={listingConfig.listingFields}
-              categoryConfiguration={config.categoryConfiguration}
-              intl={intl}
-            />
-
-            <SectionMapMaybe
-              geolocation={geolocation}
-              publicData={publicData}
-              listingId={currentListing.id}
-              mapsConfig={config.maps}
-            />
-            <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} />
-            <SectionAuthorMaybe
-              title={title}
-              listing={currentListing}
-              authorDisplayName={authorDisplayName}
-              onContactUser={onContactUser}
-              isInquiryModalOpen={isAuthenticated && inquiryModalOpen}
-              onCloseInquiryModal={() => setInquiryModalOpen(false)}
-              sendInquiryError={sendInquiryError}
-              sendInquiryInProgress={sendInquiryInProgress}
-              onSubmitInquiry={onSubmitInquiry}
-              currentUser={currentUser}
-              onManageDisableScrolling={onManageDisableScrolling}
-            />
+            </PullToRefresh>
           </div>
+
           <div className={css.orderColumnForProductLayout}>
             <OrderPanel
               className={css.productOrderPanel}

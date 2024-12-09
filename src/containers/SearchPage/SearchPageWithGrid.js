@@ -47,6 +47,8 @@ import NoSearchResultsMaybe from './NoSearchResultsMaybe/NoSearchResultsMaybe';
 
 import css from './SearchPage.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh';
+import { loadData } from './SearchPage.duck';
 
 const MODAL_BREAKPOINT = 768; // Search is in modal on mobile layout
 
@@ -299,6 +301,11 @@ export class SearchPageComponent extends Component {
       ? classNames(css.topbarBehindModal, css.topbar)
       : css.topbar;
 
+    const refreshData = () => {
+      const { config, onLoadSearchPageListings } = this.props;
+      onLoadSearchPageListings(null, location?.search, config);
+    };
+
     // N.B. openMobileMap button is sticky.
     // For some reason, stickyness doesn't work on Safari, if the element is <button>
     return (
@@ -345,80 +352,82 @@ export class SearchPageComponent extends Component {
           </aside>
 
           <div className={css.layoutWrapperMain} role="main">
-            <div className={css.searchResultContainer}>
-              <SearchFiltersMobile
-                className={css.searchFiltersMobileList}
-                urlQueryParams={validQueryParams}
-                sortByComponent={sortBy('mobile')}
-                listingsAreLoaded={listingsAreLoaded}
-                resultsCount={totalItems}
-                searchInProgress={searchInProgress}
-                searchListingsError={searchListingsError}
-                showAsModalMaxWidth={MODAL_BREAKPOINT}
-                onManageDisableScrolling={onManageDisableScrolling}
-                onOpenModal={this.onOpenMobileModal}
-                onCloseModal={this.onCloseMobileModal}
-                resetAll={this.resetAll}
-                selectedFiltersCount={selectedFiltersCountForMobile}
-                isMapVariant={false}
-                noResultsInfo={noResultsInfo}
-              >
-                {availableFilters.map(filterConfig => {
-                  const key = `SearchFiltersMobile.${filterConfig.scope || 'built-in'}.${
-                    filterConfig.key
-                  }`;
-
-                  return (
-                    <FilterComponent
-                      key={key}
-                      idPrefix="SearchFiltersMobile"
-                      config={filterConfig}
-                      listingCategories={listingCategories}
-                      marketplaceCurrency={marketplaceCurrency}
-                      urlQueryParams={validQueryParams}
-                      initialValues={initialValues(this.props, this.state.currentQueryParams)}
-                      getHandleChangedValueFn={this.getHandleChangedValueFn}
-                      intl={intl}
-                      liveEdit
-                      showAsPopup={false}
-                    />
-                  );
-                })}
-              </SearchFiltersMobile>
-              <MainPanelHeader
-                className={css.mainPanel}
-                sortByComponent={sortBy('desktop')}
-                isSortByActive={sortConfig.active}
-                listingsAreLoaded={listingsAreLoaded}
-                resultsCount={totalItems}
-                searchInProgress={searchInProgress}
-                searchListingsError={searchListingsError}
-                noResultsInfo={noResultsInfo}
-              />
-              <div
-                className={classNames(css.listingsForGridVariant, {
-                  [css.newSearchInProgress]: !(listingsAreLoaded || searchListingsError),
-                })}
-              >
-                {searchListingsError ? (
-                  <H3 className={css.error}>
-                    <FormattedMessage id="SearchPage.searchError" />
-                  </H3>
-                ) : null}
-                {!isValidDatesFilter ? (
-                  <H5>
-                    <FormattedMessage id="SearchPage.invalidDatesFilter" />
-                  </H5>
-                ) : null}
-                <SearchResultsPanel
-                  className={css.searchListingsPanel}
-                  listings={listings}
-                  pagination={listingsAreLoaded ? pagination : null}
-                  search={parse(location.search)}
+            <PullToRefresh refreshData={refreshData}>
+              <div className={css.searchResultContainer}>
+                <SearchFiltersMobile
+                  className={css.searchFiltersMobileList}
+                  urlQueryParams={validQueryParams}
+                  sortByComponent={sortBy('mobile')}
+                  listingsAreLoaded={listingsAreLoaded}
+                  resultsCount={totalItems}
+                  searchInProgress={searchInProgress}
+                  searchListingsError={searchListingsError}
+                  showAsModalMaxWidth={MODAL_BREAKPOINT}
+                  onManageDisableScrolling={onManageDisableScrolling}
+                  onOpenModal={this.onOpenMobileModal}
+                  onCloseModal={this.onCloseMobileModal}
+                  resetAll={this.resetAll}
+                  selectedFiltersCount={selectedFiltersCountForMobile}
                   isMapVariant={false}
+                  noResultsInfo={noResultsInfo}
+                >
+                  {availableFilters.map(filterConfig => {
+                    const key = `SearchFiltersMobile.${filterConfig.scope || 'built-in'}.${
+                      filterConfig.key
+                    }`;
+
+                    return (
+                      <FilterComponent
+                        key={key}
+                        idPrefix="SearchFiltersMobile"
+                        config={filterConfig}
+                        listingCategories={listingCategories}
+                        marketplaceCurrency={marketplaceCurrency}
+                        urlQueryParams={validQueryParams}
+                        initialValues={initialValues(this.props, this.state.currentQueryParams)}
+                        getHandleChangedValueFn={this.getHandleChangedValueFn}
+                        intl={intl}
+                        liveEdit
+                        showAsPopup={false}
+                      />
+                    );
+                  })}
+                </SearchFiltersMobile>
+                <MainPanelHeader
+                  className={css.mainPanel}
+                  sortByComponent={sortBy('desktop')}
+                  isSortByActive={sortConfig.active}
+                  listingsAreLoaded={listingsAreLoaded}
+                  resultsCount={totalItems}
+                  searchInProgress={searchInProgress}
+                  searchListingsError={searchListingsError}
+                  noResultsInfo={noResultsInfo}
                 />
+                <div
+                  className={classNames(css.listingsForGridVariant, {
+                    [css.newSearchInProgress]: !(listingsAreLoaded || searchListingsError),
+                  })}
+                >
+                  {searchListingsError ? (
+                    <H3 className={css.error}>
+                      <FormattedMessage id="SearchPage.searchError" />
+                    </H3>
+                  ) : null}
+                  {!isValidDatesFilter ? (
+                    <H5>
+                      <FormattedMessage id="SearchPage.invalidDatesFilter" />
+                    </H5>
+                  ) : null}
+                  <SearchResultsPanel
+                    className={css.searchListingsPanel}
+                    listings={listings}
+                    pagination={listingsAreLoaded ? pagination : null}
+                    search={parse(location.search)}
+                    isMapVariant={false}
+                  />
+                </div>
               </div>
-            </div>
+            </PullToRefresh>
           </div>
         </div>
         <NativeBottomNavbar />
@@ -505,6 +514,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   onManageDisableScrolling: (componentId, disableScrolling) =>
     dispatch(manageDisableScrolling(componentId, disableScrolling)),
+  onLoadSearchPageListings: (params, search, config) => dispatch(loadData(params, search, config)),
 });
 
 // Note: it is important that the withRouter HOC is **outside** the

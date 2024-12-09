@@ -1,7 +1,7 @@
 import React from 'react';
 import { bool, func, object, shape, string } from 'prop-types';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 
 import { useConfiguration } from '../../context/configurationContext';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
@@ -20,6 +20,8 @@ import { updateProfile, uploadImage } from './ProfileSettingsPage.duck';
 import css from './ProfileSettingsPage.module.css';
 import { initialValuesForUserFields, pickUserFieldsData } from '../../util/userHelpers';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh';
+import { fetchCurrentUser } from '../../ducks/user.duck';
 
 const onImageUploadHandler = (values, fn) => {
   const { id, imageId, file } = values;
@@ -117,6 +119,11 @@ export const ProfileSettingsPageComponent = props => {
 
   const title = intl.formatMessage({ id: 'ProfileSettingsPage.title' });
 
+  const dispatch = useDispatch();
+  const refreshData = () => {
+    dispatch(fetchCurrentUser());
+  };
+
   return (
     <Page className={css.root} title={title} scrollingDisabled={scrollingDisabled}>
       <LayoutSingleColumn
@@ -129,21 +136,23 @@ export const ProfileSettingsPageComponent = props => {
         footer={<FooterContainer />}
       >
         <div className={css.content}>
-          <div className={css.headingContainer}>
-            <H3 as="h1" className={css.heading}>
-              <FormattedMessage id="ProfileSettingsPage.heading" />
-            </H3>
-            {user.id ? (
-              <NamedLink
-                className={css.profileLink}
-                name="ProfilePage"
-                params={{ id: user.id.uuid }}
-              >
-                <FormattedMessage id="ProfileSettingsPage.viewProfileLink" />
-              </NamedLink>
-            ) : null}
-          </div>
-          {profileSettingsForm}
+          <PullToRefresh refreshData={refreshData}>
+            <div className={css.headingContainer}>
+              <H3 as="h1" className={css.heading}>
+                <FormattedMessage id="ProfileSettingsPage.heading" />
+              </H3>
+              {user.id ? (
+                <NamedLink
+                  className={css.profileLink}
+                  name="ProfilePage"
+                  params={{ id: user.id.uuid }}
+                >
+                  <FormattedMessage id="ProfileSettingsPage.viewProfileLink" />
+                </NamedLink>
+              ) : null}
+            </div>
+            {profileSettingsForm}
+          </PullToRefresh>
         </div>
       </LayoutSingleColumn>
       <NativeBottomNavbar />

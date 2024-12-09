@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { array, arrayOf, bool, func, number, object, oneOf, shape, string } from 'prop-types';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 
@@ -60,8 +60,10 @@ import {
   fetchMoreMessages,
   fetchTimeSlots,
   fetchTransactionLineItems,
+  loadData,
 } from './TransactionPage.duck';
 import css from './TransactionPage.module.css';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
 
 // Submit dispute and close the review modal
 const onDisputeOrder = (
@@ -413,90 +415,97 @@ export const TransactionPageComponent = props => {
     isBookingProcess(stateData.processName) &&
     process?.hasPassedState(process?.states?.ACCEPTED, transaction);
 
+  const dispatch = useDispatch();
+  const refreshData = () => {
+    dispatch(loadData({ id: transaction.id.uuid }, null, config));
+  };
+
   // TransactionPanel is presentational component
   // that currently handles showing everything inside layout's main view area.
   const panel = isDataAvailable ? (
-    <TransactionPanel
-      className={detailsClassName}
-      currentUser={currentUser}
-      transactionId={transaction?.id}
-      lastTransition={transaction?.attributes?.lastTransition}
-      booking={booking}
-      listing={listing}
-      customer={customer}
-      provider={provider}
-      hasTransitions={txTransitions.length > 0}
-      protectedData={transaction?.attributes?.protectedData}
-      metadata={transaction?.attributes?.metadata}
-      messages={messages}
-      initialMessageFailed={initialMessageFailed}
-      savePaymentMethodFailed={savePaymentMethodFailed}
-      fetchMessagesError={fetchMessagesError}
-      sendMessageInProgress={sendMessageInProgress}
-      sendMessageError={sendMessageError}
-      onSendMessage={onSendMessage}
-      onOpenDisputeModal={onOpenDisputeModal}
-      stateData={stateData}
-      transactionRole={transactionRole}
-      showBookingLocation={showBookingLocation}
-      activityFeed={
-        <ActivityFeed
-          messages={messages}
-          transaction={transaction}
-          stateData={stateData}
-          intl={intl}
-          currentUser={currentUser}
-          hasOlderMessages={
-            totalMessagePages > oldestMessagePageFetched && !fetchMessagesInProgress
-          }
-          onOpenReviewModal={onOpenReviewModal}
-          onShowOlderMessages={() => onShowMoreMessages(transaction.id, config)}
-          fetchMessagesInProgress={fetchMessagesInProgress}
-        />
-      }
-      isInquiryProcess={processName === INQUIRY_PROCESS_NAME}
-      config={config}
-      {...orderBreakdownMaybe}
-      stripePayoutsDisabled={stripePayoutsDisabled}
-      onManageDisableScrolling={onManageDisableScrolling}
-      orderPanel={
-        <OrderPanel
-          className={css.orderPanel}
-          titleClassName={css.orderTitle}
-          listing={listing}
-          isOwnListing={isOwnSale}
-          lineItemUnitType={lineItemUnitType}
-          title={listingTitle}
-          titleDesktop={
-            <H4 as="h2" className={css.orderPanelTitle}>
-              {listingDeleted ? (
-                listingTitle
-              ) : (
-                <NamedLink
-                  name="ListingPage"
-                  params={{ id: listing.id?.uuid, slug: createSlug(listingTitle) }}
-                >
-                  {listingTitle}
-                </NamedLink>
-              )}
-            </H4>
-          }
-          author={provider}
-          onSubmit={handleSubmitOrderRequest}
-          onManageDisableScrolling={onManageDisableScrolling}
-          onFetchTimeSlots={onFetchTimeSlots}
-          monthlyTimeSlots={monthlyTimeSlots}
-          onFetchTransactionLineItems={onFetchTransactionLineItems}
-          lineItems={lineItems}
-          fetchLineItemsInProgress={fetchLineItemsInProgress}
-          fetchLineItemsError={fetchLineItemsError}
-          validListingTypes={config.listing.listingTypes}
-          marketplaceCurrency={config.currency}
-          dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
-          marketplaceName={config.marketplaceName}
-        />
-      }
-    />
+    <PullToRefresh refreshData={refreshData}>
+      <TransactionPanel
+        className={detailsClassName}
+        currentUser={currentUser}
+        transactionId={transaction?.id}
+        lastTransition={transaction?.attributes?.lastTransition}
+        booking={booking}
+        listing={listing}
+        customer={customer}
+        provider={provider}
+        hasTransitions={txTransitions.length > 0}
+        protectedData={transaction?.attributes?.protectedData}
+        metadata={transaction?.attributes?.metadata}
+        messages={messages}
+        initialMessageFailed={initialMessageFailed}
+        savePaymentMethodFailed={savePaymentMethodFailed}
+        fetchMessagesError={fetchMessagesError}
+        sendMessageInProgress={sendMessageInProgress}
+        sendMessageError={sendMessageError}
+        onSendMessage={onSendMessage}
+        onOpenDisputeModal={onOpenDisputeModal}
+        stateData={stateData}
+        transactionRole={transactionRole}
+        showBookingLocation={showBookingLocation}
+        activityFeed={
+          <ActivityFeed
+            messages={messages}
+            transaction={transaction}
+            stateData={stateData}
+            intl={intl}
+            currentUser={currentUser}
+            hasOlderMessages={
+              totalMessagePages > oldestMessagePageFetched && !fetchMessagesInProgress
+            }
+            onOpenReviewModal={onOpenReviewModal}
+            onShowOlderMessages={() => onShowMoreMessages(transaction.id, config)}
+            fetchMessagesInProgress={fetchMessagesInProgress}
+          />
+        }
+        isInquiryProcess={processName === INQUIRY_PROCESS_NAME}
+        config={config}
+        {...orderBreakdownMaybe}
+        stripePayoutsDisabled={stripePayoutsDisabled}
+        onManageDisableScrolling={onManageDisableScrolling}
+        orderPanel={
+          <OrderPanel
+            className={css.orderPanel}
+            titleClassName={css.orderTitle}
+            listing={listing}
+            isOwnListing={isOwnSale}
+            lineItemUnitType={lineItemUnitType}
+            title={listingTitle}
+            titleDesktop={
+              <H4 as="h2" className={css.orderPanelTitle}>
+                {listingDeleted ? (
+                  listingTitle
+                ) : (
+                  <NamedLink
+                    name="ListingPage"
+                    params={{ id: listing.id?.uuid, slug: createSlug(listingTitle) }}
+                  >
+                    {listingTitle}
+                  </NamedLink>
+                )}
+              </H4>
+            }
+            author={provider}
+            onSubmit={handleSubmitOrderRequest}
+            onManageDisableScrolling={onManageDisableScrolling}
+            onFetchTimeSlots={onFetchTimeSlots}
+            monthlyTimeSlots={monthlyTimeSlots}
+            onFetchTransactionLineItems={onFetchTransactionLineItems}
+            lineItems={lineItems}
+            fetchLineItemsInProgress={fetchLineItemsInProgress}
+            fetchLineItemsError={fetchLineItemsError}
+            validListingTypes={config.listing.listingTypes}
+            marketplaceCurrency={config.currency}
+            dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
+            marketplaceName={config.marketplaceName}
+          />
+        }
+      />
+    </PullToRefresh>
   ) : (
     loadingOrFailedFetching
   );

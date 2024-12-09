@@ -21,9 +21,10 @@ import FooterContainer from '../../containers/FooterContainer/FooterContainer';
 
 import ManageListingCard from './ManageListingCard/ManageListingCard';
 
-import { closeListing, openListing, getOwnListingsById } from './ManageListingsPage.duck';
+import { closeListing, openListing, getOwnListingsById, loadData } from './ManageListingsPage.duck';
 import css from './ManageListingsPage.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
+import PullToRefresh from '../../components/PullToRefresh/PullToRefresh';
 
 export class ManageListingsPageComponent extends Component {
   constructor(props) {
@@ -31,11 +32,29 @@ export class ManageListingsPageComponent extends Component {
 
     this.state = { listingMenuOpen: null };
     this.onToggleMenu = this.onToggleMenu.bind(this);
+    this.refreshData = this.refreshData.bind(this);
   }
 
   onToggleMenu(listing) {
     this.setState({ listingMenuOpen: listing });
   }
+
+  refreshData = () => {
+    const { onLoadListings } = this.props;
+    onLoadListings(
+      null,
+      { page: 1 },
+      {
+        layout: {
+          listingImage: {
+            aspectWidth: 1,
+            aspectHeight: 1,
+            variantPrefix: 'listing-card',
+          },
+        },
+      }
+    );
+  };
 
   render() {
     const {
@@ -138,25 +157,27 @@ export class ManageListingsPageComponent extends Component {
           {queryInProgress ? loadingResults : null}
           {queryListingsError ? queryError : null}
           <div className={css.listingPanel}>
-            {heading}
-            <div className={css.listingCards}>
-              {listings.map(l => (
-                <ManageListingCard
-                  className={css.listingCard}
-                  key={l.id.uuid}
-                  listing={l}
-                  isMenuOpen={!!listingMenuOpen && listingMenuOpen.id.uuid === l.id.uuid}
-                  actionsInProgressListingId={openingListing || closingListing}
-                  onToggleMenu={this.onToggleMenu}
-                  onCloseListing={onCloseListing}
-                  onOpenListing={onOpenListing}
-                  hasOpeningError={openingErrorListingId.uuid === l.id.uuid}
-                  hasClosingError={closingErrorListingId.uuid === l.id.uuid}
-                  renderSizes={renderSizes}
-                />
-              ))}
-            </div>
-            {paginationLinks}
+            <PullToRefresh refreshData={this.refreshData}>
+              {heading}
+              <div className={css.listingCards}>
+                {listings.map(l => (
+                  <ManageListingCard
+                    className={css.listingCard}
+                    key={l.id.uuid}
+                    listing={l}
+                    isMenuOpen={!!listingMenuOpen && listingMenuOpen.id.uuid === l.id.uuid}
+                    actionsInProgressListingId={openingListing || closingListing}
+                    onToggleMenu={this.onToggleMenu}
+                    onCloseListing={onCloseListing}
+                    onOpenListing={onOpenListing}
+                    hasOpeningError={openingErrorListingId.uuid === l.id.uuid}
+                    hasClosingError={closingErrorListingId.uuid === l.id.uuid}
+                    renderSizes={renderSizes}
+                  />
+                ))}
+              </div>
+              {paginationLinks}
+            </PullToRefresh>
           </div>
         </LayoutSingleColumn>
         <NativeBottomNavbar />
@@ -233,6 +254,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   onCloseListing: listingId => dispatch(closeListing(listingId)),
   onOpenListing: listingId => dispatch(openListing(listingId)),
+  onLoadListings: (params, search, config) => dispatch(loadData(params, search, config)),
 });
 
 const ManageListingsPage = compose(
