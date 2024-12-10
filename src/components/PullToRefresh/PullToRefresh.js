@@ -5,7 +5,15 @@ import React, { useState } from 'react';
 import SimplePullToRefresh from 'react-simple-pull-to-refresh';
 
 const PullToRefresh = props => {
-  const { rootClassName, children, scrollY = false, refreshData, excludePullToRefresh } = props;
+  const {
+    rootClassName,
+    children,
+    scrollY = false,
+    refreshData,
+    excludePullToRefresh,
+    resistance = 1.5,
+    pullDownThreshold = 67,
+  } = props;
 
   if (!isNativePlatform) {
     return children;
@@ -30,7 +38,7 @@ const PullToRefresh = props => {
 
   const iconSpinnerElement = (
     <div className={css.iconSpinnerContainer}>
-      <IconSpinner className={css.iconSpinner} />
+      <IonSpinner name="lines"></IonSpinner>
     </div>
   );
 
@@ -67,7 +75,8 @@ const PullToRefresh = props => {
       onRefresh={async event => handleRefresh(event)}
       refreshingContent={iconSpinnerElement}
       pullingContent={iconSpinnerElement}
-      resistance={1.5}
+      resistance={resistance}
+      pullDownThreshold={pullDownThreshold}
     >
       {children}
     </SimplePullToRefresh>
