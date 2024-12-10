@@ -1,8 +1,9 @@
-import { IonSpinner } from '@ionic/react';
+// import { IonSpinner } from '@ionic/react';
 import css from './PullToRefresh.module.scss';
 import isNativePlatform from '../../util/isNativePlatform';
 import React, { useState } from 'react';
 import SimplePullToRefresh from 'react-simple-pull-to-refresh';
+import loadingSpinnerLines from './loading-spinner-lines.gif';
 
 const PullToRefresh = props => {
   const {
@@ -38,7 +39,8 @@ const PullToRefresh = props => {
 
   const iconSpinnerElement = (
     <div className={css.iconSpinnerContainer}>
-      <IonSpinner name="lines"></IonSpinner>
+      {/* <IonSpinner name="lines"></IonSpinner> */}
+      <img className={css.iconSpinner} src={loadingSpinnerLines} alt="loading..." />
     </div>
   );
 
