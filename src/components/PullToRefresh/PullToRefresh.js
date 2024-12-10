@@ -1,17 +1,9 @@
-// import {
-//   IonContent,
-//   IonHeader,
-//   IonRefresher,
-//   IonRefresherContent,
-//   IonTitle,
-//   IonToolbar,
-//   RefresherEventDetail,
-// } from '@ionic/react';
-import { IconSpinner } from '..';
+// import { IonSpinner } from '@ionic/react';
 import css from './PullToRefresh.module.scss';
 import isNativePlatform from '../../util/isNativePlatform';
 import React, { useState } from 'react';
 import SimplePullToRefresh from 'react-simple-pull-to-refresh';
+import loadingSpinnerLines from './loading-spinner-lines.gif';
 
 const PullToRefresh = props => {
   const { rootClassName, children, scrollY = false, refreshData, excludePullToRefresh } = props;
@@ -39,7 +31,8 @@ const PullToRefresh = props => {
 
   const iconSpinnerElement = (
     <div className={css.iconSpinnerContainer}>
-      <IconSpinner className={css.iconSpinner} />
+      {/* <IonSpinner name="lines"></IonSpinner> */}
+      <img className={css.iconSpinner} src={loadingSpinnerLines} alt="loading..." />
     </div>
   );
 
