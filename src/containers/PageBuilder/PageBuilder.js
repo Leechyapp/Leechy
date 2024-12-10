@@ -98,6 +98,8 @@ const PageBuilder = props => {
 
   const assetName = props?.assetName;
   const excludePullToRefresh = assetName !== 'landing-page' && assetName !== 'cms-page';
+  const resistance = assetName === 'landing-page' ? 4 : 1.5;
+  const pullDownThreshold = assetName === 'landing-page' ? 75 : 67;
 
   if (!pageAssetsData && fallbackPage && !inProgress && error) {
     return fallbackPage;
@@ -137,6 +139,8 @@ const PageBuilder = props => {
                   <PullToRefresh
                     refreshData={refreshData}
                     excludePullToRefresh={excludePullToRefresh}
+                    resistance={resistance}
+                    pullDownThreshold={pullDownThreshold}
                   >
                     <SectionBuilder sections={sections} options={options} />
                   </PullToRefresh>
