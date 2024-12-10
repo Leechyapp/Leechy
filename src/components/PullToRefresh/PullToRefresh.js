@@ -7,7 +7,6 @@
 //   IonToolbar,
 //   RefresherEventDetail,
 // } from '@ionic/react';
-import { IonItem, IonLabel, IonSpinner } from '@ionic/react';
 import { IconSpinner } from '..';
 import css from './PullToRefresh.module.scss';
 import isNativePlatform from '../../util/isNativePlatform';
@@ -15,15 +14,7 @@ import React, { useState } from 'react';
 import SimplePullToRefresh from 'react-simple-pull-to-refresh';
 
 const PullToRefresh = props => {
-  const {
-    rootClassName,
-    children,
-    scrollY = false,
-    refreshData,
-    excludePullToRefresh,
-    resistance = 1.5,
-    pullDownThreshold = 67,
-  } = props;
+  const { rootClassName, children, scrollY = false, refreshData, excludePullToRefresh } = props;
 
   if (!isNativePlatform) {
     return children;
@@ -48,7 +39,7 @@ const PullToRefresh = props => {
 
   const iconSpinnerElement = (
     <div className={css.iconSpinnerContainer}>
-      <IonSpinner name="lines"></IonSpinner>
+      <IconSpinner className={css.iconSpinner} />
     </div>
   );
 
@@ -85,8 +76,7 @@ const PullToRefresh = props => {
       onRefresh={async event => handleRefresh(event)}
       refreshingContent={iconSpinnerElement}
       pullingContent={iconSpinnerElement}
-      resistance={resistance}
-      pullDownThreshold={pullDownThreshold}
+      resistance={1.5}
     >
       {children}
     </SimplePullToRefresh>
