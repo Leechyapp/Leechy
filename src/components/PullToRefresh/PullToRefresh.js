@@ -1,13 +1,4 @@
-// import {
-//   IonContent,
-//   IonHeader,
-//   IonRefresher,
-//   IonRefresherContent,
-//   IonTitle,
-//   IonToolbar,
-//   RefresherEventDetail,
-// } from '@ionic/react';
-import { IconSpinner } from '..';
+import { IonSpinner } from '@ionic/react';
 import css from './PullToRefresh.module.scss';
 import isNativePlatform from '../../util/isNativePlatform';
 import React, { useState } from 'react';
