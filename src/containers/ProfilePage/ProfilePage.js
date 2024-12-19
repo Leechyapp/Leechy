@@ -463,11 +463,14 @@ export const MainContent = props => {
             <FormattedMessage id="ProfilePage.listingsTitle" values={{ count: listings.length }} />
           </H4>
           <ul className={css.listings}>
-            {listings.map(l => (
-              <li className={css.listing} key={l.id.uuid}>
-                <ListingCard listing={l} showAuthorInfo={false} />
-              </li>
-            ))}
+            {listings.map(
+              l =>
+                l?.attributes?.state !== 'closed' && (
+                  <li className={css.listing} key={l.id.uuid}>
+                    <ListingCard listing={l} showAuthorInfo={false} />
+                  </li>
+                )
+            )}
           </ul>
         </div>
       ) : null}
