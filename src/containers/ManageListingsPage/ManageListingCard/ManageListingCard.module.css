@@ -132,6 +132,10 @@
 
 .menuItem {
   display: inline;
+  @media (--viewportMaxSmall) {
+    width: 100%;
+    height: 70px;
+  }
 
   /* Borders */
   border: none;
