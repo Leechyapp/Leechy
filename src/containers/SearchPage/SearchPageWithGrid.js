@@ -352,7 +352,10 @@ export class SearchPageComponent extends Component {
           </aside>
 
           <div className={css.layoutWrapperMain} role="main">
-            <PullToRefresh refreshData={refreshData}>
+            <PullToRefresh
+              refreshData={refreshData}
+              excludePullToRefresh={this.state.isMobileModalOpen}
+            >
               <div className={css.searchResultContainer}>
                 <SearchFiltersMobile
                   className={css.searchFiltersMobileList}
@@ -430,7 +433,7 @@ export class SearchPageComponent extends Component {
             </PullToRefresh>
           </div>
         </div>
-        <NativeBottomNavbar />
+        {!this.state.isMobileModalOpen && <NativeBottomNavbar />}
         <FooterContainer />
       </Page>
     );
