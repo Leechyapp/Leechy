@@ -51,7 +51,10 @@ const SectionColumns = props => {
   const hasHeaderFields = hasDataInFields([title, description, callToAction], fieldOptions);
   const hasBlocks = blocks?.length > 0;
 
-  return isNativePlatform && title?.content === 'Download the App' ? null : (
+  const hideSectionInMobileApp =
+    title?.content === 'Download the App' || title?.content === 'List it. Earn on it.';
+
+  return isNativePlatform && hideSectionInMobileApp ? null : (
     <SectionContainer
       id={sectionId}
       className={className}
