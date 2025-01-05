@@ -20,6 +20,8 @@ import {
 } from '../../../../components';
 
 import css from './TopbarMobileMenu.module.css';
+import BlockBuilder from '../../../PageBuilder/BlockBuilder';
+import Field from '../../../PageBuilder/Field';
 
 const CustomLinkComponent = ({ linkConfig, currentPage }) => {
   const { group, text, type, href, route } = linkConfig;
@@ -133,6 +135,69 @@ const TopbarMobileMenu = props => {
   };
   const inboxTab = currentUserHasListings ? 'sales' : 'orders';
 
+  const linksWithBlockId = [
+    {
+      link: {
+        fieldType: 'socialMediaLink',
+        platform: 'facebook',
+        url: 'https://www.facebook.com/profile.php?id=61567796655532&mibextid=LQQJ4d',
+      },
+      blockType: 'socialMediaLink',
+      blockId: 'facebook',
+    },
+    {
+      link: {
+        fieldType: 'socialMediaLink',
+        platform: 'instagram',
+        url: 'https://www.instagram.com/leechyapp/',
+      },
+      blockType: 'socialMediaLink',
+      blockId: 'instagram',
+    },
+    {
+      link: {
+        fieldType: 'socialMediaLink',
+        platform: 'twitter',
+        url: 'https://x.com/leechyapp',
+      },
+      blockType: 'socialMediaLink',
+      blockId: 'twitter',
+    },
+    {
+      link: {
+        fieldType: 'socialMediaLink',
+        platform: 'linkedin',
+        url:
+          'https://www.linkedin.com/in/leechy-app-a748a3336?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app',
+      },
+      blockType: 'socialMediaLink',
+      blockId: 'linkedin',
+    },
+    {
+      link: {
+        fieldType: 'socialMediaLink',
+        platform: 'youtube',
+        url: 'https://youtube.com/@leechyapp?si=eBAartczv1pXiq8Z',
+      },
+      blockType: 'socialMediaLink',
+      blockId: 'youtube',
+    },
+    {
+      link: {
+        fieldType: 'socialMediaLink',
+        platform: 'tiktok',
+        url: 'https://www.tiktok.com/@leechyapp?_t=8r8LB7pICf0&_r=1',
+      },
+      blockType: 'socialMediaLink',
+      blockId: 'tiktok',
+    },
+  ];
+
+  const copyright = {
+    content: '© 2024 Leechy LLC. All rights reserved.',
+    fieldType: 'text',
+  };
+
   return (
     <div className={css.root}>
       <AvatarLarge className={css.avatar} user={currentUser} />
@@ -185,6 +250,40 @@ const TopbarMobileMenu = props => {
           </NamedLink>
         </div>
         <div className={css.customLinksWrapper}>{extraLinks}</div>
+        <div className={css.customLinksWrapper}>
+          <NamedLink
+            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
+            name="SecurityPage"
+          >
+            <FormattedMessage id="TopbarMobileMenu.aboutLink" />
+          </NamedLink>
+          <NamedLink
+            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
+            name="SecurityPage"
+          >
+            <FormattedMessage id="TopbarMobileMenu.contactUsLink" />
+          </NamedLink>
+        </div>
+        <div className={css.legalLinksWrapper}>
+          <NamedLink
+            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
+            name="SecurityPage"
+          >
+            <FormattedMessage id="TopbarMobileMenu.tosLink" />
+          </NamedLink>
+          <NamedLink
+            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
+            name="SecurityPage"
+          >
+            <FormattedMessage id="TopbarMobileMenu.privacyPolicyLink" />
+          </NamedLink>
+        </div>
+        <div className={css.legalLinksWrapper}>
+          <div className={css.icons}>
+            <BlockBuilder blocks={linksWithBlockId} sectionId={'footer'} options={{}} />
+          </div>
+          <Field data={copyright} className={css.copyright} />
+        </div>
         <div className={css.spacer} />
       </div>
       <div className={css.footer}>
