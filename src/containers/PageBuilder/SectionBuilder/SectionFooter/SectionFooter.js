@@ -111,7 +111,9 @@ const SectionFooter = props => {
     </>
   );
 
-  return (
+  return isNativePlatform ? (
+    <div className={css.mobileAppReplacementFooter}></div>
+  ) : (
     <SectionContainer
       as="footer"
       id={sectionId}
