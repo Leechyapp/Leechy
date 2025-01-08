@@ -134,10 +134,10 @@ const NativeBottomNavbar = injectIntl(props => {
 
       <Modal
         id="TopbarMobileMenu"
-        containerClassName={css.modalContainer}
+        scrollLayerClassName={css.scrollLayerClassName}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
-        usePortal={true}
+        usePortal={false}
         onManageDisableScrolling={onManageDisableScrolling}
       >
         {authInProgress ? null : mobileMenu}

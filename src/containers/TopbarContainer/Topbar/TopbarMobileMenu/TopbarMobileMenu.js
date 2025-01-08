@@ -2,7 +2,7 @@
  *  TopbarMobileMenu prints the menu content for authenticated user or
  * shows login actions for those who are not authenticated.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -19,9 +19,10 @@ import {
   NotificationBadge,
 } from '../../../../components';
 
-import css from './TopbarMobileMenu.module.css';
+import css from './TopbarMobileMenu.module.scss';
 import BlockBuilder from '../../../PageBuilder/BlockBuilder';
 import Field from '../../../PageBuilder/Field';
+import isNativePlatform from '../../../../util/isNativePlatform';
 
 const CustomLinkComponent = ({ linkConfig, currentPage }) => {
   const { group, text, type, href, route } = linkConfig;
@@ -69,6 +70,10 @@ const TopbarMobileMenu = props => {
   } = props;
 
   const user = ensureCurrentUser(currentUser);
+
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // }, []);
 
   const extraLinks = customLinks.map(linkConfig => {
     return (
@@ -249,41 +254,51 @@ const TopbarMobileMenu = props => {
             <FormattedMessage id="TopbarMobileMenu.securitySettingsLink" />
           </NamedLink>
         </div>
-        <div className={css.customLinksWrapper}>{extraLinks}</div>
         <div className={css.customLinksWrapper}>
-          <NamedLink
-            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
-            name="SecurityPage"
-          >
-            <FormattedMessage id="TopbarMobileMenu.aboutLink" />
-          </NamedLink>
-          <NamedLink
-            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
-            name="SecurityPage"
-          >
-            <FormattedMessage id="TopbarMobileMenu.contactUsLink" />
-          </NamedLink>
+          {!isNativePlatform && { extraLinks }}
+          {isNativePlatform && (
+            <>
+              <NamedLink
+                className={classNames(css.navigationLink, currentPageClass('CMSAboutPage'))}
+                name="CMSPage"
+                params={{ pageId: 'about' }}
+              >
+                <FormattedMessage id="TopbarMobileMenu.aboutLink" />
+              </NamedLink>
+              <NamedLink
+                className={classNames(css.navigationLink, currentPageClass('CMSContactUsPage'))}
+                name="CMSPage"
+                params={{ pageId: 'contact-us' }}
+              >
+                <FormattedMessage id="TopbarMobileMenu.contactUsLink" />
+              </NamedLink>
+            </>
+          )}
         </div>
-        <div className={css.legalLinksWrapper}>
-          <NamedLink
-            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
-            name="SecurityPage"
-          >
-            <FormattedMessage id="TopbarMobileMenu.tosLink" />
-          </NamedLink>
-          <NamedLink
-            className={classNames(css.navigationLink, currentPageClass('SecurityPage'))}
-            name="SecurityPage"
-          >
-            <FormattedMessage id="TopbarMobileMenu.privacyPolicyLink" />
-          </NamedLink>
-        </div>
-        <div className={css.legalLinksWrapper}>
-          <div className={css.icons}>
-            <BlockBuilder blocks={linksWithBlockId} sectionId={'footer'} options={{}} />
-          </div>
-          <Field data={copyright} className={css.copyright} />
-        </div>
+        {isNativePlatform && (
+          <>
+            <div className={css.legalLinksWrapper}>
+              <NamedLink
+                className={classNames(css.navigationLink, currentPageClass('TermsOfServicePage'))}
+                name="TermsOfServicePage"
+              >
+                <FormattedMessage id="TopbarMobileMenu.tosLink" />
+              </NamedLink>
+              <NamedLink
+                className={classNames(css.navigationLink, currentPageClass('PrivacyPolicyPage'))}
+                name="PrivacyPolicyPage"
+              >
+                <FormattedMessage id="TopbarMobileMenu.privacyPolicyLink" />
+              </NamedLink>
+            </div>
+            <div className={css.legalLinksWrapper}>
+              <div className={css.icons}>
+                <BlockBuilder blocks={linksWithBlockId} sectionId={'footer'} options={{}} />
+              </div>
+              <Field data={copyright} className={css.copyright} />
+            </div>
+          </>
+        )}
         <div className={css.spacer} />
       </div>
       <div className={css.footer}>
