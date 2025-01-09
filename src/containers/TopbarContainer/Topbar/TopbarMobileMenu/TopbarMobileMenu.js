@@ -251,7 +251,7 @@ const TopbarMobileMenu = props => {
           </NamedLink>
         </div>
         <div className={css.customLinksWrapper}>
-          {!isNativePlatform && { extraLinks }}
+          {extraLinks}
           {isNativePlatform && (
             <>
               <NamedLink
