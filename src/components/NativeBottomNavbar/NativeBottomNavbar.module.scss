@@ -54,3 +54,25 @@
 p {
   margin: unset;
 }
+
+.scrollLayerClassName {
+  flex-grow: 1;
+  display: flex;
+
+  /* Add default background color to avoid bouncing scroll showing the
+ page contents from behind the modal. */
+  background-color: var(--colorWhite);
+
+  /* Additional styles for the modal window, dimming the background and positioning the modal */
+  min-height: 100vh;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  @media (--viewportMedium) {
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    background-image: none;
+  }
+}
