@@ -87,7 +87,9 @@ heroku git:remote -a yourapp-staging
 heroku git:remote -a yourapp-prod
 
 # Deploy web app to heroku (you should deploy from your ideal branch)
-git push heroku staging:main
+git push heroku your-branch:main
+-- or --
+git push heroku your-branch:staging
 -- or --
 git push heroku main
 
