@@ -13,6 +13,7 @@ import { default as appStoreBadge } from '../../../../assets/mobile-app-store-ba
 import { default as googlePlayStoreBadge } from '../../../../assets/mobile-app-store-badges/google-play-badge.png';
 import { FormattedMessage } from 'react-intl';
 import isNativePlatform from '../../../../util/isNativePlatform';
+import { useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 
 // The number of columns (numberOfColumns) affects styling
 
@@ -52,6 +53,9 @@ const SectionFooter = props => {
     linkLogoToExternalSite,
   } = props;
 
+  const location = useLocation();
+  const isHomeLandingPage = location?.pathname === '/';
+
   // If external mapping has been included for fields
   // E.g. { h1: { component: MyAwesomeHeader } }
   const fieldComponents = options?.fieldComponents;
@@ -80,7 +84,7 @@ const SectionFooter = props => {
     window.open('https://play.google.com/store/apps/details?id=com.leechy.app', '_blank');
   };
 
-  const leechyAppButtons = (
+  const leechyAppButtons = !isNativePlatform && (
     <>
       <div className={css.rowUnsetMarginLR}>
         <div className={css.appIcons}>
@@ -111,7 +115,7 @@ const SectionFooter = props => {
     </>
   );
 
-  return isNativePlatform ? (
+  return isNativePlatform && !isHomeLandingPage ? (
     <div className={css.mobileAppReplacementFooter}></div>
   ) : (
     <SectionContainer
