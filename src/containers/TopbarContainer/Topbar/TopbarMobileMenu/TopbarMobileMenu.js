@@ -23,6 +23,7 @@ import css from './TopbarMobileMenu.module.scss';
 import BlockBuilder from '../../../PageBuilder/BlockBuilder';
 import Field from '../../../PageBuilder/Field';
 import isNativePlatform from '../../../../util/isNativePlatform';
+import { useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 
 const CustomLinkComponent = ({ linkConfig, currentPage }) => {
   const { group, text, type, href, route } = linkConfig;
@@ -70,6 +71,9 @@ const TopbarMobileMenu = props => {
   } = props;
 
   const user = ensureCurrentUser(currentUser);
+
+  const location = useLocation();
+  const isHomeLandingPage = location?.pathname === '/';
 
   const extraLinks = customLinks.map(linkConfig => {
     return (
@@ -252,7 +256,7 @@ const TopbarMobileMenu = props => {
         </div>
         <div className={css.customLinksWrapper}>
           {extraLinks}
-          {isNativePlatform && (
+          {isNativePlatform && !isHomeLandingPage && (
             <>
               <NamedLink
                 className={classNames(css.navigationLink, currentPageClass('CMSAboutPage'))}
@@ -271,7 +275,7 @@ const TopbarMobileMenu = props => {
             </>
           )}
         </div>
-        {isNativePlatform && (
+        {isNativePlatform && !isHomeLandingPage && (
           <>
             <div className={css.legalLinksWrapper}>
               <NamedLink
