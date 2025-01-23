@@ -4,6 +4,7 @@ const SharetribeService = require('../services/sharetribe.service');
 const StripeService = require('../services/stripe.service');
 const { types } = require('sharetribe-flex-sdk');
 const ProcessAliasEnum = require('../enums/process-alias.enum');
+const StripeUtil = require('../utils/stripe.util');
 const { UUID } = types;
 
 class BookingController {
@@ -81,6 +82,8 @@ class BookingController {
       };
 
       const paymentIntent = await StripeService.createPaymentIntent(paymentIntentObject);
+
+      StripeUtil.checkIfPaymentIntentSucceeded(paymentIntent);
 
       await SharetribeIntegrationService.updateMetadata({
         id: new UUID(transactionId),
