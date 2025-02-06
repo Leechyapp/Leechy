@@ -22,7 +22,7 @@
 
       .searchForm {
         background-color: #1f1f1f80;
-        height: 344px;
+        height: 100%;
         left: 0;
         position: absolute;
         // top: 49px;
@@ -44,76 +44,95 @@
           top: 34px;
         }
 
-        .overlap2 {
+        .locationWrapper {
           background-color: #ffffff;
           border-radius: 6px;
           height: 48px;
           // left: 23px;
           position: absolute;
           top: 87px;
-          width: 348px;
+          width: 100%;
+          max-width: 348px;
+          cursor: pointer;
+
+          .locationPlaceholder {
+            color: #4a4a4e;
+            font-family: 'Inter', Helvetica;
+            font-size: 16px;
+            font-weight: 400;
+            left: 33px;
+            letter-spacing: 0;
+            line-height: normal;
+            position: absolute;
+            top: 14px;
+            white-space: nowrap;
+          }
+
+          .vector {
+            height: 19px;
+            left: 11px;
+            position: absolute;
+            top: 14px;
+            width: 14px;
+          }
         }
 
-        .textWrapper2 {
-          color: #4a4a4e;
-          font-family: 'Inter', Helvetica;
-          font-size: 16px;
-          font-weight: 400;
-          left: 33px;
-          letter-spacing: 0;
-          line-height: normal;
-          position: absolute;
-          top: 14px;
-          white-space: nowrap;
-        }
-
-        .vector {
-          height: 19px;
-          left: 11px;
-          position: absolute;
-          top: 14px;
-          width: 14px;
-        }
-
-        .overlap3 {
+        .datesWrapper {
           background-color: #ffffff;
           border-radius: 6px;
           height: 48px;
           // left: 23px;
           position: absolute;
           top: 149px;
-          width: 348px;
+          width: 100%;
+          max-width: 348px;
+          cursor: pointer;
+
+          .datesPlaceholder {
+            color: #4a4a4e;
+            font-family: 'Inter', Helvetica;
+            font-size: 16px;
+            font-weight: 400;
+            left: 33px;
+            letter-spacing: 0;
+            line-height: normal;
+            position: absolute;
+            top: 14px;
+            white-space: nowrap;
+          }
+
+          .img {
+            height: 17px;
+            left: 11px;
+            position: absolute;
+            top: 15px;
+            width: 15px;
+          }
         }
 
-        .img {
-          height: 17px;
-          left: 11px;
-          position: absolute;
-          top: 15px;
-          width: 15px;
-        }
-
-        .divWrapper {
+        .categoryDropdownWrapper {
           background-image: url(https://c.animaapp.com/x4t9OtXc/img/rectangle-3.png);
           background-size: 100% 100%;
           height: 48px;
           // left: 23px;
           position: absolute;
           top: 211px;
-          width: 348px;
-        }
+          width: 100%;
+          max-width: 348px;
+          cursor: pointer;
 
-        .textWrapper3 {
-          color: #4a4a4e;
-          font-family: 'Inter', Helvetica;
-          font-size: 16px;
-          font-weight: 400;
-          left: 11px;
-          letter-spacing: 0;
-          line-height: normal;
-          position: absolute;
-          top: 13px;
-          white-space: nowrap;
+          .categoryPlaceholder {
+            color: #4a4a4e;
+            font-family: 'Inter', Helvetica;
+            font-size: 16px;
+            font-weight: 400;
+            left: 11px;
+            letter-spacing: 0;
+            line-height: normal;
+            position: absolute;
+            top: 13px;
+            white-space: nowrap;
+          }
         }
 
         .searchButton {
@@ -124,10 +143,11 @@
           // left: 23px;
           position: absolute;
           top: 273px;
-          width: 348px;
+          width: 100%;
+          max-width: 348px;
           cursor: pointer;
 
-          .textWrapper4 {
+          .searchButtonText {
             color: #ffffff;
             font-family: 'Inter', Helvetica;
             font-size: 16px;
