@@ -1,6 +1,7 @@
 import React from 'react';
 import css from './LandingPageHeroSection.module.scss';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const LandingPageHeroSection = () => {
   const history = useHistory();
@@ -18,19 +19,11 @@ const LandingPageHeroSection = () => {
             <div className={css.watermark}>Leechy</div>
             <div className={css.locationWrapper}>
               <div className={css.locationPlaceholder}>Location</div>
-              <img
-                className={css.vector}
-                alt="Vector"
-                src="https://c.animaapp.com/x4t9OtXc/img/vector-1.svg"
-              />
+              <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
             </div>
             <div className={css.datesWrapper}>
               <div className={css.datesPlaceholder}>Dates</div>
-              <img
-                className={css.img}
-                alt="Vector"
-                src="https://c.animaapp.com/x4t9OtXc/img/vector.svg"
-              />
+              <FontAwesomeIcon className={css.icon} icon="calendar" />
             </div>
             <div className={css.categoryDropdownWrapper}>
               <div className={css.categoryPlaceholder}>Category</div>
