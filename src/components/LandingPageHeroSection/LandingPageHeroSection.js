@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import css from './LandingPageHeroSection.module.scss';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const LandingPageHeroSection = () => {
   const history = useHistory();
+
+  const [category, setCategory] = useState('');
+
   const redirectToSearchPage = () => {
     console.log('redirectToSearchPage clicked');
     let searchQuery = '/s';
@@ -26,7 +29,18 @@ const LandingPageHeroSection = () => {
               <FontAwesomeIcon className={css.icon} icon="calendar" />
             </div>
             <div className={css.categoryDropdownWrapper}>
-              <div className={css.categoryPlaceholder}>Category</div>
+              <select
+                className={css.categoryDropdown}
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+              >
+                <option value="" className={css.categoryPlaceholder}>
+                  Category
+                </option>
+                <option value="furniture">Furniture</option>
+                <option value="clothing">Clothing</option>
+                <option value="electronics">Electronics</option>
+              </select>
             </div>
             <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
               <div className={css.searchButtonText}>Search</div>
