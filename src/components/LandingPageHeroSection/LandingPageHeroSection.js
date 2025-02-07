@@ -3,13 +3,23 @@ import css from './LandingPageHeroSection.module.scss';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import leechyWatermarkImg from './assets/leechy-watermark.jpeg';
+import Modal from '../Modal/Modal';
+import { manageDisableScrolling } from '../../ducks/ui.duck';
+import { useDispatch } from 'react-redux';
 
 const LandingPageHeroSection = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
+  const onManageDisableScrolling = (componentId, disableScrolling) => {
+    dispatch(manageDisableScrolling(componentId, disableScrolling));
+  };
 
   const [location, setLocation] = useState();
   const [dates, setDates] = useState();
   const [category, setCategory] = useState();
+
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showDateModal, setShowDateModal] = useState(false);
 
   const redirectToSearchPage = () => {
     console.log('redirectToSearchPage clicked');
@@ -37,13 +47,13 @@ const LandingPageHeroSection = () => {
                 </div>
               </div>
               <div className={css.col12}>
-                <div className={css.locationWrapper}>
+                <div className={css.locationWrapper} onClick={() => setShowLocationModal(true)}>
                   <div className={css.locationPlaceholder}>Location</div>
                   <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
                 </div>
               </div>
               <div className={css.col12}>
-                <div className={css.datesWrapper}>
+                <div className={css.datesWrapper} onClick={() => setShowDateModal(true)}>
                   <div className={css.datesPlaceholder}>Dates</div>
                   <FontAwesomeIcon className={css.icon} icon="calendar" />
                 </div>
@@ -73,6 +83,24 @@ const LandingPageHeroSection = () => {
           </div>
         </div>
       </div>
+      <Modal
+        id="LandingPageHeroSection.locationModal"
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        usePortal={false}
+        onManageDisableScrolling={onManageDisableScrolling}
+      >
+        Test
+      </Modal>
+      <Modal
+        id="LandingPageHeroSection.dateModal"
+        isOpen={showDateModal}
+        onClose={() => setShowDateModal(false)}
+        usePortal={false}
+        onManageDisableScrolling={onManageDisableScrolling}
+      >
+        Dates
+      </Modal>
     </div>
   );
 };
