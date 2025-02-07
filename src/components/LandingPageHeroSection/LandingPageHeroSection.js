@@ -25,37 +25,50 @@ const LandingPageHeroSection = () => {
       <div className={css.overlapGroupWrapper}>
         <div className={css.overlapGroup}>
           <div className={css.searchForm}>
-            <div className={css.watermark}>
-              <img src={leechyWatermarkImg} />
-            </div>
-            {/* <div className={css.sloganWrapper}>
-              <p>The rental marketplace for everyone</p>
-            </div> */}
-            {/* <div className={css.sloganWrapper}>Rent everything marketplace</div> */}
-            <div className={css.locationWrapper}>
-              <div className={css.locationPlaceholder}>Location</div>
-              <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
-            </div>
-            <div className={css.datesWrapper}>
-              <div className={css.datesPlaceholder}>Dates</div>
-              <FontAwesomeIcon className={css.icon} icon="calendar" />
-            </div>
-            <div className={css.categoryDropdownWrapper}>
-              <select
-                className={css.categoryDropdown}
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-              >
-                <option value="" className={css.categoryPlaceholder}>
-                  Category
-                </option>
-                <option value="furniture">Furniture</option>
-                <option value="clothing">Clothing</option>
-                <option value="electronics">Electronics</option>
-              </select>
-            </div>
-            <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
-              <div className={css.searchButtonText}>Search</div>
+            <div className={css.row}>
+              <div className={css.col12}>
+                <div className={css.watermark}>
+                  <img src={leechyWatermarkImg} />
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.sloganWrapper}>
+                  <p>The rental marketplace for everyone</p>
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.locationWrapper}>
+                  <div className={css.locationPlaceholder}>Location</div>
+                  <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.datesWrapper}>
+                  <div className={css.datesPlaceholder}>Dates</div>
+                  <FontAwesomeIcon className={css.icon} icon="calendar" />
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.categoryDropdownWrapper}>
+                  <select
+                    className={css.categoryDropdown}
+                    value={category}
+                    onChange={e => setCategory(e.target.value)}
+                  >
+                    <option value="" className={css.categoryPlaceholder}>
+                      Category
+                    </option>
+                    <option value="furniture">Furniture</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="electronics">Electronics</option>
+                  </select>
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
+                  <div className={css.searchButtonText}>Search</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
