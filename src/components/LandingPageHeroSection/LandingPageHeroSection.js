@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import css from './LandingPageHeroSection.module.scss';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import leechyWatermarkImg from './assets/leechy-watermark.jpeg';
 
 const LandingPageHeroSection = () => {
   const history = useHistory();
@@ -24,7 +25,13 @@ const LandingPageHeroSection = () => {
       <div className={css.overlapGroupWrapper}>
         <div className={css.overlapGroup}>
           <div className={css.searchForm}>
-            <div className={css.watermark}>Leechy</div>
+            <div className={css.watermark}>
+              <img src={leechyWatermarkImg} />
+            </div>
+            {/* <div className={css.sloganWrapper}>
+              <p>The rental marketplace for everyone</p>
+            </div> */}
+            {/* <div className={css.sloganWrapper}>Rent everything marketplace</div> */}
             <div className={css.locationWrapper}>
               <div className={css.locationPlaceholder}>Location</div>
               <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
