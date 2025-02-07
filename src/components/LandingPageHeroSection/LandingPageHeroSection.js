@@ -6,11 +6,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const LandingPageHeroSection = () => {
   const history = useHistory();
 
-  const [category, setCategory] = useState('');
+  const [location, setLocation] = useState();
+  const [dates, setDates] = useState();
+  const [category, setCategory] = useState();
 
   const redirectToSearchPage = () => {
     console.log('redirectToSearchPage clicked');
     let searchQuery = '/s';
+    if (category) {
+      searchQuery += `?pub_categoryLevel1=${category}`;
+    }
     history.push(searchQuery);
   };
 
