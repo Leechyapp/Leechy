@@ -27,17 +27,9 @@ const LandingPageHeroSection = injectIntl(props => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
   };
 
-  const addressRequiredMessage = intl.formatMessage({
-    id: 'EditListingLocationForm.addressRequired',
-  });
-  const addressNotRecognizedMessage = intl.formatMessage({
-    id: 'EditListingLocationForm.addressNotRecognized',
-  });
-
   const [location, setLocation] = useState();
   const [finalLocation, setFinalLocation] = useState();
   const [locationText, setLocationText] = useState();
-  const [dates, setDates] = useState();
   const [category, setCategory] = useState();
 
   const [showLocationModal, setShowLocationModal] = useState(false);
