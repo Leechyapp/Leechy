@@ -83,7 +83,7 @@
             height: 19px;
             left: 11px;
             position: relative;
-            top: -7.5px;
+            top: -6px;
             width: 14px;
           }
         }
@@ -178,6 +178,37 @@
           }
         }
       }
+    }
+  }
+}
+
+.locationModalForm {
+  margin-top: 30px;
+  .locationAutocompleteInputIcon {
+    display: none;
+  }
+  .predictionsRoot {
+    position: absolute;
+    width: 100%;
+    top: 36px;
+    left: 0;
+    background-color: var(--marketplaceColor);
+    border-bottom-left-radius: var(--borderRadius);
+    border-bottom-right-radius: var(--borderRadius);
+    box-shadow: var(--boxShadowPopup);
+    z-index: calc(var(--zIndexPopup) + 1);
+
+    @media (--viewportMedium) {
+      top: 40px;
+    }
+  }
+  .locationAddress,
+  .building {
+    flex-shrink: 0;
+    margin-bottom: 24px;
+
+    @media (--viewportMedium) {
+      margin-bottom: 32px;
     }
   }
 }
