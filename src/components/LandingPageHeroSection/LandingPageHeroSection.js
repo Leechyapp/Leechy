@@ -137,7 +137,9 @@ const LandingPageHeroSection = injectIntl(props => {
               </div>
               <div className={css.col12}>
                 <div className={css.sloganWrapper}>
-                  <p>The rental marketplace for everyone.</p>
+                  <p>
+                    <FormattedMessage id="LandingPageHeroSection.heading" />
+                  </p>
                 </div>
               </div>
               <div className={css.col12}>
@@ -145,7 +147,9 @@ const LandingPageHeroSection = injectIntl(props => {
                   {locationText ? (
                     <div className={css.locationPlaceholder}>{locationText}</div>
                   ) : (
-                    <div className={css.locationPlaceholder}>Location</div>
+                    <div className={css.locationPlaceholder}>
+                      <FormattedMessage id="LandingPageHeroSection.location.placeholder" />
+                    </div>
                   )}
                   <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
                 </div>
@@ -155,7 +159,9 @@ const LandingPageHeroSection = injectIntl(props => {
                   {selectedDatePlaceholder ? (
                     <div className={css.datesPlaceholder}>{selectedDatePlaceholder}</div>
                   ) : (
-                    <div className={css.datesPlaceholder}>Dates</div>
+                    <div className={css.datesPlaceholder}>
+                      <FormattedMessage id="LandingPageHeroSection.dates.placeholder" />
+                    </div>
                   )}
                   <FontAwesomeIcon className={css.icon} icon="calendar" />
                 </div>
@@ -168,7 +174,7 @@ const LandingPageHeroSection = injectIntl(props => {
                     onChange={e => setCategory(e.target.value)}
                   >
                     <option value="" className={css.categoryPlaceholder}>
-                      Category
+                      <FormattedMessage id="LandingPageHeroSection.category.placeholder" />
                     </option>
                     <option value="furniture">Furniture</option>
                     <option value="clothing">Clothing</option>
@@ -178,7 +184,9 @@ const LandingPageHeroSection = injectIntl(props => {
               </div>
               <div className={css.col12}>
                 <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
-                  <div className={css.searchButtonText}>Search</div>
+                  <div className={css.searchButtonText}>
+                    <FormattedMessage id="LandingPageHeroSection.search.button.text" />
+                  </div>
                 </div>
               </div>
             </div>
