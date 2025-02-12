@@ -14,6 +14,7 @@ import momentTz from 'moment-timezone';
 import DateRangeInput from '../FieldDateRangeInput/DateRangeInput';
 import { getDefaultTimeZoneOnBrowser } from '../../util/dates';
 import moment from 'moment-timezone';
+import { getPredictionAddress, placeBounds } from '../LocationAutocompleteInput/GeocoderMapbox';
 
 const identity = v => v;
 
@@ -37,7 +38,7 @@ const LandingPageHeroSection = injectIntl(props => {
   const [bookingStartDate, setBookingStartDate] = useState();
   const [selectedDatePlaceholder, setSelectedDatePlaceholder] = useState();
 
-  const [finalLocation, setFinalLocation] = useState();
+  const [prediction, setPrediction] = useState();
   const [location, setLocation] = useState();
   const [locationText, setLocationText] = useState();
 
@@ -56,21 +57,36 @@ const LandingPageHeroSection = injectIntl(props => {
 
   const redirectToSearchPage = () => {
     console.log('redirectToSearchPage clicked');
+    let bounds;
+    if (prediction) {
+      const predictionPlaceBounds = placeBounds(prediction);
+      if (predictionPlaceBounds) {
+        bounds = [
+          predictionPlaceBounds.ne.lat,
+          predictionPlaceBounds.ne.lng,
+          predictionPlaceBounds.sw.lat,
+          predictionPlaceBounds.sw.lng,
+        ].join(',');
+      }
+    }
+
     const searchParams = {
       ...(category ? { pub_categoryLevel1: category } : {}),
-      ...(finalLocation
+      ...(prediction
         ? {
-            address: encodeURIComponent(finalLocation['place_name_en-US']),
-            bounds: encodeURIComponent(finalLocation['bbox']),
+            address: getPredictionAddress(prediction),
+            bounds,
+            mapSearch: 'true',
           }
         : {}),
       ...(bookingStartDate && bookingEndDate
-        ? { startDate: onFormatDate(bookingStartDate), endDate: onFormatDate(bookingEndDate) }
+        ? { dates: `${bookingStartDate},${bookingEndDate}` }
         : {}),
     };
+    console.log('searchParams', searchParams);
     const searchQuery =
       Object.keys(searchParams).length > 0
-        ? '/s?' + new URLSearchParams(searchParams).toString()
+        ? '/s?' + new URLSearchParams(searchParams).toString().replace(/,/g, '%2C')
         : '/s';
     history.push(searchQuery);
   };
@@ -83,7 +99,7 @@ const LandingPageHeroSection = injectIntl(props => {
     if (location && location?.predictions?.length > 0) {
       const firstPrediction = location.predictions[0];
       console.log(`onBlurLocation`, JSON.stringify(firstPrediction, null, 2));
-      setFinalLocation(firstPrediction);
+      setPrediction(firstPrediction);
       setLocationText(firstPrediction['place_name_en-US']);
       setShowLocationModal(false);
     }
@@ -178,7 +194,7 @@ const LandingPageHeroSection = injectIntl(props => {
       >
         <FinalForm
           {...props}
-          onSubmit={onSubmit}
+          onSubmit={() => {}}
           render={formRenderProps => {
             const { formId, autoFocus, intl } = formRenderProps;
             return (
