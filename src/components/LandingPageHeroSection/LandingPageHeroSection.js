@@ -27,17 +27,19 @@ const LandingPageHeroSection = injectIntl(props => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
   };
 
-  const [location, setLocation] = useState();
-  const [finalLocation, setFinalLocation] = useState();
-  const [locationText, setLocationText] = useState();
-  const [category, setCategory] = useState();
-
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
+
+  const [category, setCategory] = useState();
+
   const [inputDate, setInputDate] = useState();
-  const [bookingStartDate, setBookingStartDate] = useState();
   const [bookingEndDate, setBookingEndDate] = useState();
+  const [bookingStartDate, setBookingStartDate] = useState();
   const [selectedDatePlaceholder, setSelectedDatePlaceholder] = useState();
+
+  const [finalLocation, setFinalLocation] = useState();
+  const [location, setLocation] = useState();
+  const [locationText, setLocationText] = useState();
 
   useEffect(() => {
     if (bookingStartDate && bookingEndDate) {
