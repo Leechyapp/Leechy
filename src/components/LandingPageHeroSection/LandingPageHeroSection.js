@@ -7,7 +7,7 @@ import Modal from '../Modal/Modal';
 import { manageDisableScrolling } from '../../ducks/ui.duck';
 import { useDispatch } from 'react-redux';
 import { FieldLocationAutocompleteInput } from '../LocationAutocompleteInput/LocationAutocompleteInput';
-import { injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { Form as FinalForm } from 'react-final-form';
 import Form from '../Form/Form';
 import momentTz from 'moment-timezone';
@@ -15,23 +15,28 @@ import DateRangeInput from '../FieldDateRangeInput/DateRangeInput';
 import { getDefaultTimeZoneOnBrowser } from '../../util/dates';
 import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../LocationAutocompleteInput/GeocoderMapbox';
+import { useConfiguration } from '../../context/configurationContext';
+import excludedTextFieldsSet from '../../containers/EditListingPage/EditListingWizard/EditListingDetailsPanel/excludedTextFieldsSet';
 
 const identity = v => v;
 
 const LandingPageHeroSection = injectIntl(props => {
   const { intl } = props;
 
+  const config = useConfiguration();
   const history = useHistory();
   const timeZone = getDefaultTimeZoneOnBrowser();
   const dispatch = useDispatch();
   const onManageDisableScrolling = (componentId, disableScrolling) => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
   };
+  console.log('config', config);
 
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
 
   const [category, setCategory] = useState();
+  const [categoryList, setCategoryList] = useState([]);
 
   const [inputDate, setInputDate] = useState();
   const [bookingEndDate, setBookingEndDate] = useState();
@@ -41,6 +46,23 @@ const LandingPageHeroSection = injectIntl(props => {
   const [prediction, setPrediction] = useState();
   const [location, setLocation] = useState();
   const [locationText, setLocationText] = useState();
+
+  useEffect(() => {
+    if (config?.listing?.listingFields) {
+      const listingFields = config.listing.listingFields;
+      const listingCategoriesSet = excludedTextFieldsSet;
+      const listingCategories = [];
+      listingFields.forEach(listingField => {
+        if (listingCategoriesSet.has(listingField.key)) {
+          listingCategories.push({
+            key: listingField.key,
+            name: listingField.filterConfig.label,
+          });
+        }
+      });
+      setCategoryList(listingCategories);
+    }
+  }, []);
 
   useEffect(() => {
     if (bookingStartDate && bookingEndDate) {
@@ -174,11 +196,14 @@ const LandingPageHeroSection = injectIntl(props => {
                     onChange={e => setCategory(e.target.value)}
                   >
                     <option value="" className={css.categoryPlaceholder}>
-                      <FormattedMessage id="LandingPageHeroSection.category.placeholder" />
+                      {intl.formatMessage({ id: 'LandingPageHeroSection.category.placeholder' })}
                     </option>
-                    <option value="furniture">Furniture</option>
-                    <option value="clothing">Clothing</option>
-                    <option value="electronics">Electronics</option>
+                    {categoryList.length > 0 &&
+                      categoryList.map(category => (
+                        <option key={category.key} value={category.key}>
+                          {category.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>
