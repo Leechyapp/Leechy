@@ -16,6 +16,7 @@ import SectionHero from './SectionHero';
 // TODO: alternatively, we could consider more in-place way of theming components
 import css from './SectionBuilder.module.css';
 import SectionFooter from './SectionFooter';
+import isPlatformBrowser from '../../../util/isPlatformBrowser.util';
 
 // These are shared classes.
 // Use these to have consistent styles between different section components
@@ -80,11 +81,13 @@ const SectionBuilder = props => {
     }
   };
 
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [screenWidth, setScreenWidth] = useState(isPlatformBrowser() ? window.innerWidth : null);
   useEffect(() => {
-    const handleResize = () => setScreenWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (screenWidth) {
+      const handleResize = () => setScreenWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   return (
@@ -99,7 +102,7 @@ const SectionBuilder = props => {
         const classes = classNames({ [css.darkTheme]: isDarkTheme });
         const sectionId = getUniqueSectionId(section.sectionId, index);
 
-        if (assetName === 'landing-page') {
+        if (screenWidth && assetName === 'landing-page') {
           if (section?.sectionName === 'Marketplace introduction') {
             if (screenWidth < MIN_SCREEN_WIDTH_LANDING_PAGE_HERO) {
               return null;

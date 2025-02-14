@@ -12,11 +12,11 @@ import { Form as FinalForm } from 'react-final-form';
 import Form from '../Form/Form';
 import momentTz from 'moment-timezone';
 import DateRangeInput from '../FieldDateRangeInput/DateRangeInput';
-import { getDefaultTimeZoneOnBrowser } from '../../util/dates';
 import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../LocationAutocompleteInput/GeocoderMapbox';
 import { useConfiguration } from '../../context/configurationContext';
 import excludedTextFieldsSet from '../../containers/EditListingPage/EditListingWizard/EditListingDetailsPanel/excludedTextFieldsSet';
+import isPlatformBrowser from '../../util/isPlatformBrowser.util';
 
 const MAX_SCREEN_WIDTH = 767;
 const identity = v => v;
@@ -26,7 +26,7 @@ const LandingPageHeroSection = injectIntl(props => {
 
   const config = useConfiguration();
   const history = useHistory();
-  const timeZone = getDefaultTimeZoneOnBrowser();
+  const timeZone = moment.tz.guess();
   const dispatch = useDispatch();
   const onManageDisableScrolling = (componentId, disableScrolling) => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
@@ -47,12 +47,14 @@ const LandingPageHeroSection = injectIntl(props => {
   const [location, setLocation] = useState();
   const [locationText, setLocationText] = useState();
 
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [screenWidth, setScreenWidth] = useState(isPlatformBrowser() ? window.innerWidth : null);
 
   useEffect(() => {
-    const handleResize = () => setScreenWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (screenWidth) {
+      const handleResize = () => setScreenWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   useEffect(() => {
@@ -152,6 +154,7 @@ const LandingPageHeroSection = injectIntl(props => {
   };
 
   return (
+    screenWidth &&
     screenWidth < MAX_SCREEN_WIDTH && (
       <div className={css.frame}>
         <div className={css.overlapGroupWrapper}>
