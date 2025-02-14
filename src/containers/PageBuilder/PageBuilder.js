@@ -144,7 +144,7 @@ const PageBuilder = props => {
                     pullDownThreshold={pullDownThreshold}
                   >
                     {assetName === 'landing-page' && <LandingPageHeroSection />}
-                    <SectionBuilder sections={sections} options={options} />
+                    <SectionBuilder assetName={assetName} sections={sections} options={options} />
                   </PullToRefresh>
                 )}
               </Main>
