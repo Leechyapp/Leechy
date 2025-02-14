@@ -166,6 +166,11 @@
   /* ================ PageBuilder ================ */
   /* --carouselWidth will be updated dynamically through JS */
   --carouselWidth: 100vw;
+
+
+  /* ================ IOS Offsets ================ */
+  --isoCushionHeight: 50px;
+  --isoCushionMarginTop: 50px;
 }
 
 /* ================ Global element styles ================ */
