@@ -18,6 +18,7 @@ import { getPredictionAddress, placeBounds } from '../LocationAutocompleteInput/
 import { useConfiguration } from '../../context/configurationContext';
 import excludedTextFieldsSet from '../../containers/EditListingPage/EditListingWizard/EditListingDetailsPanel/excludedTextFieldsSet';
 
+const MAX_SCREEN_WIDTH = 767;
 const identity = v => v;
 
 const LandingPageHeroSection = injectIntl(props => {
@@ -30,7 +31,6 @@ const LandingPageHeroSection = injectIntl(props => {
   const onManageDisableScrolling = (componentId, disableScrolling) => {
     dispatch(manageDisableScrolling(componentId, disableScrolling));
   };
-  console.log('config', config);
 
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
@@ -46,6 +46,14 @@ const LandingPageHeroSection = injectIntl(props => {
   const [prediction, setPrediction] = useState();
   const [location, setLocation] = useState();
   const [locationText, setLocationText] = useState();
+
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (config?.listing?.listingFields) {
@@ -78,7 +86,6 @@ const LandingPageHeroSection = injectIntl(props => {
   };
 
   const redirectToSearchPage = () => {
-    console.log('redirectToSearchPage clicked');
     let bounds;
     if (prediction) {
       const predictionPlaceBounds = placeBounds(prediction);
@@ -105,7 +112,7 @@ const LandingPageHeroSection = injectIntl(props => {
         ? { dates: `${bookingStartDate},${bookingEndDate}` }
         : {}),
     };
-    console.log('searchParams', searchParams);
+
     const searchQuery =
       Object.keys(searchParams).length > 0
         ? '/s?' + new URLSearchParams(searchParams).toString().replace(/,/g, '%2C')
@@ -120,7 +127,6 @@ const LandingPageHeroSection = injectIntl(props => {
   const onBlurLocation = location => {
     if (location && location?.predictions?.length > 0) {
       const firstPrediction = location.predictions[0];
-      console.log(`onBlurLocation`, JSON.stringify(firstPrediction, null, 2));
       setPrediction(firstPrediction);
       setLocationText(firstPrediction['place_name_en-US']);
       setShowLocationModal(false);
@@ -128,7 +134,6 @@ const LandingPageHeroSection = injectIntl(props => {
   };
 
   const onChangeDate = values => {
-    console.log('onChangeDate', values);
     if (values) {
       setInputDate(values);
       if (values.startDate) {
@@ -147,133 +152,135 @@ const LandingPageHeroSection = injectIntl(props => {
   };
 
   return (
-    <div className={css.frame}>
-      <div className={css.overlapGroupWrapper}>
-        <div className={css.overlapGroup}>
-          <div className={css.searchForm}>
-            <div className={css.row}>
-              <div className={css.col12}>
-                <div className={css.watermark}>
-                  <img src={leechyWatermarkImg} />
+    screenWidth < MAX_SCREEN_WIDTH && (
+      <div className={css.frame}>
+        <div className={css.overlapGroupWrapper}>
+          <div className={css.overlapGroup}>
+            <div className={css.searchForm}>
+              <div className={css.row}>
+                <div className={css.col12}>
+                  <div className={css.watermark}>
+                    <img src={leechyWatermarkImg} />
+                  </div>
                 </div>
-              </div>
-              <div className={css.col12}>
-                <div className={css.sloganWrapper}>
-                  <p>
-                    <FormattedMessage id="LandingPageHeroSection.heading" />
-                  </p>
+                <div className={css.col12}>
+                  <div className={css.sloganWrapper}>
+                    <p>
+                      <FormattedMessage id="LandingPageHeroSection.heading" />
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className={css.col12}>
-                <div className={css.locationWrapper} onClick={() => setShowLocationModal(true)}>
-                  {locationText ? (
-                    <div className={css.locationPlaceholder}>{locationText}</div>
-                  ) : (
-                    <div className={css.locationPlaceholder}>
-                      <FormattedMessage id="LandingPageHeroSection.location.placeholder" />
+                <div className={css.col12}>
+                  <div className={css.locationWrapper} onClick={() => setShowLocationModal(true)}>
+                    {locationText ? (
+                      <div className={css.locationPlaceholder}>{locationText}</div>
+                    ) : (
+                      <div className={css.locationPlaceholder}>
+                        <FormattedMessage id="LandingPageHeroSection.location.placeholder" />
+                      </div>
+                    )}
+                    <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
+                  </div>
+                </div>
+                <div className={css.col12}>
+                  <div className={css.datesWrapper} onClick={() => setShowDateModal(true)}>
+                    {selectedDatePlaceholder ? (
+                      <div className={css.datesPlaceholder}>{selectedDatePlaceholder}</div>
+                    ) : (
+                      <div className={css.datesPlaceholder}>
+                        <FormattedMessage id="LandingPageHeroSection.dates.placeholder" />
+                      </div>
+                    )}
+                    <FontAwesomeIcon className={css.icon} icon="calendar" />
+                  </div>
+                </div>
+                <div className={css.col12}>
+                  <div className={css.categoryDropdownWrapper}>
+                    <select
+                      className={css.categoryDropdown}
+                      value={category}
+                      onChange={e => setCategory(e.target.value)}
+                    >
+                      <option value="" className={css.categoryPlaceholder}>
+                        {intl.formatMessage({ id: 'LandingPageHeroSection.category.placeholder' })}
+                      </option>
+                      {categoryList.length > 0 &&
+                        categoryList.map(category => (
+                          <option key={category.key} value={category.key}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+                <div className={css.col12}>
+                  <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
+                    <div className={css.searchButtonText}>
+                      <FormattedMessage id="LandingPageHeroSection.search.button.text" />
                     </div>
-                  )}
-                  <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
-                </div>
-              </div>
-              <div className={css.col12}>
-                <div className={css.datesWrapper} onClick={() => setShowDateModal(true)}>
-                  {selectedDatePlaceholder ? (
-                    <div className={css.datesPlaceholder}>{selectedDatePlaceholder}</div>
-                  ) : (
-                    <div className={css.datesPlaceholder}>
-                      <FormattedMessage id="LandingPageHeroSection.dates.placeholder" />
-                    </div>
-                  )}
-                  <FontAwesomeIcon className={css.icon} icon="calendar" />
-                </div>
-              </div>
-              <div className={css.col12}>
-                <div className={css.categoryDropdownWrapper}>
-                  <select
-                    className={css.categoryDropdown}
-                    value={category}
-                    onChange={e => setCategory(e.target.value)}
-                  >
-                    <option value="" className={css.categoryPlaceholder}>
-                      {intl.formatMessage({ id: 'LandingPageHeroSection.category.placeholder' })}
-                    </option>
-                    {categoryList.length > 0 &&
-                      categoryList.map(category => (
-                        <option key={category.key} value={category.key}>
-                          {category.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-              </div>
-              <div className={css.col12}>
-                <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
-                  <div className={css.searchButtonText}>
-                    <FormattedMessage id="LandingPageHeroSection.search.button.text" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <Modal
+          id="LandingPageHeroSection.locationModal"
+          isOpen={showLocationModal}
+          onClose={() => setShowLocationModal(false)}
+          usePortal={false}
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <FinalForm
+            {...props}
+            onSubmit={() => {}}
+            render={formRenderProps => {
+              const { formId, autoFocus, intl } = formRenderProps;
+              return (
+                <Form className={css.locationModalForm}>
+                  <FieldLocationAutocompleteInput
+                    rootClassName={css.locationAddress}
+                    inputClassName={css.locationAutocompleteInput}
+                    iconClassName={css.locationAutocompleteInputIcon}
+                    predictionsClassName={css.predictionsRoot}
+                    validClassName={css.validLocation}
+                    autoFocus={autoFocus}
+                    name={`${formId}.location`}
+                    label={intl.formatMessage({ id: 'EditListingLocationForm.address' })}
+                    placeholder={intl.formatMessage({
+                      id: 'EditListingLocationForm.addressPlaceholder',
+                    })}
+                    useDefaultPredictions={false}
+                    format={identity}
+                    valueFromForm={location}
+                    input={{
+                      onBlur: location => onBlurLocation(location),
+                      onFocus: () => {},
+                      onChange: location => onChangeLocation(location),
+                    }}
+                  />
+                </Form>
+              );
+            }}
+          />
+        </Modal>
+        <Modal
+          id="LandingPageHeroSection.dateModal"
+          isOpen={showDateModal}
+          onClose={() => setShowDateModal(false)}
+          usePortal={false}
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <DateRangeInput
+            onChange={onChangeDate}
+            onBlur={() => {}}
+            onFocus={() => {}}
+            isOutsideRange={() => {}}
+            value={inputDate}
+          />
+        </Modal>
       </div>
-      <Modal
-        id="LandingPageHeroSection.locationModal"
-        isOpen={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
-        usePortal={false}
-        onManageDisableScrolling={onManageDisableScrolling}
-      >
-        <FinalForm
-          {...props}
-          onSubmit={() => {}}
-          render={formRenderProps => {
-            const { formId, autoFocus, intl } = formRenderProps;
-            return (
-              <Form className={css.locationModalForm}>
-                <FieldLocationAutocompleteInput
-                  rootClassName={css.locationAddress}
-                  inputClassName={css.locationAutocompleteInput}
-                  iconClassName={css.locationAutocompleteInputIcon}
-                  predictionsClassName={css.predictionsRoot}
-                  validClassName={css.validLocation}
-                  autoFocus={autoFocus}
-                  name={`${formId}.location`}
-                  label={intl.formatMessage({ id: 'EditListingLocationForm.address' })}
-                  placeholder={intl.formatMessage({
-                    id: 'EditListingLocationForm.addressPlaceholder',
-                  })}
-                  useDefaultPredictions={false}
-                  format={identity}
-                  valueFromForm={location}
-                  input={{
-                    onBlur: location => onBlurLocation(location),
-                    onFocus: () => {},
-                    onChange: location => onChangeLocation(location),
-                  }}
-                />
-              </Form>
-            );
-          }}
-        />
-      </Modal>
-      <Modal
-        id="LandingPageHeroSection.dateModal"
-        isOpen={showDateModal}
-        onClose={() => setShowDateModal(false)}
-        usePortal={false}
-        onManageDisableScrolling={onManageDisableScrolling}
-      >
-        <DateRangeInput
-          onChange={onChangeDate}
-          onBlur={() => {}}
-          onFocus={() => {}}
-          isOutsideRange={() => {}}
-          value={inputDate}
-        />
-      </Modal>
-    </div>
+    )
   );
 });
 

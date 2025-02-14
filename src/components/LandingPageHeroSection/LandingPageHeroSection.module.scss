@@ -5,7 +5,7 @@
   width: 100%;
 
   .overlapGroupWrapper {
-    background-color: #ffffff;
+    background-color: var(--colorWhite);
     height: 100%;
     max-height: 600px;
     width: 100%;
@@ -24,7 +24,7 @@
         justify-content: center;
         align-items: center;
         margin: 0 auto;
-        padding: 20px 5px 30px 5px;
+        padding: 20px 8px 30px 8px;
 
         .watermark {
           width: 348px;
@@ -36,7 +36,7 @@
         }
 
         .sloganWrapper {
-          color: #ffffff;
+          color: var(--colorWhite);
           font-family: 'Inter', Helvetica;
           font-size: 24px;
           font-weight: 700;
@@ -58,7 +58,7 @@
         }
 
         .locationWrapper {
-          background-color: #ffffff;
+          background-color: var(--colorWhite);
           border-radius: 6px;
           height: 48px;
           margin: 10px auto 0 auto;
@@ -77,6 +77,9 @@
             position: relative;
             top: 14px;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
           }
 
           .icon {
@@ -89,7 +92,7 @@
         }
 
         .datesWrapper {
-          background-color: #ffffff;
+          background-color: var(--colorWhite);
           border-radius: 6px;
           height: 48px;
           margin: 10px auto 0 auto;
@@ -146,6 +149,9 @@
             position: relative;
             top: 13px;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
           }
         }
 
@@ -163,7 +169,7 @@
           }
 
           .searchButtonText {
-            color: white;
+            color: var(--colorWhite);
             text-shadow: -0.5px 0 var(--colorGrey700), 0 0.5px var(--colorGrey700),
               0.5px 0 var(--colorGrey700), 0 -0.5px var(--colorGrey700);
             font-family: 'Inter', Helvetica;
