@@ -271,13 +271,15 @@ const LandingPageHeroSection = injectIntl(props => {
           usePortal={false}
           onManageDisableScrolling={onManageDisableScrolling}
         >
-          <DateRangeInput
-            onChange={onChangeDate}
-            onBlur={() => {}}
-            onFocus={() => {}}
-            isOutsideRange={() => {}}
-            value={inputDate}
-          />
+          <div className={css.dateModalContents}>
+            <DateRangeInput
+              onChange={onChangeDate}
+              onBlur={() => {}}
+              onFocus={() => {}}
+              isOutsideRange={() => {}}
+              value={inputDate}
+            />
+          </div>
         </Modal>
       </div>
     )
