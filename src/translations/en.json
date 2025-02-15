@@ -1189,5 +1189,10 @@
   "NativeBottomNavbar.menuItem.search": "Search",
   "NativeBottomNavbar.menuItem.inbox": "Inbox",
   "NativeBottomNavbar.menuItem.profile": "Profile",
-  "NativeBottomNavbar.menuItem.more": "More"
+  "NativeBottomNavbar.menuItem.more": "More",
+  "LandingPageHeroSection.heading": "The rental marketplace for everyone.",
+  "LandingPageHeroSection.location.placeholder": "Location",
+  "LandingPageHeroSection.dates.placeholder": "Dates",
+  "LandingPageHeroSection.category.placeholder": "Category",
+  "LandingPageHeroSection.search.button.text": "Search"
 }

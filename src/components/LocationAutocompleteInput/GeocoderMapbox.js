@@ -40,7 +40,7 @@ const placeOrigin = prediction => {
   return null;
 };
 
-const placeBounds = prediction => {
+export const placeBounds = prediction => {
   if (prediction) {
     if (Array.isArray(prediction.bbox) && prediction.bbox.length === 4) {
       // Bounds in Mapbox features are represented as [minX, minY, maxX, maxY]
@@ -61,6 +61,15 @@ const placeBounds = prediction => {
     }
   }
   return null;
+};
+
+export const getPredictionAddress = prediction => {
+  if (prediction.predictionPlace) {
+    // default prediction defined above
+    return prediction.predictionPlace.address;
+  }
+  // prediction from Mapbox geocoding API
+  return prediction.place_name;
 };
 
 export const GeocoderAttribution = () => null;
