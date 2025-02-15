@@ -17,11 +17,14 @@ import { getPredictionAddress, placeBounds } from '../LocationAutocompleteInput/
 import { useConfiguration } from '../../context/configurationContext';
 import excludedTextFieldsSet from '../../containers/EditListingPage/EditListingWizard/EditListingDetailsPanel/excludedTextFieldsSet';
 import isPlatformBrowser from '../../util/isPlatformBrowser.util';
+import isNativePlatform from '../../util/isNativePlatform';
 
 const MAX_SCREEN_WIDTH = 767;
 const identity = v => v;
 
 const LandingPageHeroSection = injectIntl(props => {
+  if (!isNativePlatform) return null;
+
   const { intl } = props;
 
   const config = useConfiguration();

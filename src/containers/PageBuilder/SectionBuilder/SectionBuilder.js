@@ -17,6 +17,7 @@ import SectionHero from './SectionHero';
 import css from './SectionBuilder.module.css';
 import SectionFooter from './SectionFooter';
 import isPlatformBrowser from '../../../util/isPlatformBrowser.util';
+import isNativePlatform from '../../../util/isNativePlatform';
 
 // These are shared classes.
 // Use these to have consistent styles between different section components
@@ -102,7 +103,7 @@ const SectionBuilder = props => {
         const classes = classNames({ [css.darkTheme]: isDarkTheme });
         const sectionId = getUniqueSectionId(section.sectionId, index);
 
-        if (screenWidth && assetName === 'landing-page') {
+        if (isNativePlatform && screenWidth && assetName === 'landing-page') {
           if (section?.sectionName === 'Marketplace introduction') {
             if (screenWidth < MIN_SCREEN_WIDTH_LANDING_PAGE_HERO) {
               return null;
