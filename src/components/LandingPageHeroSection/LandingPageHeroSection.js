@@ -16,10 +16,10 @@ import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../LocationAutocompleteInput/GeocoderMapbox';
 import { useConfiguration } from '../../context/configurationContext';
 import excludedTextFieldsSet from '../../containers/EditListingPage/EditListingWizard/EditListingDetailsPanel/excludedTextFieldsSet';
-import isPlatformBrowser from '../../util/isPlatformBrowser.util';
+// import isPlatformBrowser from '../../util/isPlatformBrowser.util';
 import isNativePlatform from '../../util/isNativePlatform';
 
-const MAX_SCREEN_WIDTH = 767;
+// const MAX_SCREEN_WIDTH = 767;
 const identity = v => v;
 
 const LandingPageHeroSection = injectIntl(props => {
@@ -50,15 +50,14 @@ const LandingPageHeroSection = injectIntl(props => {
   const [location, setLocation] = useState();
   const [locationText, setLocationText] = useState();
 
-  const [screenWidth, setScreenWidth] = useState(isPlatformBrowser() ? window.innerWidth : null);
-
-  useEffect(() => {
-    if (screenWidth) {
-      const handleResize = () => setScreenWidth(window.innerWidth);
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
+  // const [screenWidth, setScreenWidth] = useState(isPlatformBrowser() ? window.innerWidth : null);
+  // useEffect(() => {
+  //   if (screenWidth) {
+  //     const handleResize = () => setScreenWidth(window.innerWidth);
+  //     window.addEventListener('resize', handleResize);
+  //     return () => window.removeEventListener('resize', handleResize);
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (config?.listing?.listingFields) {
@@ -157,8 +156,7 @@ const LandingPageHeroSection = injectIntl(props => {
   };
 
   return (
-    screenWidth &&
-    screenWidth < MAX_SCREEN_WIDTH && (
+    isNativePlatform && (
       <div className={css.frame}>
         <div className={css.overlapGroupWrapper}>
           <div className={css.overlapGroup}>
