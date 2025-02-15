@@ -18,6 +18,7 @@ import { useConfiguration } from '../../context/configurationContext';
 import excludedTextFieldsSet from '../../containers/EditListingPage/EditListingWizard/EditListingDetailsPanel/excludedTextFieldsSet';
 // import isPlatformBrowser from '../../util/isPlatformBrowser.util';
 import isNativePlatform from '../../util/isNativePlatform';
+import isIOSPlatform from '../../util/isIOSPlatform';
 
 // const MAX_SCREEN_WIDTH = 767;
 const identity = v => v;
@@ -156,6 +157,13 @@ const LandingPageHeroSection = injectIntl(props => {
     }
   };
 
+  const iosCushion = isIOSPlatform && (
+    <>
+      <br />
+      <br />
+    </>
+  );
+
   return (
     isNativePlatform && (
       <div className={css.frame}>
@@ -233,7 +241,7 @@ const LandingPageHeroSection = injectIntl(props => {
           id="LandingPageHeroSection.locationModal"
           isOpen={showLocationModal}
           onClose={() => setShowLocationModal(false)}
-          usePortal={false}
+          usePortal
           onManageDisableScrolling={onManageDisableScrolling}
         >
           <FinalForm
@@ -242,29 +250,32 @@ const LandingPageHeroSection = injectIntl(props => {
             render={formRenderProps => {
               const { formId, autoFocus, intl } = formRenderProps;
               return (
-                <Form className={css.locationModalForm}>
-                  <FieldLocationAutocompleteInput
-                    rootClassName={css.locationAddress}
-                    inputClassName={css.locationAutocompleteInput}
-                    iconClassName={css.locationAutocompleteInputIcon}
-                    predictionsClassName={css.predictionsRoot}
-                    validClassName={css.validLocation}
-                    autoFocus={autoFocus}
-                    name={`${formId}.location`}
-                    label={intl.formatMessage({ id: 'EditListingLocationForm.address' })}
-                    placeholder={intl.formatMessage({
-                      id: 'EditListingLocationForm.addressPlaceholder',
-                    })}
-                    useDefaultPredictions={false}
-                    format={identity}
-                    valueFromForm={location}
-                    input={{
-                      onBlur: location => onBlurLocation(location),
-                      onFocus: () => {},
-                      onChange: location => onChangeLocation(location),
-                    }}
-                  />
-                </Form>
+                <>
+                  {iosCushion}
+                  <Form className={css.locationModalForm}>
+                    <FieldLocationAutocompleteInput
+                      rootClassName={css.locationAddress}
+                      inputClassName={css.locationAutocompleteInput}
+                      iconClassName={css.locationAutocompleteInputIcon}
+                      predictionsClassName={css.predictionsRoot}
+                      validClassName={css.validLocation}
+                      autoFocus={autoFocus}
+                      name={`${formId}.location`}
+                      label={intl.formatMessage({ id: 'EditListingLocationForm.address' })}
+                      placeholder={intl.formatMessage({
+                        id: 'EditListingLocationForm.addressPlaceholder',
+                      })}
+                      useDefaultPredictions={false}
+                      format={identity}
+                      valueFromForm={location}
+                      input={{
+                        onBlur: location => onBlurLocation(location),
+                        onFocus: () => {},
+                        onChange: location => onChangeLocation(location),
+                      }}
+                    />
+                  </Form>
+                </>
               );
             }}
           />
@@ -273,10 +284,11 @@ const LandingPageHeroSection = injectIntl(props => {
           id="LandingPageHeroSection.dateModal"
           isOpen={showDateModal}
           onClose={() => setShowDateModal(false)}
-          usePortal={false}
+          usePortal
           onManageDisableScrolling={onManageDisableScrolling}
         >
           <div className={css.dateModalContents}>
+            {iosCushion}
             <DateRangeInput
               onChange={onChangeDate}
               onBlur={() => {}}
