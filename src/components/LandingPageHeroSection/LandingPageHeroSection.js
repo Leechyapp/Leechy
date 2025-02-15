@@ -72,6 +72,7 @@ const LandingPageHeroSection = injectIntl(props => {
           });
         }
       });
+      listingCategories.sort((a, b) => (a.key > b.key ? 1 : -1));
       setCategoryList(listingCategories);
     }
   }, []);
