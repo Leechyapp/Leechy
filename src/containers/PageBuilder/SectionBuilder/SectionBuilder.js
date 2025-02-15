@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { arrayOf, bool, func, node, oneOf, shape, string } from 'prop-types';
 import classNames from 'classnames';
 
@@ -16,6 +16,8 @@ import SectionHero from './SectionHero';
 // TODO: alternatively, we could consider more in-place way of theming components
 import css from './SectionBuilder.module.css';
 import SectionFooter from './SectionFooter';
+// import isPlatformBrowser from '../../../util/isPlatformBrowser.util';
+import isNativePlatform from '../../../util/isNativePlatform';
 
 // These are shared classes.
 // Use these to have consistent styles between different section components
@@ -41,12 +43,14 @@ const defaultSectionComponents = {
   hero: { component: SectionHero },
 };
 
+const MIN_SCREEN_WIDTH_LANDING_PAGE_HERO = 768;
+
 //////////////////////
 // Section builder //
 //////////////////////
 
 const SectionBuilder = props => {
-  const { sections, options } = props;
+  const { assetName, sections, options } = props;
   const { sectionComponents = {}, isInsideContainer, ...otherOption } = options || {};
 
   // If there's no sections, we can't render the correct section component
@@ -78,6 +82,15 @@ const SectionBuilder = props => {
     }
   };
 
+  // const [screenWidth, setScreenWidth] = useState(isPlatformBrowser() ? window.innerWidth : null);
+  // useEffect(() => {
+  //   if (screenWidth) {
+  //     const handleResize = () => setScreenWidth(window.innerWidth);
+  //     window.addEventListener('resize', handleResize);
+  //     return () => window.removeEventListener('resize', handleResize);
+  //   }
+  // }, []);
+
   return (
     <>
       {sections.map((section, index) => {
@@ -89,6 +102,15 @@ const SectionBuilder = props => {
           section?.appearance?.textColor === 'white';
         const classes = classNames({ [css.darkTheme]: isDarkTheme });
         const sectionId = getUniqueSectionId(section.sectionId, index);
+
+        // if (isNativePlatform && screenWidth && assetName === 'landing-page') {
+        if (isNativePlatform && assetName === 'landing-page') {
+          if (section?.sectionName === 'Marketplace introduction') {
+            // if (screenWidth < MIN_SCREEN_WIDTH_LANDING_PAGE_HERO) {
+            return null;
+            // }
+          }
+        }
 
         if (Section) {
           return (

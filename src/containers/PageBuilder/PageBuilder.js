@@ -12,6 +12,7 @@ import StaticPage from './StaticPage.js';
 import css from './PageBuilder.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
+import LandingPageHeroSection from '../../components/LandingPageHeroSection/LandingPageHeroSection.js';
 
 const getMetadata = (meta, schemaType, fieldOptions) => {
   const { pageTitle, pageDescription, socialSharing } = meta;
@@ -142,7 +143,8 @@ const PageBuilder = props => {
                     resistance={resistance}
                     pullDownThreshold={pullDownThreshold}
                   >
-                    <SectionBuilder sections={sections} options={options} />
+                    {assetName === 'landing-page' && <LandingPageHeroSection />}
+                    <SectionBuilder assetName={assetName} sections={sections} options={options} />
                   </PullToRefresh>
                 )}
               </Main>
