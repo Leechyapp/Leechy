@@ -15,13 +15,29 @@ import DateRangeInput from '../FieldDateRangeInput/DateRangeInput';
 import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../LocationAutocompleteInput/GeocoderMapbox';
 import { useConfiguration } from '../../context/configurationContext';
-import excludedTextFieldsSet from '../../containers/EditListingPage/EditListingWizard/EditListingDetailsPanel/excludedTextFieldsSet';
 // import isPlatformBrowser from '../../util/isPlatformBrowser.util';
 import isNativePlatform from '../../util/isNativePlatform';
 import isIOSPlatform from '../../util/isIOSPlatform';
 
 // const MAX_SCREEN_WIDTH = 767;
 const identity = v => v;
+
+const listingCategoriesSet = new Set();
+const listingCategoriesArr = [
+  'books',
+  'electronics',
+  'furniture',
+  'menswear',
+  'outdoors',
+  'party',
+  'self_storage',
+  'sports',
+  'toysgames',
+  'transportation',
+  'womenswear',
+  'workout',
+];
+listingCategoriesArr.forEach(f => listingCategoriesSet.add(f));
 
 const LandingPageHeroSection = injectIntl(props => {
   if (!isNativePlatform) return null;
@@ -63,8 +79,7 @@ const LandingPageHeroSection = injectIntl(props => {
   useEffect(() => {
     if (config?.listing?.listingFields) {
       const listingFields = config.listing.listingFields;
-      const listingCategoriesSet = excludedTextFieldsSet;
-      const listingCategories = [];
+      const listingCategories = [{ key: 'tools-machinery', name: 'Tools & Machinery' }];
       listingFields.forEach(listingField => {
         if (listingCategoriesSet.has(listingField.key)) {
           listingCategories.push({
