@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import css from './LandingPageHeroSectionMobile.module.scss';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import leechyWatermarkImg from './assets/leechy-watermark.png';
+import leechyWatermarkImg from '../assets/leechy-watermark.png';
 import Modal from '../../Modal/Modal';
 import { manageDisableScrolling } from '../../../ducks/ui.duck';
 import { useDispatch } from 'react-redux';
@@ -15,31 +15,12 @@ import DateRangeInput from '../../FieldDateRangeInput/DateRangeInput';
 import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../../LocationAutocompleteInput/GeocoderMapbox';
 import { useConfiguration } from '../../../context/configurationContext';
-import isNativePlatform from '../../../util/isNativePlatform';
 import isIOSPlatform from '../../../util/isIOSPlatform';
+import listingCategoriesSet from '../assets/listingCategoriesSet';
 
 const identity = v => v;
 
-const listingCategoriesSet = new Set();
-const listingCategoriesArr = [
-  'books',
-  'electronics',
-  'furniture',
-  'menswear',
-  'outdoors',
-  'party',
-  'self_storage',
-  'sports',
-  'toysgames',
-  'transportation',
-  'womenswear',
-  'workout',
-];
-listingCategoriesArr.forEach(f => listingCategoriesSet.add(f));
-
 const LandingPageHeroSectionMobile = injectIntl(props => {
-  if (!isNativePlatform) return null;
-
   const { intl } = props;
 
   const config = useConfiguration();
@@ -169,141 +150,139 @@ const LandingPageHeroSectionMobile = injectIntl(props => {
   );
 
   return (
-    isNativePlatform && (
-      <div className={css.frame}>
-        <div className={css.overlapGroupWrapper}>
-          <div className={css.overlapGroup}>
-            <div className={css.searchForm}>
-              <div className={css.row}>
-                <div className={css.col12}>
-                  <div className={css.watermark}>
-                    <img src={leechyWatermarkImg} />
-                  </div>
+    <div className={css.frame}>
+      <div className={css.overlapGroupWrapper}>
+        <div className={css.overlapGroup}>
+          <div className={css.searchForm}>
+            <div className={css.row}>
+              <div className={css.col12}>
+                <div className={css.watermark}>
+                  <img src={leechyWatermarkImg} />
                 </div>
-                <div className={css.col12}>
-                  <div className={css.sloganWrapper}>
-                    <p>
-                      <FormattedMessage id="LandingPageHeroSection.heading" />
-                    </p>
-                  </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.sloganWrapper}>
+                  <p>
+                    <FormattedMessage id="LandingPageHeroSection.heading" />
+                  </p>
                 </div>
-                <div className={css.col12}>
-                  <div className={css.locationWrapper} onClick={() => setShowLocationModal(true)}>
-                    {locationText ? (
-                      <div className={css.locationPlaceholder}>{locationText}</div>
-                    ) : (
-                      <div className={css.locationPlaceholder}>
-                        <FormattedMessage id="LandingPageHeroSection.location.placeholder" />
-                      </div>
-                    )}
-                    <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
-                  </div>
-                </div>
-                <div className={css.col12}>
-                  <div className={css.datesWrapper} onClick={() => setShowDateModal(true)}>
-                    {selectedDatePlaceholder ? (
-                      <div className={css.datesPlaceholder}>{selectedDatePlaceholder}</div>
-                    ) : (
-                      <div className={css.datesPlaceholder}>
-                        <FormattedMessage id="LandingPageHeroSection.dates.placeholder" />
-                      </div>
-                    )}
-                    <FontAwesomeIcon className={css.icon} icon="calendar" />
-                  </div>
-                </div>
-                <div className={css.col12}>
-                  <div className={css.categoryDropdownWrapper}>
-                    <select
-                      className={css.categoryDropdown}
-                      value={category}
-                      onChange={e => setCategory(e.target.value)}
-                    >
-                      <option value="" className={css.categoryPlaceholder}>
-                        {intl.formatMessage({ id: 'LandingPageHeroSection.category.placeholder' })}
-                      </option>
-                      {categoryList.length > 0 &&
-                        categoryList.map(category => (
-                          <option key={category.key} value={category.key}>
-                            {category.name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                </div>
-                <div className={css.col12}>
-                  <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
-                    <div className={css.searchButtonText}>
-                      <FormattedMessage id="LandingPageHeroSection.search.button.text" />
+              </div>
+              <div className={css.col12}>
+                <div className={css.locationWrapper} onClick={() => setShowLocationModal(true)}>
+                  {locationText ? (
+                    <div className={css.locationPlaceholder}>{locationText}</div>
+                  ) : (
+                    <div className={css.locationPlaceholder}>
+                      <FormattedMessage id="LandingPageHeroSection.location.placeholder" />
                     </div>
+                  )}
+                  <FontAwesomeIcon className={css.icon} icon="map-marker-alt" />
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.datesWrapper} onClick={() => setShowDateModal(true)}>
+                  {selectedDatePlaceholder ? (
+                    <div className={css.datesPlaceholder}>{selectedDatePlaceholder}</div>
+                  ) : (
+                    <div className={css.datesPlaceholder}>
+                      <FormattedMessage id="LandingPageHeroSection.dates.placeholder" />
+                    </div>
+                  )}
+                  <FontAwesomeIcon className={css.icon} icon="calendar" />
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.categoryDropdownWrapper}>
+                  <select
+                    className={css.categoryDropdown}
+                    value={category}
+                    onChange={e => setCategory(e.target.value)}
+                  >
+                    <option value="" className={css.categoryPlaceholder}>
+                      {intl.formatMessage({ id: 'LandingPageHeroSection.category.placeholder' })}
+                    </option>
+                    {categoryList.length > 0 &&
+                      categoryList.map(category => (
+                        <option key={category.key} value={category.key}>
+                          {category.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </div>
+              <div className={css.col12}>
+                <div className={css.searchButton} onClick={() => redirectToSearchPage()}>
+                  <div className={css.searchButtonText}>
+                    <FormattedMessage id="LandingPageHeroSection.search.button.text" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <Modal
-          id="LandingPageHeroSection.locationModal"
-          isOpen={showLocationModal}
-          onClose={() => setShowLocationModal(false)}
-          usePortal
-          onManageDisableScrolling={onManageDisableScrolling}
-        >
-          <FinalForm
-            {...props}
-            onSubmit={() => {}}
-            render={formRenderProps => {
-              const { formId, autoFocus, intl } = formRenderProps;
-              return (
-                <>
-                  {iosCushion}
-                  <Form className={css.locationModalForm}>
-                    <FieldLocationAutocompleteInput
-                      rootClassName={css.locationAddress}
-                      inputClassName={css.locationAutocompleteInput}
-                      iconClassName={css.locationAutocompleteInputIcon}
-                      predictionsClassName={css.predictionsRoot}
-                      validClassName={css.validLocation}
-                      autoFocus={autoFocus}
-                      name={`${formId}.location`}
-                      label={intl.formatMessage({ id: 'EditListingLocationForm.address' })}
-                      placeholder={intl.formatMessage({
-                        id: 'EditListingLocationForm.addressPlaceholder',
-                      })}
-                      useDefaultPredictions={false}
-                      format={identity}
-                      valueFromForm={location}
-                      input={{
-                        onBlur: location => onBlurLocation(location),
-                        onFocus: () => {},
-                        onChange: location => onChangeLocation(location),
-                      }}
-                    />
-                  </Form>
-                </>
-              );
-            }}
-          />
-        </Modal>
-        <Modal
-          id="LandingPageHeroSection.dateModal"
-          isOpen={showDateModal}
-          onClose={() => setShowDateModal(false)}
-          usePortal
-          onManageDisableScrolling={onManageDisableScrolling}
-        >
-          <div className={css.dateModalContents}>
-            {iosCushion}
-            <DateRangeInput
-              onChange={onChangeDate}
-              onBlur={() => {}}
-              onFocus={() => {}}
-              isOutsideRange={() => {}}
-              value={inputDate}
-            />
-          </div>
-        </Modal>
       </div>
-    )
+      <Modal
+        id="LandingPageHeroSection.locationModal"
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        usePortal
+        onManageDisableScrolling={onManageDisableScrolling}
+      >
+        <FinalForm
+          {...props}
+          onSubmit={() => {}}
+          render={formRenderProps => {
+            const { formId, autoFocus, intl } = formRenderProps;
+            return (
+              <>
+                {iosCushion}
+                <Form className={css.locationModalForm}>
+                  <FieldLocationAutocompleteInput
+                    rootClassName={css.locationAddress}
+                    inputClassName={css.locationAutocompleteInput}
+                    iconClassName={css.locationAutocompleteInputIcon}
+                    predictionsClassName={css.predictionsRoot}
+                    validClassName={css.validLocation}
+                    autoFocus={autoFocus}
+                    name={`${formId}.location`}
+                    label={intl.formatMessage({ id: 'EditListingLocationForm.address' })}
+                    placeholder={intl.formatMessage({
+                      id: 'EditListingLocationForm.addressPlaceholder',
+                    })}
+                    useDefaultPredictions={false}
+                    format={identity}
+                    valueFromForm={location}
+                    input={{
+                      onBlur: location => onBlurLocation(location),
+                      onFocus: () => {},
+                      onChange: location => onChangeLocation(location),
+                    }}
+                  />
+                </Form>
+              </>
+            );
+          }}
+        />
+      </Modal>
+      <Modal
+        id="LandingPageHeroSection.dateModal"
+        isOpen={showDateModal}
+        onClose={() => setShowDateModal(false)}
+        usePortal
+        onManageDisableScrolling={onManageDisableScrolling}
+      >
+        <div className={css.dateModalContents}>
+          {iosCushion}
+          <DateRangeInput
+            onChange={onChangeDate}
+            onBlur={() => {}}
+            onFocus={() => {}}
+            isOutsideRange={() => {}}
+            value={inputDate}
+          />
+        </div>
+      </Modal>
+    </div>
   );
 });
 
