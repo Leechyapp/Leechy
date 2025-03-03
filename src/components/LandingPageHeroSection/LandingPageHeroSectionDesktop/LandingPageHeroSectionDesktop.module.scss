@@ -1,5 +1,5 @@
-@import '../../styles/customMediaQueries.css';
-@import '../../styles/gridDefaults.scss';
+@import '../../../styles/customMediaQueries.css';
+@import '../../../styles/gridDefaults.scss';
 
 $placeholderGrey: #4a4a4e;
 
@@ -38,13 +38,11 @@ $placeholderGrey: #4a4a4e;
   width: 100%;
 
   .overlapGroupWrapper {
-    background-color: var(--colorWhite);
-    height: 100%;
     min-height: 700px;
     width: 100%;
 
     .overlapGroup {
-      background-image: url('./assets/leechy-home-hero-background.png');
+      background-image: url('../assets/leechy-home-hero-background.png');
       background-position: 50% 50%;
       background-size: cover;
       height: 100%;
