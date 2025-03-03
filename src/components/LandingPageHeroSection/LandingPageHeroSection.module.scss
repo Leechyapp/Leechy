@@ -1,13 +1,15 @@
+@import '../../styles/customMediaQueries.css';
+
 .landingPageHeroSectionMobile {
   display: block;
-  @media (--viewportMedium) {
+  @media (--viewportLarge) {
     display: none;
   }
 }
 
 .landingPageHeroSectionDesktop {
   display: none;
-  @media (--viewportMedium) {
+  @media (--viewportLarge) {
     display: block;
   }
 }
