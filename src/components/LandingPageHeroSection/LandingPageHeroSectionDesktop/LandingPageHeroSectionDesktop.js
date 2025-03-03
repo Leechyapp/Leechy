@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import css from './LandingPageHeroSectionDesktop.module.scss';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import leechyWatermarkImg from './assets/leechy-watermark.png';
+import leechyWatermarkImg from '../assets/leechy-watermark.png';
 import Modal from '../../Modal/Modal';
 import { manageDisableScrolling } from '../../../ducks/ui.duck';
 import { useDispatch } from 'react-redux';
@@ -15,27 +15,9 @@ import DateRangeInput from '../../FieldDateRangeInput/DateRangeInput';
 import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../../LocationAutocompleteInput/GeocoderMapbox';
 import { useConfiguration } from '../../../context/configurationContext';
-import isNativePlatform from '../../../util/isNativePlatform';
-import isIOSPlatform from '../../../util/isIOSPlatform';
+import listingCategoriesSet from '../assets/listingCategoriesSet';
 
 const identity = v => v;
-
-const listingCategoriesSet = new Set();
-const listingCategoriesArr = [
-  'books',
-  'electronics',
-  'furniture',
-  'menswear',
-  'outdoors',
-  'party',
-  'self_storage',
-  'sports',
-  'toysgames',
-  'transportation',
-  'womenswear',
-  'workout',
-];
-listingCategoriesArr.forEach(f => listingCategoriesSet.add(f));
 
 const LandingPageHeroSectionDesktop = injectIntl(props => {
   const { intl } = props;
