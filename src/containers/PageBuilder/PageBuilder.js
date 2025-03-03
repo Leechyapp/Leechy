@@ -12,8 +12,8 @@ import StaticPage from './StaticPage.js';
 import css from './PageBuilder.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
-import LandingPageHeroSectionMobile from '../../components/LandingPageHeroSection/LandingPageHeroSectionMobile.js';
-import LandingPageHeroSectionDesktop from '../../components/LandingPageHeroSection/LandingPageHeroSectionDesktop.js';
+import LandingPageHeroSectionMobile from '../../components/LandingPageHeroSection/LandingPageHeroSectionMobile/LandingPageHeroSectionMobile.js';
+import LandingPageHeroSectionDesktop from '../../components/LandingPageHeroSection/LandingPageHeroSectionDesktop/LandingPageHeroSectionDesktop.js';
 
 const getMetadata = (meta, schemaType, fieldOptions) => {
   const { pageTitle, pageDescription, socialSharing } = meta;
