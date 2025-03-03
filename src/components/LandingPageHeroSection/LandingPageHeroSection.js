@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import css from './LandingPageHeroSection.module.scss';
+import css from './LandingPageHeroSectionMobile.module.scss';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import leechyWatermarkImg from './assets/leechy-watermark.png';
