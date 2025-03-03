@@ -39,7 +39,7 @@ const listingCategoriesArr = [
 ];
 listingCategoriesArr.forEach(f => listingCategoriesSet.add(f));
 
-const LandingPageHeroSection = injectIntl(props => {
+const LandingPageHeroSectionMobile = injectIntl(props => {
   if (!isNativePlatform) return null;
 
   const { intl } = props;
@@ -318,4 +318,4 @@ const LandingPageHeroSection = injectIntl(props => {
   );
 });
 
-export default LandingPageHeroSection;
+export default LandingPageHeroSectionMobile;
