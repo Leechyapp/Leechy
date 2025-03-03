@@ -1,0 +1,13 @@
+.landingPageHeroSectionMobile {
+  display: block;
+  @media (--viewportMedium) {
+    display: none;
+  }
+}
+
+.landingPageHeroSectionDesktop {
+  display: none;
+  @media (--viewportMedium) {
+    display: block;
+  }
+}
