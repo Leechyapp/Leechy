@@ -12,7 +12,7 @@ import StaticPage from './StaticPage.js';
 import css from './PageBuilder.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
-import LandingPageHeroSection from '../../components/LandingPageHeroSection/LandingPageHeroSection.js';
+import LandingPageHeroSectionMobile from '../../components/LandingPageHeroSection/LandingPageHeroSectionMobile.js';
 import LandingPageHeroSectionDesktop from '../../components/LandingPageHeroSection/LandingPageHeroSectionDesktop.js';
 
 const getMetadata = (meta, schemaType, fieldOptions) => {
@@ -146,7 +146,7 @@ const PageBuilder = props => {
                   >
                     {assetName === 'landing-page' && (
                       <>
-                        <LandingPageHeroSection />
+                        <LandingPageHeroSectionMobile />
                         <LandingPageHeroSectionDesktop />
                       </>
                     )}
