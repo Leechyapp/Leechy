@@ -1,6 +1,8 @@
 @import '../../styles/customMediaQueries.css';
 @import '../../styles/gridDefaults.scss';
 
+$placeholderGrey: #4a4a4e;
+
 .frame {
   width: 100%;
 
@@ -47,7 +49,7 @@
           max-width: 348px;
 
           p {
-            color: #ffffff;
+            color: var(--colorWhite);
             font-family: 'Inter', Helvetica;
             font-size: 16px;
             font-weight: 700;
@@ -67,7 +69,7 @@
           cursor: pointer;
 
           .locationPlaceholder {
-            color: #4a4a4e;
+            color: $placeholderGrey;
             font-family: 'Inter', Helvetica;
             font-size: 16px;
             font-weight: 400;
@@ -101,7 +103,7 @@
           cursor: pointer;
 
           .datesPlaceholder {
-            color: #4a4a4e;
+            color: $placeholderGrey;
             font-family: 'Inter', Helvetica;
             font-size: 16px;
             font-weight: 400;
@@ -139,7 +141,7 @@
           }
 
           .categoryPlaceholder {
-            color: #4a4a4e;
+            color: $placeholderGrey;
             font-family: 'Inter', Helvetica;
             font-size: 16px;
             font-weight: 400;

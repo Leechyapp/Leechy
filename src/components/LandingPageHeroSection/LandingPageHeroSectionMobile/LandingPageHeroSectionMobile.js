@@ -15,11 +15,9 @@ import DateRangeInput from '../../FieldDateRangeInput/DateRangeInput';
 import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../../LocationAutocompleteInput/GeocoderMapbox';
 import { useConfiguration } from '../../../context/configurationContext';
-// import isPlatformBrowser from '../../util/isPlatformBrowser.util';
 import isNativePlatform from '../../../util/isNativePlatform';
 import isIOSPlatform from '../../../util/isIOSPlatform';
 
-// const MAX_SCREEN_WIDTH = 767;
 const identity = v => v;
 
 const listingCategoriesSet = new Set();
@@ -66,15 +64,6 @@ const LandingPageHeroSectionMobile = injectIntl(props => {
   const [prediction, setPrediction] = useState();
   const [location, setLocation] = useState();
   const [locationText, setLocationText] = useState();
-
-  // const [screenWidth, setScreenWidth] = useState(isPlatformBrowser() ? window.innerWidth : null);
-  // useEffect(() => {
-  //   if (screenWidth) {
-  //     const handleResize = () => setScreenWidth(window.innerWidth);
-  //     window.addEventListener('resize', handleResize);
-  //     return () => window.removeEventListener('resize', handleResize);
-  //   }
-  // }, []);
 
   useEffect(() => {
     if (config?.listing?.listingFields) {
