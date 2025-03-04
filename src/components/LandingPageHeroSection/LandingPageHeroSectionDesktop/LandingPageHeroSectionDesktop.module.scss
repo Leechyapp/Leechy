@@ -1,17 +1,18 @@
 @import '../../../styles/customMediaQueries.css';
 @import '../../../styles/gridDefaults.scss';
 
+$maxContentWidth: 1200px;
 $placeholderGrey: #4a4a4e;
 
 .baseInputWrapper {
   background-color: var(--colorWhite);
   height: 48px;
   margin: 10px auto 0 auto;
-  width: 100%;
-  max-width: 348px;
+  width: 98%;
   border: 1px solid var(--colorGrey400);
   border-radius: 6px;
   cursor: pointer;
+  margin-right: 5px;
 }
 
 .colInputs {
@@ -64,7 +65,7 @@ $placeholderGrey: #4a4a4e;
 
           .headerWrapper {
             width: 100%;
-            max-width: 1198px;
+            max-width: $maxContentWidth;
             margin: 0 auto;
             padding: 0 10px;
             margin-bottom: 15px;
@@ -102,7 +103,7 @@ $placeholderGrey: #4a4a4e;
             margin: 0 auto;
             border-radius: 15px;
             min-height: 80px;
-            max-width: 1198px;
+            max-width: $maxContentWidth;
             width: 100%;
             padding: 5px 25px;
 
