@@ -17,6 +17,7 @@ import { getPredictionAddress, placeBounds } from '../../LocationAutocompleteInp
 import { useConfiguration } from '../../../context/configurationContext';
 import isIOSPlatform from '../../../util/isIOSPlatform';
 import listingCategoriesSet from '../assets/listingCategoriesSet';
+import HeroSectionDateRangeFilterInput from '../HeroSectionDateRangeFilterInput/HeroSectionDateRangeFilterInput';
 
 const identity = v => v;
 
@@ -271,16 +272,11 @@ const LandingPageHeroSectionMobile = injectIntl(props => {
         usePortal
         onManageDisableScrolling={onManageDisableScrolling}
       >
-        <div className={css.dateModalContents}>
-          {iosCushion}
-          <DateRangeInput
-            onChange={onChangeDate}
-            onBlur={() => {}}
-            onFocus={() => {}}
-            isOutsideRange={() => {}}
-            value={inputDate}
-          />
-        </div>
+        <HeroSectionDateRangeFilterInput
+          onChangeDate={onChangeDate}
+          inputDate={inputDate}
+          iosCushion={iosCushion}
+        />
       </Modal>
     </div>
   );
