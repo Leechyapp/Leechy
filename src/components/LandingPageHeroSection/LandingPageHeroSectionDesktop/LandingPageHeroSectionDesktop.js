@@ -11,11 +11,11 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { Form as FinalForm } from 'react-final-form';
 import Form from '../../Form/Form';
 import momentTz from 'moment-timezone';
-import DateRangeInput from '../../FieldDateRangeInput/DateRangeInput';
 import moment from 'moment-timezone';
 import { getPredictionAddress, placeBounds } from '../../LocationAutocompleteInput/GeocoderMapbox';
 import { useConfiguration } from '../../../context/configurationContext';
 import listingCategoriesSet from '../assets/listingCategoriesSet';
+import HeroSectionDateRangeFilterInput from '../HeroSectionDateRangeFilterInput/HeroSectionDateRangeFilterInput';
 
 const identity = v => v;
 
@@ -272,15 +272,7 @@ const LandingPageHeroSectionDesktop = injectIntl(props => {
         usePortal
         onManageDisableScrolling={onManageDisableScrolling}
       >
-        <div className={css.dateModalContents}>
-          <DateRangeInput
-            onChange={onChangeDate}
-            onBlur={() => {}}
-            onFocus={() => {}}
-            isOutsideRange={() => {}}
-            value={inputDate}
-          />
-        </div>
+        <HeroSectionDateRangeFilterInput onChangeDate={onChangeDate} inputDate={inputDate} />
       </Modal>
     </div>
   );
