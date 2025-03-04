@@ -1,0 +1,252 @@
+@import '../../../styles/customMediaQueries.css';
+@import '../../../styles/gridDefaults.scss';
+
+$maxContentWidth: 1200px;
+$placeholderGrey: #4a4a4e;
+
+.baseInputWrapper {
+  background-color: var(--colorWhite);
+  height: 48px;
+  margin: 10px auto 0 auto;
+  width: 98%;
+  border: 1px solid var(--colorGrey400);
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.colInputs {
+  flex: $flexColDefault;
+  width: 100%;
+  @media (--viewportLarge) {
+    width: 30%;
+  }
+}
+
+.colSearchButton {
+  flex: $flexColDefault;
+  width: 100%;
+  @media (--viewportLarge) {
+    width: 10%;
+  }
+}
+
+.frame {
+  background-color: var(--colorWhite);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+
+  .overlapGroupWrapper {
+    min-height: 700px;
+    width: 100%;
+
+    .overlapGroup {
+      background-image: url('../assets/leechy-home-hero-background.png');
+      background-position: 50% 50%;
+      background-size: cover;
+      height: 100%;
+
+      .backdropWrapper {
+        background-color: #1f1f1f80;
+        height: 100%;
+        width: 100%;
+
+        .contentWrapper {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          margin: auto;
+          padding: 20px 8px 30px 8px;
+          position: relative;
+          top: 14%;
+
+          .headerWrapper {
+            width: 100%;
+            max-width: $maxContentWidth;
+            margin: 0 auto;
+            padding: 0 10px;
+            margin-bottom: 15px;
+
+            .watermark {
+              width: 348px;
+              img {
+                width: 217px;
+              }
+            }
+
+            .sloganWrapper {
+              color: var(--colorWhite);
+              font-family: 'Inter', Helvetica;
+              font-weight: 700;
+              letter-spacing: 0;
+              line-height: normal;
+              margin: 10px auto 0 auto;
+              width: 100%;
+
+              p {
+                color: var(--colorWhite);
+                font-family: 'Inter', Helvetica;
+                font-size: 36px;
+                font-weight: 700;
+                letter-spacing: 0;
+                line-height: normal;
+                text-align: left;
+              }
+            }
+          }
+
+          .searchFormBackground {
+            background-color: var(--colorWhite);
+            margin: 0 auto;
+            border-radius: 15px;
+            min-height: 80px;
+            max-width: $maxContentWidth;
+            width: 100%;
+            padding: 5px 25px;
+
+            .locationWrapper {
+              @extend .baseInputWrapper;
+
+              .locationPlaceholder {
+                color: $placeholderGrey;
+                font-family: 'Inter', Helvetica;
+                font-size: 16px;
+                font-weight: 400;
+                left: 33px;
+                letter-spacing: 0;
+                line-height: normal;
+                position: relative;
+                top: 14px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 300px;
+              }
+
+              .icon {
+                height: 19px;
+                left: 11px;
+                position: relative;
+                top: -6px;
+                width: 14px;
+              }
+            }
+
+            .datesWrapper {
+              @extend .baseInputWrapper;
+
+              .datesPlaceholder {
+                color: $placeholderGrey;
+                font-family: 'Inter', Helvetica;
+                font-size: 16px;
+                font-weight: 400;
+                left: 33px;
+                letter-spacing: 0;
+                line-height: normal;
+                position: relative;
+                top: 14px;
+                white-space: nowrap;
+              }
+
+              .icon {
+                height: 17px;
+                left: 11px;
+                position: relative;
+                top: -7.5px;
+                width: 15px;
+              }
+            }
+
+            .categoryDropdownWrapper {
+              @extend .baseInputWrapper;
+              background-image: url(https://c.animaapp.com/x4t9OtXc/img/rectangle-3.png);
+              background-size: 100% 100%;
+
+              .categoryDropdown {
+                box-shadow: unset;
+                background-color: unset;
+                border: unset;
+                height: 48px;
+              }
+
+              .categoryPlaceholder {
+                color: $placeholderGrey;
+                font-family: 'Inter', Helvetica;
+                font-size: 16px;
+                font-weight: 400;
+                left: 11px;
+                letter-spacing: 0;
+                line-height: normal;
+                position: relative;
+                top: 13px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 300px;
+              }
+            }
+
+            .searchButton {
+              background-color: var(--marketplaceColorDark);
+              border: 0px none;
+              border-radius: 50px;
+              height: 48px;
+              width: 100%;
+              max-width: 110px;
+              margin: 10px auto 0 auto;
+              float: right;
+              cursor: pointer;
+              &:hover {
+                background-color: var(--marketplaceColor);
+              }
+
+              .searchButtonText {
+                color: var(--colorWhite);
+                font-family: 'Inter-ExtraBold', Helvetica;
+                font-size: 16px;
+                font-weight: 800;
+                letter-spacing: 0;
+                line-height: normal;
+                white-space: nowrap;
+              }
+            }
+          } // end of searchFormBackground
+        } // end of contentWrapper
+      } // end of backdropWrapper
+    }
+  }
+}
+
+.locationModalForm {
+  margin-top: 30px;
+  .locationAutocompleteInputIcon {
+    display: none;
+  }
+  .predictionsRoot {
+    position: absolute;
+    width: 100%;
+    top: 36px;
+    left: 0;
+    background-color: var(--marketplaceColor);
+    border-bottom-left-radius: var(--borderRadius);
+    border-bottom-right-radius: var(--borderRadius);
+    box-shadow: var(--boxShadowPopup);
+    z-index: calc(var(--zIndexPopup) + 1);
+
+    @media (--viewportMedium) {
+      top: 40px;
+    }
+  }
+  .locationAddress,
+  .building {
+    flex-shrink: 0;
+    margin-bottom: 24px;
+
+    @media (--viewportMedium) {
+      margin-bottom: 32px;
+    }
+  }
+}

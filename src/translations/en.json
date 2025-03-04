@@ -1194,5 +1194,7 @@
   "LandingPageHeroSection.location.placeholder": "Location",
   "LandingPageHeroSection.dates.placeholder": "Dates",
   "LandingPageHeroSection.category.placeholder": "Category",
-  "LandingPageHeroSection.search.button.text": "Search"
+  "LandingPageHeroSection.search.button.text": "Search",
+  "HeroSectionDateRangeFilterInput.startDateLabel": "Start date",
+  "HeroSectionDateRangeFilterInput.endDateLabel": "End date"
 }
