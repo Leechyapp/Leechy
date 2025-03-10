@@ -50,6 +50,11 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
   server: serverConfig,
   plugins: {
+    App: {
+      appUrlOpen: {
+        uri: 'leechy://',
+      },
+    },
     SplashScreen: {
       launchShowDuration: 5000,
       // launchAutoHide: true,
