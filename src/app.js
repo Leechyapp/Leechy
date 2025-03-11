@@ -36,6 +36,7 @@ import Routes from './routing/Routes';
 import defaultMessages from './translations/en.json';
 import { App } from '@capacitor/app';
 import isNativePlatform from './util/isNativePlatform';
+import SmartBanner from './components/SmartBanner/SmartBanner';
 // import { SplashScreen } from '@capacitor/splash-screen';
 
 // If you want to change the language of default (fallback) translations,
@@ -294,6 +295,7 @@ export const ClientApp = props => {
       >
         <Provider store={store}>
           <HelmetProvider>
+            <SmartBanner />
             <IncludeScripts config={appConfig} />
             <BrowserRouter>
               <Routes logLoadDataCalls={logLoadDataCalls} />
