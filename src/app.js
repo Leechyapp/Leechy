@@ -338,6 +338,7 @@ export const ServerApp = props => {
       >
         <Provider store={store}>
           <HelmetProvider context={helmetContext}>
+            <SmartBanner />
             <IncludeScripts config={appConfig} />
             <StaticRouter location={url} context={context}>
               <Routes />
