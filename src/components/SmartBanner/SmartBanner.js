@@ -2,11 +2,6 @@ import { useEffect, useState } from 'react';
 
 const marketplaceColor = '#5ae271';
 
-const isInstagramBrowser = () => {
-  const userAgent = navigator.userAgent || navigator.vendor;
-  return userAgent.includes('Instagram');
-};
-
 const isIOS = () => {
   return /iPhone|iPad|iPod/.test(navigator.userAgent);
 };
@@ -15,7 +10,7 @@ const SmartBanner = () => {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    if (isIOS() && isInstagramBrowser()) {
+    if (isIOS()) {
       setShowBanner(true);
     }
   }, []);
