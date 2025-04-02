@@ -15,6 +15,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import PushNotificationService from '../../services/push-notifications.service';
 import { Toast } from '@capacitor/toast';
 import { updateFCMToken } from '../../util/api';
+import isIOSPlatform from '../../util/isIOSPlatform';
 
 const PageBuilder = loadable(() =>
   import(/* webpackChunkName: "PageBuilder" */ '../PageBuilder/PageBuilder')
@@ -91,7 +92,7 @@ export const LandingPageComponent = props => {
       fallbackPage={<FallbackPage error={error} />}
       // hideMobileBackButton={true} //hide this for menu to work on web
       // hideMobileBackButton={process.env.REACT_CAPACITOR_ENV == 'web'}
-      hideMobileBackButton={isIOSPlatform && resolvedCurrentPage === 'LandingPage'}
+      hideMobileBackButton={isIOSPlatform}
       refreshData={refreshData}
     />
   );
