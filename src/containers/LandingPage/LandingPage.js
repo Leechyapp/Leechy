@@ -89,8 +89,9 @@ export const LandingPageComponent = props => {
       inProgress={inProgress}
       error={error}
       fallbackPage={<FallbackPage error={error} />}
- //     hideMobileBackButton={true} //hide this for menu to work on web
-      hideMobileBackButton={process.env.REACT_CAPACITOR_ENV == 'web'}
+      // hideMobileBackButton={true} //hide this for menu to work on web
+      // hideMobileBackButton={process.env.REACT_CAPACITOR_ENV == 'web'}
+      hideMobileBackButton={isIOSPlatform && resolvedCurrentPage === 'LandingPage'}
       refreshData={refreshData}
     />
   );
