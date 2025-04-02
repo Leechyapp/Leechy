@@ -310,7 +310,8 @@ class TopbarComponent extends Component {
         <div className={classNames(mobileRootClassName || css.container, mobileClassName)}>
           <Button
             rootClassName={css.menu}
-            onClick={() => (hideMobileBackButton ? () => {} : handleMenuOrBackButtonClick())}
+            // onClick={() => (hideMobileBackButton ? () => {} : handleMenuOrBackButtonClick())}
+            onClick={handleMenuOrBackButtonClick}
             title={intl.formatMessage({ id: 'Topbar.menuIcon' })}
           >
             {isNativePlatform ? (
