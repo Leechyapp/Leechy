@@ -90,7 +90,7 @@ export const LandingPageComponent = props => {
       error={error}
       fallbackPage={<FallbackPage error={error} />}
  //     hideMobileBackButton={true} //hide this for menu to work on web
-      hideMobileBackButton={isNativePlatform()} //added 
+      hideMobileBackButton={process.env.REACT_CAPACITOR_ENV !== 'web'}
       refreshData={refreshData}
     />
   );
