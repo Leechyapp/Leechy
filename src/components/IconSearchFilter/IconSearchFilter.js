@@ -1,75 +1,88 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 const categories = [
-  { key: 'womens', emoji: '👠', label: 'Womens' },
-  { key: 'mens', emoji: '👔', label: 'Mens' },
+  { key: 'womenswear', emoji: '👠', label: 'Womens' },
+  { key: 'menswear', emoji: '👔', label: 'Mens' },
   { key: 'sports', emoji: '🏀', label: 'Sports' },
-  { key: 'tools', emoji: '🛠️', label: 'Tools' },
+  { key: 'toolsmachinery', emoji: '🛠️', label: 'Tools' },
   { key: 'furniture', emoji: '🪑', label: 'Furniture' },
-  { key: 'games', emoji: '🎮', label: 'Games' },
-  { key: 'transport', emoji: '🚲', label: 'Transport' },
-  { key: 'fitness', emoji: '🏋️‍♂️', label: 'Fitness' },
+  { key: 'toysgames', emoji: '🎮', label: 'Games' },
+  { key: 'transportation', emoji: '🚲', label: 'Transport' },
+  { key: 'workout', emoji: '🏋️‍♂️', label: 'Fitness' },
   { key: 'books', emoji: '📖', label: 'Books' },
   { key: 'electronics', emoji: '🎧', label: 'Electronics' },
-  { key: 'party', emoji: '🎉', label: 'Party' },
-  { key: 'outdoors', emoji: '🏕️', label: 'Outdoors' },
-  { key: 'storage', emoji: '📦', label: 'Storage' }
 ];
 
 export default function IconSearchFilter({ selected, onSelect }) {
-  const topRow = categories.slice(0, 6);
-  const bottomRow = categories.slice(6);
+  const topRow = categories.slice(0, 5);
+  const bottomRow = categories.slice(5);
+
+  const handleSelect = (categoryKey) => {
+    // Use the categoryLevel1 parameter which is the standard for category filtering
+    onSelect({ pub_categoryLevel1: categoryKey });
+  };
 
   const renderRow = (row) => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollRow}>
+    <div style={styles.scrollRow}>
       {row.map((cat) => (
-        <TouchableOpacity
+        <button
           key={cat.key}
-          style={[
-            styles.item,
-            selected === cat.key && styles.selectedItem
-          ]}
-          onPress={() => onSelect(cat.key)}
+          onClick={() => handleSelect(cat.key)}
+          style={{
+            ...styles.item,
+            ...(selected === cat.key ? styles.selectedItem : {})
+          }}
         >
-          <Text style={styles.emoji}>{cat.emoji}</Text>
-          <Text style={styles.label}>{cat.label}</Text>
-        </TouchableOpacity>
+          <div style={styles.emoji}>{cat.emoji}</div>
+          <div style={styles.label}>{cat.label}</div>
+        </button>
       ))}
-    </ScrollView>
+    </div>
   );
 
   return (
-    <View style={styles.container}>
+    <div style={styles.container}>
       {renderRow(topRow)}
       {renderRow(bottomRow)}
-    </View>
+    </div>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
-    marginVertical: 10,
+    margin: '10px 0',
   },
   scrollRow: {
-    flexDirection: 'row',
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '10px',
+    padding: '0 10px',
   },
   item: {
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    marginRight: 16,
+    justifyContent: 'center',
+    width: '80px',
+    height: '80px',
+    textAlign: 'center',
+    padding: '10px',
+    borderRadius: '12px',
+    transition: 'background-color 0.3s',
+    border: 'none',
+    background: 'none',
+    cursor: 'pointer',
   },
   selectedItem: {
     backgroundColor: '#e0f7f3',
-    borderRadius: 12,
-    padding: 10,
   },
   emoji: {
-    fontSize: 32,
+    fontSize: '32px',
+    lineHeight: '1',
   },
   label: {
-    marginTop: 5,
-    fontSize: 12,
+    marginTop: '5px',
+    fontSize: '12px',
+    lineHeight: '1',
   },
-});
+};

@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { useHistory } from 'react-router-dom';
 
 import { IconSpinner, LayoutComposer } from '../../components/index.js';
 import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer.js';
@@ -98,10 +100,17 @@ const PageBuilder = props => {
     ...pageProps
   } = props;
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const history = useHistory();
   const assetName = props?.assetName;
   const excludePullToRefresh = assetName !== 'landing-page' && assetName !== 'cms-page';
   const resistance = assetName === 'landing-page' ? 4 : 1.5;
   const pullDownThreshold = assetName === 'landing-page' ? 75 : 67;
+
+  const handleCategorySelect = (categoryParams) => {
+    setSelectedCategory(categoryParams.pub_categoryLevel1);
+    // Navigate to search page with the selected category
+    history.push(`/s?${new URLSearchParams(categoryParams).toString()}`);
+  };
 
   if (!pageAssetsData && fallbackPage && !inProgress && error) {
     return fallbackPage;
@@ -135,29 +144,28 @@ const PageBuilder = props => {
                 />
               </Topbar>
               <Main as="main" className={css.main}>
-  {sections.length === 0 && inProgress ? (
-    <LoadingSpinner />
-  ) : (
-    <PullToRefresh
-      refreshData={refreshData}
-      excludePullToRefresh={excludePullToRefresh}
-      resistance={resistance}
-      pullDownThreshold={pullDownThreshold}
-    >
-      {assetName === 'landing-page' && <LandingPageHeroSection />}
+                {sections.length === 0 && inProgress ? (
+                  <LoadingSpinner />
+                ) : (
+                  <PullToRefresh
+                    refreshData={refreshData}
+                    excludePullToRefresh={excludePullToRefresh}
+                    resistance={resistance}
+                    pullDownThreshold={pullDownThreshold}
+                  >
+                    {assetName === 'landing-page' && <LandingPageHeroSection />}
 
-      {/* ⬇️ Your filter component here */}
-      {assetName === 'landing-page' && (
-        <IconSearchFilter
-          selected={selectedCategory}
-          onSelect={(key) => setSelectedCategory(key)}
-        />
-      )}
+                    {Capacitor.isNativePlatform() && assetName === 'landing-page' && (
+                      <IconSearchFilter
+                        selected={selectedCategory}
+                        onSelect={handleCategorySelect}
+                      />
+                    )}
 
-      <SectionBuilder assetName={assetName} sections={sections} options={options} />
-    </PullToRefresh>
-  )}
-</Main>
+                    <SectionBuilder assetName={assetName} sections={sections} options={options} />
+                  </PullToRefresh>
+                )}
+              </Main>
               <Footer>
                 <NativeBottomNavbar />
                 <FooterContainer />
