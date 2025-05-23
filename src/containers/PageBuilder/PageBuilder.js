@@ -13,6 +13,7 @@ import css from './PageBuilder.module.css';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
 import LandingPageHeroSection from '../../components/LandingPageHeroSection/LandingPageHeroSection.js';
+import IconSearchFilter from '../../components/IconSearchFilter/IconSearchFilter';
 
 const getMetadata = (meta, schemaType, fieldOptions) => {
   const { pageTitle, pageDescription, socialSharing } = meta;
@@ -96,7 +97,7 @@ const PageBuilder = props => {
     refreshData,
     ...pageProps
   } = props;
-
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const assetName = props?.assetName;
   const excludePullToRefresh = assetName !== 'landing-page' && assetName !== 'cms-page';
   const resistance = assetName === 'landing-page' ? 4 : 1.5;
@@ -134,20 +135,29 @@ const PageBuilder = props => {
                 />
               </Topbar>
               <Main as="main" className={css.main}>
-                {sections.length === 0 && inProgress ? (
-                  <LoadingSpinner />
-                ) : (
-                  <PullToRefresh
-                    refreshData={refreshData}
-                    excludePullToRefresh={excludePullToRefresh}
-                    resistance={resistance}
-                    pullDownThreshold={pullDownThreshold}
-                  >
-                    {assetName === 'landing-page' && <LandingPageHeroSection />}
-                    <SectionBuilder assetName={assetName} sections={sections} options={options} />
-                  </PullToRefresh>
-                )}
-              </Main>
+  {sections.length === 0 && inProgress ? (
+    <LoadingSpinner />
+  ) : (
+    <PullToRefresh
+      refreshData={refreshData}
+      excludePullToRefresh={excludePullToRefresh}
+      resistance={resistance}
+      pullDownThreshold={pullDownThreshold}
+    >
+      {assetName === 'landing-page' && <LandingPageHeroSection />}
+
+      {/* ⬇️ Your filter component here */}
+      {assetName === 'landing-page' && (
+        <IconSearchFilter
+          selected={selectedCategory}
+          onSelect={(key) => setSelectedCategory(key)}
+        />
+      )}
+
+      <SectionBuilder assetName={assetName} sections={sections} options={options} />
+    </PullToRefresh>
+  )}
+</Main>
               <Footer>
                 <NativeBottomNavbar />
                 <FooterContainer />
