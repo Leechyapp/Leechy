@@ -6,25 +6,28 @@ const categories = [
   { key: 'sports', emoji: '🏀', label: 'Sports' },
   { key: 'toolsmachinery', emoji: '🛠️', label: 'Tools' },
   { key: 'furniture', emoji: '🪑', label: 'Furniture' },
+  { key: 'outdoors', emoji: '🏕️', label: 'Outdoors' },
+  { key: 'storage', emoji: '📦', label: 'Storage' },
   { key: 'toysgames', emoji: '🎮', label: 'Games' },
   { key: 'transportation', emoji: '🚲', label: 'Transport' },
   { key: 'workout', emoji: '🏋️‍♂️', label: 'Fitness' },
   { key: 'books', emoji: '📖', label: 'Books' },
   { key: 'electronics', emoji: '🎧', label: 'Electronics' },
+  { key: 'party', emoji: '🎉', label: 'Party' }
 ];
 
 export default function IconSearchFilter({ selected, onSelect }) {
-  const topRow = categories.slice(0, 5);
-  const bottomRow = categories.slice(5);
-
   const handleSelect = (categoryKey) => {
-    // Use the categoryLevel1 parameter which is the standard for category filtering
     onSelect({ pub_categoryLevel1: categoryKey });
   };
 
-  const renderRow = (row) => (
-    <div style={styles.scrollRow}>
-      {row.map((cat) => (
+  // Split categories into two rows
+  const firstRow = categories.slice(0, Math.ceil(categories.length / 2));
+  const secondRow = categories.slice(Math.ceil(categories.length / 2));
+
+  const renderScrollableRow = (rowCategories) => (
+    <div style={styles.scrollContainer}>
+      {rowCategories.map((cat) => (
         <button
           key={cat.key}
           onClick={() => handleSelect(cat.key)}
@@ -42,28 +45,47 @@ export default function IconSearchFilter({ selected, onSelect }) {
 
   return (
     <div style={styles.container}>
-      {renderRow(topRow)}
-      {renderRow(bottomRow)}
+      {renderScrollableRow(firstRow)}
+      {renderScrollableRow(secondRow)}
     </div>
   );
 }
 
 const styles = {
   container: {
-    margin: '10px 0',
+    margin: '5px 0',
+    width: '100%',
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    position: 'relative',
+    zIndex: 1,
   },
-  scrollRow: {
+  scrollContainer: {
     display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '10px',
-    padding: '0 10px',
+    overflowX: 'auto',
+    padding: '5px 10px',
+    gap: '10px',
+    marginBottom: '5px',
+    scrollbarWidth: 'thin',
+    msOverflowStyle: 'none',
+    '&::-webkit-scrollbar': {
+      height: '6px',
+    },
+    '&::-webkit-scrollbar-track': {
+      background: '#f1f1f1',
+      borderRadius: '3px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#888',
+      borderRadius: '3px',
+    },
   },
   item: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '80px',
+    minWidth: '80px',
     height: '80px',
     textAlign: 'center',
     padding: '10px',
@@ -72,6 +94,7 @@ const styles = {
     border: 'none',
     background: 'none',
     cursor: 'pointer',
+    flexShrink: 0,
   },
   selectedItem: {
     backgroundColor: '#e0f7f3',
