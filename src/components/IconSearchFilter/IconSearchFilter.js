@@ -27,7 +27,7 @@ export default function IconSearchFilter({ selected, onSelect }) {
   useEffect(() => {
     const containers = containerRef.current?.querySelectorAll('[data-scroll-container]');
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    
+   
     const handleTouchStart = (e) => {
       // Store initial touch position
       const touch = e.touches[0];
@@ -43,52 +43,42 @@ export default function IconSearchFilter({ selected, onSelect }) {
       const deltaY = Math.abs(touch.clientY - e.currentTarget.startY);
       const moveY = touch.clientY - e.currentTarget.startY;
       const moveX = touch.clientX - e.currentTarget.startX;
-      
+     
       // Only intercept if we haven't already decided to let the browser handle it
       if (e.currentTarget.hasIntercepted) {
         if (e.currentTarget.isHorizontalScrolling && isIOS) {
           e.preventDefault();
-          // Continue manual scrolling for iOS with boundary handling
-          const maxScrollLeft = e.currentTarget.scrollWidth - e.currentTarget.clientWidth;
+          // Continue manual scrolling for iOS
           const newScrollLeft = e.currentTarget.scrollStartX - moveX;
-          const clampedScrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
-          
-          // Only update if we're not at the boundaries or if we're moving away from them
-          if ((clampedScrollLeft > 0 && clampedScrollLeft < maxScrollLeft) || 
-              (clampedScrollLeft === 0 && moveX < 0) || 
-              (clampedScrollLeft === maxScrollLeft && moveX > 0)) {
-            e.currentTarget.scrollLeft = clampedScrollLeft;
-          }
+          e.currentTarget.scrollLeft = Math.max(0, Math.min(newScrollLeft, e.currentTarget.scrollWidth - e.currentTarget.clientWidth));
         }
         return;
       }
-      
+     
       // Wait for more significant movement before making any decisions
       if (deltaX < 5 && deltaY < 5) {
         return; // Too small to determine intent
       }
-      
+     
       // Check if user is trying to scroll horizontally
       const isHorizontalScroll = deltaX > deltaY && deltaX > 3;
-      
-      // Check if this is a potential pull-to-refresh (downward movement at top of page)
+     
+      // Check if this is a potential pull-to-refresh
       const isPullToRefresh = moveY > 8 && deltaY > deltaX && window.pageYOffset === 0;
-      
+     
       if (isHorizontalScroll) {
-        // User is clearly trying to scroll horizontally - intercept this
         e.currentTarget.hasIntercepted = true;
         e.currentTarget.isHorizontalScrolling = true;
         e.stopPropagation();
-        
+       
         if (isIOS) {
           e.preventDefault();
-          
+         
           // Manual scrolling for iOS to ensure smooth horizontal scroll
           const newScrollLeft = e.currentTarget.scrollStartX - moveX;
           e.currentTarget.scrollLeft = Math.max(0, Math.min(newScrollLeft, e.currentTarget.scrollWidth - e.currentTarget.clientWidth));
         }
       } else if (isPullToRefresh) {
-        // This is clearly a pull-to-refresh attempt - intercept and prevent it
         e.currentTarget.hasIntercepted = true;
         e.preventDefault();
         e.stopPropagation();
@@ -131,7 +121,7 @@ export default function IconSearchFilter({ selected, onSelect }) {
   const secondRow = categories.slice(Math.ceil(categories.length / 2));
 
   const renderScrollableRow = (rowCategories) => (
-    <div 
+    <div
       style={styles.scrollContainer}
       data-scroll-container
     >
@@ -166,8 +156,12 @@ const styles = {
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     position: 'relative',
-    zIndex: 10,
-    // Remove conflicting touch-action, let iOS handle naturally
+    zIndex: 10, // Increased z-index to ensure it's above pull-to-refresh
+    touchAction: 'pan-x pan-y pinch-zoom', // Allow both horizontal and vertical panning
+    // iOS-specific fixes
+    '-webkit-touch-callout': 'none',
+    '-webkit-user-select': 'none',
+    '-webkit-tap-highlight-color': 'transparent',
   },
   scrollContainer: {
     display: 'flex',
@@ -182,13 +176,9 @@ const styles = {
     position: 'relative',
     '-webkit-scrollbar': 'none',
     '-ms-overflow-style': 'none',
-    // iOS-specific fixes to prevent bounce and improve consistency
+    // iOS-specific fixes
     '-webkit-touch-callout': 'none',
     '-webkit-user-select': 'none',
-    '-webkit-overflow-scrolling': 'touch',
-    // Prevent overscroll bounce on iOS
-    overscrollBehavior: 'contain',
-    overscrollBehaviorX: 'contain',
     '&::-webkit-scrollbar': {
       display: 'none',
       width: 0,

@@ -6,6 +6,11 @@
 
 const fs = require('fs');
 
+// Load .env first to get NODE_ENV
+if (fs.existsSync('.env')) {
+  require('dotenv').config({ path: '.env' });
+}
+
 const NODE_ENV = process.env.NODE_ENV;
 
 if (!NODE_ENV) {
