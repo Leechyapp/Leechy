@@ -2,6 +2,8 @@ import { useSelector } from 'react-redux';
 import { connectStripeAccount, createStripeDashboardLink } from '../../util/api';
 import React, { useState } from 'react';
 import StripeConnectAccountStatusBox from '../StripeConnectAccountStatusBox/StripeConnectAccountStatusBox';
+import StripeConnectEmbedded from '../StripeConnectEmbedded/StripeConnectEmbedded';
+import { useConfiguration } from '../../context/configurationContext';
 import css from './StripeExpressStatusBox.module.scss';
 import { propTypes } from '../../util/types';
 import Button from '../Button/Button';
@@ -11,6 +13,7 @@ import isNativePlatform from '../../util/isNativePlatform';
 
 const StripeExpressStatusBox = injectIntl(props => {
   const { intl, transactionId, isCustomOffer } = props;
+  const config = useConfiguration();
 
   const state = useSelector(state => state);
 
@@ -23,17 +26,24 @@ const StripeExpressStatusBox = injectIntl(props => {
   const [dashboardLinkInProgress, setDashboardLinkInProgress] = useState(false);
   const [accountLinkInError, setAccountLinkError] = useState(null);
   const [countryCode, setCountryCode] = useState('');
+  const [showEmbeddedConnect, setShowEmbeddedConnect] = useState(false);
+  const [stripeConnectUrl, setStripeConnectUrl] = useState(null);
 
   const onConnnectStripeAccount = (linkTarget = '_self') => {
     setAccountLinkInProgress(true);
     connectStripeAccount({ transactionId: transactionId?.uuid, countryCode })
       .then(link => {
         if (link) {
-          const target = isNativePlatform ? '_self' : linkTarget;
-          window.open(link, target);
-          if (target === '_blank') {
-            setAccountLinkInProgress(false);
+          // Instead of opening in new tab, show embedded modal
+          if (isNativePlatform) {
+            // For native platforms, still use the old method
+            window.open(link, '_self');
+          } else {
+            // For web, use embedded approach
+            setStripeConnectUrl(link);
+            setShowEmbeddedConnect(true);
           }
+          setAccountLinkInProgress(false);
         } else {
           setAccountLinkInProgress(false);
         }
@@ -43,6 +53,20 @@ const StripeExpressStatusBox = injectIntl(props => {
         setAccountLinkInProgress(false);
         setAccountLinkError(true);
       });
+  };
+
+  const handleEmbeddedSuccess = () => {
+    // Refresh the data after successful connection
+    window.location.reload();
+  };
+
+  const handleEmbeddedError = () => {
+    setAccountLinkError(true);
+  };
+
+  const handleEmbeddedClose = () => {
+    setShowEmbeddedConnect(false);
+    setStripeConnectUrl(null);
   };
 
   const getStripeConnectExpressDashboardLink = () => {
@@ -112,6 +136,16 @@ const StripeExpressStatusBox = injectIntl(props => {
           )}
         </>
       )}
+      
+      {/* Embedded Stripe Connect Modal */}
+      <StripeConnectEmbedded
+        isOpen={showEmbeddedConnect}
+        onClose={handleEmbeddedClose}
+        stripeUrl={stripeConnectUrl}
+        onSuccess={handleEmbeddedSuccess}
+        onError={handleEmbeddedError}
+        marketplaceRootURL={config.marketplaceRootURL}
+      />
     </>
   );
 });

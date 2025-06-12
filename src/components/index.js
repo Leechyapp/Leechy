@@ -126,6 +126,7 @@ export { default as Page } from './Page/Page';
 export { default as Reviews } from './Reviews/Reviews';
 export { default as SavedCardDetails } from './SavedCardDetails/SavedCardDetails';
 export { default as StripeConnectAccountStatusBox } from './StripeConnectAccountStatusBox/StripeConnectAccountStatusBox';
+export { default as StripeConnectEmbedded } from './StripeConnectEmbedded/StripeConnectEmbedded';
 export { default as StripePaymentAddress } from './StripePaymentAddress/StripePaymentAddress';
 
 // Forms

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { bool, func, oneOf, shape } from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -21,6 +21,7 @@ import {
   Page,
   StripeConnectAccountStatusBox,
   StripeConnectAccountForm,
+  StripeConnectEmbedded,
   UserNav,
   LayoutSideNavigation,
 } from '../../components';
@@ -68,11 +69,17 @@ const hasRequirements = (stripeAccountData, requirementType) =>
   Array.isArray(stripeAccountData.requirements[requirementType]) &&
   stripeAccountData.requirements[requirementType].length > 0;
 
-// Redirect user to Stripe's hosted Connect account onboarding form
-const handleGetStripeConnectAccountLinkFn = (getLinkFn, commonParams) => type => () => {
+// Handle Stripe Connect account link - now with embedded option
+const handleGetStripeConnectAccountLinkFn = (getLinkFn, commonParams, showEmbeddedFn) => type => () => {
   getLinkFn({ type, ...commonParams })
     .then(url => {
-      window.location.href = url;
+      if (showEmbeddedFn) {
+        // Use embedded approach
+        showEmbeddedFn(url);
+      } else {
+        // Fallback to redirect
+        window.location.href = url;
+      }
     })
     .catch(err => console.error(err));
 };
@@ -99,6 +106,10 @@ export const StripePayoutPageComponent = props => {
     intl,
   } = props;
 
+  // State for embedded Stripe Connect
+  const [showEmbeddedConnect, setShowEmbeddedConnect] = useState(false);
+  const [stripeConnectUrl, setStripeConnectUrl] = useState(null);
+
   const { returnURLType } = params;
   const ensuredCurrentUser = ensureCurrentUser(currentUser);
   const currentUserLoaded = !!ensuredCurrentUser.id;
@@ -121,13 +132,35 @@ export const StripePayoutPageComponent = props => {
 
   const savedCountry = stripeAccountData ? stripeAccountData.country : null;
 
+  // Embedded Stripe Connect handlers
+  const showEmbeddedStripeConnect = (url) => {
+    setStripeConnectUrl(url);
+    setShowEmbeddedConnect(true);
+  };
+
+  const handleEmbeddedSuccess = () => {
+    // Refresh the data after successful connection
+    window.location.reload();
+  };
+
+  const handleEmbeddedError = () => {
+    // Handle error - maybe show a notification
+    console.error('Stripe onboarding failed');
+  };
+
+  const handleEmbeddedClose = () => {
+    setShowEmbeddedConnect(false);
+    setStripeConnectUrl(null);
+  };
+
   const handleGetStripeConnectAccountLink = handleGetStripeConnectAccountLinkFn(
     onGetStripeConnectAccountLink,
     {
       accountId,
       successURL,
       failureURL,
-    }
+    },
+    showEmbeddedStripeConnect
   );
 
   const returnedNormallyFromStripe = returnURLType === STRIPE_ONBOARDING_RETURN_URL_SUCCESS;
@@ -215,6 +248,16 @@ export const StripePayoutPageComponent = props => {
         </div>
       </LayoutSideNavigation>
       <NativeBottomNavbar />
+      
+      {/* Embedded Stripe Connect Modal */}
+      <StripeConnectEmbedded
+        isOpen={showEmbeddedConnect}
+        onClose={handleEmbeddedClose}
+        stripeUrl={stripeConnectUrl}
+        onSuccess={handleEmbeddedSuccess}
+        onError={handleEmbeddedError}
+        marketplaceRootURL={config.marketplaceRootURL}
+      />
     </Page>
   );
 };
