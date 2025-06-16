@@ -7,6 +7,13 @@
   justify-content: center;
   padding: 20px;
   box-sizing: border-box;
+  overflow: visible;
+  
+  /* Ensure no clipping on mobile */
+  @media (max-width: 768px) {
+    padding: 16px 8px 40px 8px;
+    overflow: visible;
+  }
 }
 
 .loadingContainer {
@@ -49,7 +56,17 @@
   width: 100%;
   min-height: 400px;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0 auto;
+  
+  /* Ensure Stripe component has proper space */
+  @media (max-width: 768px) {
+    width: calc(100% - 8px);
+    margin: 0 auto;
+    padding: 0 4px;
+  }
 }
 
 .errorContainer {
@@ -126,6 +143,32 @@
   .retryButton {
     padding: 14px 20px;
     font-size: 16px;
+  }
+}
+
+/* Specific styling for Stripe Connect embedded components */
+.stripeContainer :global([data-testid*="connect"]),
+.stripeContainer :global([class*="connect"]),
+.stripeContainer :global([class*="stripe"]) {
+  width: 100% !important;
+  overflow: visible !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Ensure no clipping of dropdowns, popups, or tooltips within Stripe components */
+.stripeContainer :global(div),
+.stripeContainer :global(iframe) {
+  overflow: visible !important;
+}
+
+/* Mobile specific fixes for Stripe components */
+@media (max-width: 768px) {
+  .stripeContainer :global([data-testid*="connect"]),
+  .stripeContainer :global([class*="connect"]),
+  .stripeContainer :global([class*="stripe"]) {
+    margin: 0 auto !important;
+    max-width: calc(100vw - 24px) !important;
   }
 }
 
