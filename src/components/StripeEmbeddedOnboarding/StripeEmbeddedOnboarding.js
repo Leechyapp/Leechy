@@ -187,8 +187,25 @@ const StripeEmbeddedOnboarding = ({
         // Mount the component to the DOM
         if (containerRef.current && mounted) {
           containerRef.current.innerHTML = '';
+          
+          // Apply specific styles to ensure proper sizing
+          containerRef.current.style.width = '100%';
+          containerRef.current.style.overflow = 'visible';
+          containerRef.current.style.position = 'relative';
+          
           containerRef.current.appendChild(accountOnboarding);
           componentRef.current = accountOnboarding;
+          
+          // Ensure the Stripe component itself has proper styling
+          setTimeout(() => {
+            if (containerRef.current && containerRef.current.firstChild) {
+              const stripeElement = containerRef.current.firstChild;
+              stripeElement.style.width = '100%';
+              stripeElement.style.overflow = 'visible';
+              stripeElement.style.position = 'relative';
+              stripeElement.style.zIndex = '1';
+            }
+          }, 100);
         }
 
         setIsLoading(false);

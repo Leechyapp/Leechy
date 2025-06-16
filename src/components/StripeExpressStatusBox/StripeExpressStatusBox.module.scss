@@ -10,31 +10,40 @@ button.stripeConnectCtaButton {
 // Embedded Onboarding Modal Styles
 .embeddedOnboardingModal {
   max-width: 950px;
-  width: 95vw;
-  max-height: 90vh;
+  width: calc(100vw - 24px);
+  max-height: calc(100vh - 40px);
   height: auto;
   padding: 0;
   border-radius: 12px;
   overflow-y: auto;
-  overflow-x: visible;
+  overflow-x: hidden;
   margin: 20px auto;
+  
+  // Ensure modal fits within safe areas
+  max-height: calc(100vh - env(safe-area-inset-top, 20px) - env(safe-area-inset-bottom, 20px) - 40px);
 
   @media (max-width: 768px) {
-    width: 98vw;
-    max-height: 95vh;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - env(safe-area-inset-top, 20px) - env(safe-area-inset-bottom, 20px) - 20px);
     border-radius: 8px;
     margin: 10px auto;
+    // Add safe area padding
+    margin-top: calc(env(safe-area-inset-top, 10px) + 10px);
+    margin-bottom: calc(env(safe-area-inset-bottom, 10px) + 10px);
   }
 }
 
 .embeddedOnboardingContent {
-  padding: 20px 24px 40px 24px;
+  padding: 20px 24px 60px 24px;
   min-height: 600px;
   height: auto;
+  box-sizing: border-box;
   
   @media (max-width: 768px) {
-    padding: 16px 16px 32px 16px;
+    padding: 16px 12px 80px 12px;
     min-height: 500px;
+    // Add extra bottom padding for safe area and privacy text
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
   }
 }
 
@@ -71,4 +80,14 @@ button.stripeConnectCtaButton {
   min-height: 600px;
   height: auto;
   flex: 1;
+  margin: 0 auto;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    margin: 0 auto;
+    min-height: 500px;
+    // Ensure the Stripe component fits within the container
+    max-width: calc(100vw - 32px);
+  }
 }
