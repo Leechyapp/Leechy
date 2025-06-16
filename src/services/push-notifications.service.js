@@ -1,7 +1,7 @@
 import { PushNotifications } from '@capacitor/push-notifications';
 
 export default class PushNotificationService {
-  static registerPushNotifications = (setNotifications, showToast, onUpdateFCMToken) => {
+  static registerPushNotifications = (setNotifications, showToast, onUpdateFCMToken, onNotificationTap) => {
     console.log('registerPushNotifications');
 
     // Register with Apple / Google to receive push via APNS/FCM
@@ -34,6 +34,8 @@ export default class PushNotificationService {
 
     // Method called when tapping on a notification
     PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+      console.log('Push notification action performed:', notification);
+      
       setNotifications(notifications => [
         ...notifications,
         {
@@ -43,6 +45,15 @@ export default class PushNotificationService {
           type: 'action',
         },
       ]);
+
+      // Handle navigation based on notification data
+      if (onNotificationTap && notification.notification.data) {
+        const { transactionId } = notification.notification.data;
+        if (transactionId) {
+          console.log('Navigating to transaction:', transactionId);
+          onNotificationTap(transactionId);
+        }
+      }
     });
   };
 }

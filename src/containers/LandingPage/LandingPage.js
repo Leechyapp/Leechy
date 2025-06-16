@@ -4,6 +4,7 @@ import loadable from '@loadable/component';
 import { bool, object } from 'prop-types';
 import { compose } from 'redux';
 import { connect, useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { camelize } from '../../util/string';
 import { propTypes } from '../../util/types';
@@ -28,6 +29,7 @@ export const LandingPageComponent = props => {
 
   const state = useSelector(state => state);
   const currentUser = state.user?.currentUser;
+  const history = useHistory();
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -45,6 +47,30 @@ export const LandingPageComponent = props => {
       });
   };
 
+  const handleNotificationTap = (transactionId) => {
+    console.log('Handling notification tap for transaction:', transactionId);
+    
+    // Check if user is authenticated
+    if (!currentUser?.id) {
+      console.log('User not authenticated, redirecting to login');
+      history.push('/login');
+      return;
+    }
+
+    // Navigate to transaction page
+    // We'll try both order and sale routes since the TransactionPage component 
+    // will handle the proper redirects based on user ownership
+    // Start with order page - if user doesn't own it, the page will redirect to the correct route
+    try {
+      history.push(`/order/${transactionId}`);
+      console.log(`Navigated to /order/${transactionId}`);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback to inbox
+      history.push('/inbox');
+    }
+  };
+
   const initPushNotifications = () => {
     if (isNativePlatform) {
       PushNotifications.checkPermissions().then(res => {
@@ -57,7 +83,8 @@ export const LandingPageComponent = props => {
               PushNotificationService.registerPushNotifications(
                 setNotifications,
                 showToast,
-                onUpdateFCMToken
+                onUpdateFCMToken,
+                handleNotificationTap
               );
             }
           });
@@ -65,7 +92,8 @@ export const LandingPageComponent = props => {
           PushNotificationService.registerPushNotifications(
             setNotifications,
             showToast,
-            onUpdateFCMToken
+            onUpdateFCMToken,
+            handleNotificationTap
           );
         }
       });

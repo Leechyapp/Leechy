@@ -36,6 +36,11 @@ class StripeService {
     return accountLinks;
   }
 
+  static async createAccountSession(dataObj) {
+    const accountSession = await stripe.accountSessions.create(dataObj);
+    return accountSession;
+  }
+
   static async retrieveAccount(stripeAccountId) {
     const account = await stripe.accounts.retrieve(stripeAccountId);
     return account;

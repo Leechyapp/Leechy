@@ -76,6 +76,16 @@ app.use(
   })
 );
 
+// Add Cross-Origin-Opener-Policy header required for Stripe Connect embedded components
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  // Add Permissions Policy to allow payment and clipboard features for Stripe
+  res.setHeader('Permissions-Policy', 'payment=*, clipboard-write=*, payment-request=*');
+  // Also add Feature-Policy for older browser support
+  res.setHeader('Feature-Policy', 'payment *; clipboard-write *; payment-request *');
+  next();
+});
+
 if (cspEnabled) {
   // When a CSP directive is violated, the browser posts a JSON body
   // to the defined report URL and we need to parse this body.

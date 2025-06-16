@@ -31,6 +31,7 @@ const StripeAccountRoute = require('./api/routes/stripe-account.route');
 const SetupIntentRoute = require('./api/routes/setup-intent.route');
 const PaymentMethodRoute = require('./api/routes/payment-method.route');
 const BookingRoute = require('./api/routes/booking.route');
+const StripeCheckoutRoute = require('./api/routes/stripe-checkout.route');
 
 const router = express.Router();
 
@@ -102,5 +103,8 @@ new StripeAccountRoute(router);
 new BookingRoute(router);
 new SetupIntentRoute(router);
 new PaymentMethodRoute(router);
+
+// Add Stripe Checkout routes for Google Pay fallback
+router.use('/stripe-checkout', StripeCheckoutRoute);
 
 module.exports = router;

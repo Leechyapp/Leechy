@@ -1,0 +1,17 @@
+.root {
+  width: 100%;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+
+  p {
+    color: var(--colorGrey600);
+    font-size: 14px;
+    margin: 0;
+  }
+} 

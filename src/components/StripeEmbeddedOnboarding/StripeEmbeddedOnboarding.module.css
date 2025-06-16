@@ -1,0 +1,147 @@
+.container {
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.loadingContainer p {
+  margin: 16px 0 8px 0;
+  font-size: 16px;
+  color: #424770;
+  font-weight: 500;
+}
+
+.loadingContainer small {
+  margin: 0;
+  font-size: 14px;
+  color: #8898aa;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #635bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.stripeContainer {
+  width: 100%;
+  min-height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.errorContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.errorMessage {
+  text-align: center;
+  max-width: 400px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e6ebf1;
+}
+
+.errorMessage h3 {
+  margin: 0 0 12px 0;
+  color: #d73502;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.errorMessage p {
+  margin: 0 0 24px 0;
+  color: #424770;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.retryButton {
+  background: #635bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.retryButton:hover {
+  background: #5a52e8;
+}
+
+.retryButton:disabled {
+  background: #8898aa;
+  cursor: not-allowed;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .buttonContainer {
+    gap: 10px;
+  }
+  
+  .retryButton {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .errorMessage {
+    background: #1a1f36;
+    border-color: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .errorMessage h3 {
+    color: #f7fafc;
+  }
+  
+  .errorMessage p {
+    color: #cbd5e0;
+  }
+} 

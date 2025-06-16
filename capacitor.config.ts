@@ -55,6 +55,10 @@ const config: CapacitorConfig = {
     //     uri: 'leechy://',
     //   },
     // },
+    Browser: {
+      androidCustomTabs: true,
+      iosCustomScheme: true,
+    },
     SplashScreen: {
       launchShowDuration: 5000,
       // launchAutoHide: true,

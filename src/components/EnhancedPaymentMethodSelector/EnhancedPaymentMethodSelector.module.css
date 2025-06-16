@@ -1,0 +1,259 @@
+@import '../../styles/customMediaQueries.css';
+
+.root {
+  width: 100%;
+  max-width: 600px;
+}
+
+.title {
+  margin-bottom: 24px;
+  font-weight: var(--fontWeightSemiBold);
+  color: var(--colorGrey700);
+}
+
+.paymentMethodsContainer {
+  margin-bottom: 32px;
+}
+
+.methodCategory {
+  margin-bottom: 24px;
+}
+
+.categoryTitle {
+  composes: h5 from global;
+  margin-bottom: 12px;
+  color: var(--colorGrey600);
+  font-weight: var(--fontWeightMedium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+}
+
+.methodsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paymentMethodOption {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--colorGrey300);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--colorWhite);
+
+  &:hover {
+    border-color: var(--colorSuccess);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &.selected {
+    border-color: var(--colorSuccess);
+    background-color: var(--colorSuccess50);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.methodIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  border-radius: 6px;
+  background-color: var(--colorGrey100);
+  color: var(--colorGrey600);
+  font-size: 18px;
+
+  .selected & {
+    background-color: var(--colorSuccess);
+    color: var(--colorWhite);
+  }
+}
+
+.methodInfo {
+  flex: 1;
+}
+
+.methodName {
+  font-weight: var(--fontWeightMedium);
+  color: var(--colorGrey700);
+  margin-bottom: 4px;
+  font-size: 16px;
+}
+
+.methodDescription {
+  font-size: 14px;
+  color: var(--colorGrey500);
+  line-height: 1.4;
+}
+
+.methodSelector {
+  margin-left: 16px;
+}
+
+.radioButton {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--colorGrey300);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+
+  &.checked {
+    border-color: var(--colorSuccess);
+    background-color: var(--colorSuccess);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--colorWhite);
+    }
+  }
+}
+
+.selectedMethodContent {
+  border-top: 1px solid var(--colorGrey300);
+  padding-top: 24px;
+}
+
+.selectedMethodHeader {
+  margin-bottom: 16px;
+
+  h4 {
+    color: var(--colorGrey700);
+    font-weight: var(--fontWeightMedium);
+    margin: 0;
+  }
+}
+
+.bankTransferInfo {
+  padding: 20px;
+  background-color: var(--colorGrey50);
+  border-radius: 8px;
+  text-align: center;
+
+  p {
+    margin-bottom: 16px;
+    color: var(--colorGrey600);
+    line-height: 1.5;
+  }
+}
+
+/* Mobile responsiveness */
+@media (--viewportSmall) {
+  .paymentMethodOption {
+    padding: 12px;
+  }
+
+  .methodIcon {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    font-size: 16px;
+  }
+
+  .methodName {
+    font-size: 14px;
+  }
+
+  .methodDescription {
+    font-size: 12px;
+  }
+
+  .radioButton {
+    width: 18px;
+    height: 18px;
+
+    &.checked::after {
+      width: 6px;
+      height: 6px;
+    }
+  }
+}
+
+/* Dark mode support - Updated to avoid black backgrounds */
+@media (prefers-color-scheme: dark) {
+  .paymentMethodOption {
+    background-color: var(--colorWhite);
+    border-color: var(--colorGrey300);
+
+    &:hover {
+      border-color: var(--colorSuccess);
+    }
+
+    &.selected {
+      background-color: var(--colorSuccess50);
+    }
+  }
+
+  .methodIcon {
+    background-color: var(--colorGrey100);
+    color: var(--colorGrey600);
+  }
+
+  .methodName {
+    color: var(--colorGrey700);
+  }
+
+  .methodDescription {
+    color: var(--colorGrey500);
+  }
+
+  .categoryTitle {
+    color: var(--colorGrey600);
+  }
+
+  .bankTransferInfo {
+    background-color: var(--colorGrey50);
+
+    p {
+      color: var(--colorGrey600);
+    }
+  }
+}
+
+/* Animation for method selection */
+.paymentMethodOption {
+  transform: scale(1);
+  transition: transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Focus states for accessibility */
+.paymentMethodOption:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--colorSuccessRGB), 0.3);
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+}
+
+/* Error state */
+.error {
+  padding: 16px;
+  background-color: var(--colorFail50);
+  border: 1px solid var(--colorFail300);
+  border-radius: 8px;
+  color: var(--colorFail700);
+  text-align: center;
+  margin-bottom: 16px;
+} 

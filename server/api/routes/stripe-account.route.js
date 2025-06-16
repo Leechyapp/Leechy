@@ -16,6 +16,11 @@ class StripeAccountRoute extends BaseRoute {
       StripeAccountController.connectStripeAccount
     );
     router.post(
+      this.ROOT_PATH + '/create-account-session',
+      authMiddleware,
+      StripeAccountController.createAccountSession
+    );
+    router.post(
       this.ROOT_PATH + '/create-stripe-account-dashboard-link',
       authMiddleware,
       StripeAccountController.createStripeDashboardLink

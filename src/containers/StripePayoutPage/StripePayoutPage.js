@@ -1,335 +1,401 @@
-import React, { useState } from 'react';
-import { bool, func, oneOf, shape } from 'prop-types';
+import React, { Component } from 'react';
+import { bool, func, object, shape, string } from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-
-import { useConfiguration } from '../../context/configurationContext';
-import { useRouteConfiguration } from '../../context/routeConfigurationContext';
-import { createResourceLocatorString } from '../../util/routes';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
-import { ensureCurrentUser } from '../../util/data';
 import { propTypes } from '../../util/types';
+import { ensureCurrentUser } from '../../util/data';
+import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { isScrollingDisabled } from '../../ducks/ui.duck';
+import {
+  H3,
+  LayoutSideNavigation,
+  Page,
+  UserNav,
+  IconSpinner,
+  InlineTextButton,
+  Modal,
+} from '../../components';
+import StripeEmbeddedOnboarding from '../../components/StripeEmbeddedOnboarding/StripeEmbeddedOnboarding';
+import TopbarContainer from '../TopbarContainer/TopbarContainer';
+import { connectStripeAccount } from '../../util/api';
+import { isMobileDevice, isMobileAppWebView, supportsPopups } from '../../util/isMobileDevice';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
+
 import {
   stripeAccountClearError,
   getStripeConnectAccountLink,
+  fetchStripeAccount,
 } from '../../ducks/stripeConnectAccount.duck';
-
-import {
-  H3,
-  NamedRedirect,
-  Page,
-  StripeConnectAccountStatusBox,
-  StripeConnectAccountForm,
-  StripeConnectEmbedded,
-  UserNav,
-  LayoutSideNavigation,
-} from '../../components';
-
-import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
-import FooterContainer from '../../containers/FooterContainer/FooterContainer';
-
-import { savePayoutDetails } from './StripePayoutPage.duck';
-
+import { savePayoutDetails, loadData } from './StripePayoutPage.duck';
 import css from './StripePayoutPage.module.css';
-import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar';
 
 const STRIPE_ONBOARDING_RETURN_URL_SUCCESS = 'success';
 const STRIPE_ONBOARDING_RETURN_URL_FAILURE = 'failure';
-const STRIPE_ONBOARDING_RETURN_URL_TYPES = [
-  STRIPE_ONBOARDING_RETURN_URL_SUCCESS,
-  STRIPE_ONBOARDING_RETURN_URL_FAILURE,
-];
 
-// Create return URL for the Stripe onboarding form
-const createReturnURL = (returnURLType, rootURL, routes) => {
-  const path = createResourceLocatorString(
-    'StripePayoutOnboardingPage',
-    routes,
-    { returnURLType },
-    {}
-  );
-  const root = rootURL.replace(/\/$/, '');
-  return `${root}${path}`;
-};
-
-// Get attribute: stripeAccountData
-const getStripeAccountData = stripeAccount => stripeAccount.attributes.stripeAccountData || null;
-
-// Get last 4 digits of bank account returned in Stripe account
-const getBankAccountLast4Digits = stripeAccountData =>
-  stripeAccountData && stripeAccountData.external_accounts.data.length > 0
-    ? stripeAccountData.external_accounts.data[0].last4
-    : null;
-
-// Check if there's requirements on selected type: 'past_due', 'currently_due' etc.
-const hasRequirements = (stripeAccountData, requirementType) =>
-  stripeAccountData != null &&
-  stripeAccountData.requirements &&
-  Array.isArray(stripeAccountData.requirements[requirementType]) &&
-  stripeAccountData.requirements[requirementType].length > 0;
-
-// Handle Stripe Connect account link - now with embedded option
-const handleGetStripeConnectAccountLinkFn = (getLinkFn, commonParams, showEmbeddedFn) => type => () => {
-  getLinkFn({ type, ...commonParams })
-    .then(url => {
-      if (showEmbeddedFn) {
-        // Use embedded approach
-        showEmbeddedFn(url);
-      } else {
-        // Fallback to redirect
-        window.location.href = url;
-      }
-    })
-    .catch(err => console.error(err));
-};
-
-export const StripePayoutPageComponent = props => {
-  const config = useConfiguration();
-  const routes = useRouteConfiguration();
-  const {
-    currentUser,
-    scrollingDisabled,
-    getAccountLinkInProgress,
-    getAccountLinkError,
-    createStripeAccountError,
-    updateStripeAccountError,
-    fetchStripeAccountError,
-    stripeAccountFetched,
-    stripeAccount,
-    onPayoutDetailsChange,
-    onPayoutDetailsSubmit,
-    onGetStripeConnectAccountLink,
-    payoutDetailsSaveInProgress,
-    payoutDetailsSaved,
-    params,
-    intl,
-  } = props;
-
-  // State for embedded Stripe Connect
-  const [showEmbeddedConnect, setShowEmbeddedConnect] = useState(false);
-  const [stripeConnectUrl, setStripeConnectUrl] = useState(null);
-
-  const { returnURLType } = params;
-  const ensuredCurrentUser = ensureCurrentUser(currentUser);
-  const currentUserLoaded = !!ensuredCurrentUser.id;
-  const stripeConnected = currentUserLoaded && !!stripeAccount && !!stripeAccount.id;
-
-  const title = intl.formatMessage({ id: 'StripePayoutPage.title' });
-
-  const formDisabled = getAccountLinkInProgress;
-
-  const rootURL = config.marketplaceRootURL;
-  const successURL = createReturnURL(STRIPE_ONBOARDING_RETURN_URL_SUCCESS, rootURL, routes);
-  const failureURL = createReturnURL(STRIPE_ONBOARDING_RETURN_URL_FAILURE, rootURL, routes);
-
-  const accountId = stripeConnected ? stripeAccount.id : null;
-  const stripeAccountData = stripeConnected ? getStripeAccountData(stripeAccount) : null;
-  const requirementsMissing =
-    stripeAccount &&
-    (hasRequirements(stripeAccountData, 'past_due') ||
-      hasRequirements(stripeAccountData, 'currently_due'));
-
-  const savedCountry = stripeAccountData ? stripeAccountData.country : null;
-
-  // Embedded Stripe Connect handlers
-  const showEmbeddedStripeConnect = (url) => {
-    setStripeConnectUrl(url);
-    setShowEmbeddedConnect(true);
-  };
-
-  const handleEmbeddedSuccess = () => {
-    // Refresh the data after successful connection
-    window.location.reload();
-  };
-
-  const handleEmbeddedError = () => {
-    // Handle error - maybe show a notification
-    console.error('Stripe onboarding failed');
-  };
-
-  const handleEmbeddedClose = () => {
-    setShowEmbeddedConnect(false);
-    setStripeConnectUrl(null);
-  };
-
-  const handleGetStripeConnectAccountLink = handleGetStripeConnectAccountLinkFn(
-    onGetStripeConnectAccountLink,
-    {
-      accountId,
-      successURL,
-      failureURL,
-    },
-    showEmbeddedStripeConnect
-  );
-
-  const returnedNormallyFromStripe = returnURLType === STRIPE_ONBOARDING_RETURN_URL_SUCCESS;
-  const returnedAbnormallyFromStripe = returnURLType === STRIPE_ONBOARDING_RETURN_URL_FAILURE;
-  const showVerificationNeeded = stripeConnected && requirementsMissing;
-
-  // Redirect from success URL to basic path for StripePayoutPage
-  if (returnedNormallyFromStripe && stripeConnected && !requirementsMissing) {
-    return <NamedRedirect name="StripePayoutPage" />;
+export class StripePayoutPageComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      countryCode: 'US',
+      showEmbeddedOnboarding: false,
+      useEmbeddedFlow: true,
+    };
+    
+    // Bind methods
+    this.handleGetStripeConnectAccountLinkError = this.handleGetStripeConnectAccountLinkError.bind(this);
+    this.handleCreateStripeAccount = this.handleCreateStripeAccount.bind(this);
+    this.handleEmbeddedSuccess = this.handleEmbeddedSuccess.bind(this);
+    this.handleEmbeddedError = this.handleEmbeddedError.bind(this);
+    this.handleEmbeddedExit = this.handleEmbeddedExit.bind(this);
   }
 
-  // Failure url should redirect back to Stripe since it's most likely due to page reload
-  // Account link creation will fail if the account is the reason
-  if (returnedAbnormallyFromStripe && !getAccountLinkError) {
-    handleGetStripeConnectAccountLink('custom_account_verification')();
+  componentDidMount() {
+    const { onLoadData } = this.props;
+    if (onLoadData) {
+      onLoadData();
+    }
   }
 
-  return (
-    <Page title={title} scrollingDisabled={scrollingDisabled}>
-      <LayoutSideNavigation
-        topbar={
-          <>
-            <TopbarContainer
-              desktopClassName={css.desktopTopbar}
-              mobileClassName={css.mobileTopbar}
-            />
-            <UserNav currentPage="StripePayoutPage" />
-          </>
+  handleGetStripeConnectAccountLinkError() {
+    const { onStripeAccountClearError } = this.props;
+    onStripeAccountClearError();
+  }
+
+  handleCreateStripeAccount() {
+    const { getStripeConnectAccountLinkInProgress, onGetStripeConnectAccountLink } = this.props;
+    
+    // Check if we should use embedded flow (allow on all platforms - let's try embedded even in native apps)
+    if (this.state.useEmbeddedFlow) {
+      this.setState({ showEmbeddedOnboarding: true });
+      return;
+    }
+    
+    if (!getStripeConnectAccountLinkInProgress) {
+      onGetStripeConnectAccountLink().then(async url => {
+        if (url) {
+          if (Capacitor.isNativePlatform()) {
+            // Get the platform to customize browser behavior
+            const platform = Capacitor.getPlatform();
+            
+            if (platform === 'ios') {
+              // iOS-specific Safari View Controller configuration
+              await Browser.open({
+                url: url,
+                windowName: '_blank',
+                toolbarColor: '#635BFF',
+                presentationStyle: 'popover', // Use popover for better in-app experience
+                // iOS-specific options for Safari View Controller
+                width: Math.min(window.innerWidth * 0.9, 800),
+                height: Math.min(window.innerHeight * 0.9, 700)
+              });
+            } else if (platform === 'android') {
+              // Android-specific Custom Tabs configuration
+              await Browser.open({
+                url: url,
+                windowName: '_blank',
+                toolbarColor: '#635BFF',
+                presentationStyle: 'fullscreen'
+              });
+            } else {
+              // Fallback for other platforms
+              await Browser.open({
+                url: url,
+                windowName: '_blank',
+                toolbarColor: '#635BFF',
+                presentationStyle: 'fullscreen'
+              });
+            }
+            
+            // Listen for browser closure to refresh data
+            const listener = await Browser.addListener('browserFinished', () => {
+              console.log('Browser was closed - refreshing data');
+              window.location.reload();
+              listener.remove();
+            });
+            
+          } else if (isMobileDevice() || isMobileAppWebView()) {
+            // Mobile device or WebView - open in same window to prevent external browser redirect
+            window.location.href = url;
+          } else if (supportsPopups()) {
+            // Desktop with popup support - use popup
+            const popupFeatures = 'width=800,height=700,scrollbars=yes,resizable=yes,status=yes,left=' + 
+              ((window.innerWidth - 800) / 2) + ',top=' + ((window.innerHeight - 700) / 2);
+            const popup = window.open(url, 'stripe-connect', popupFeatures);
+            
+            if (popup) {
+              const checkClosed = setInterval(() => {
+                if (popup.closed) {
+                  clearInterval(checkClosed);
+                  window.location.reload();
+                }
+              }, 1000);
+            } else {
+              // Popup blocked - fallback to same window
+              window.location.href = url;
+            }
+          } else {
+            // No popup support - fallback to same window
+            window.location.href = url;
+          }
         }
-        sideNav={null}
-        useAccountSettingsNav
-        currentPage="StripePayoutPage"
-        footer={<FooterContainer />}
-      >
-        <div className={css.content}>
-          <H3 as="h1" className={css.heading}>
-            <FormattedMessage id="StripePayoutPage.heading" />
-          </H3>
-          {!currentUserLoaded ? (
-            <FormattedMessage id="StripePayoutPage.loadingData" />
-          ) : returnedAbnormallyFromStripe && !getAccountLinkError ? (
-            <FormattedMessage id="StripePayoutPage.redirectingToStripe" />
-          ) : (
-            <StripeConnectAccountForm
-              rootClassName={css.stripeConnectAccountForm}
-              disabled={formDisabled}
-              inProgress={payoutDetailsSaveInProgress}
-              ready={payoutDetailsSaved}
-              currentUser={ensuredCurrentUser}
-              stripeBankAccountLastDigits={getBankAccountLast4Digits(stripeAccountData)}
-              savedCountry={savedCountry}
-              submitButtonText={intl.formatMessage({
-                id: 'StripePayoutPage.submitButtonText',
-              })}
-              stripeAccountError={
-                createStripeAccountError || updateStripeAccountError || fetchStripeAccountError
-              }
-              stripeAccountLinkError={getAccountLinkError}
-              stripeAccountFetched={stripeAccountFetched}
-              onChange={onPayoutDetailsChange}
-              onSubmit={onPayoutDetailsSubmit}
-              onGetStripeConnectAccountLink={handleGetStripeConnectAccountLink}
-              stripeConnected={stripeConnected}
-            >
-              {stripeConnected && !returnedAbnormallyFromStripe && showVerificationNeeded ? (
-                <StripeConnectAccountStatusBox
-                  type="verificationNeeded"
-                  inProgress={getAccountLinkInProgress}
-                  onGetStripeConnectAccountLink={handleGetStripeConnectAccountLink(
-                    'custom_account_verification'
-                  )}
-                />
-              ) : stripeConnected && savedCountry && !returnedAbnormallyFromStripe ? (
-                <StripeConnectAccountStatusBox
-                  type="verificationSuccess"
-                  inProgress={getAccountLinkInProgress}
-                  disabled={payoutDetailsSaveInProgress}
-                  onGetStripeConnectAccountLink={handleGetStripeConnectAccountLink(
-                    'custom_account_update'
-                  )}
-                />
-              ) : null}
-            </StripeConnectAccountForm>
-          )}
-        </div>
-      </LayoutSideNavigation>
-      <NativeBottomNavbar />
-      
-      {/* Embedded Stripe Connect Modal */}
-      <StripeConnectEmbedded
-        isOpen={showEmbeddedConnect}
-        onClose={handleEmbeddedClose}
-        stripeUrl={stripeConnectUrl}
-        onSuccess={handleEmbeddedSuccess}
-        onError={handleEmbeddedError}
-        marketplaceRootURL={config.marketplaceRootURL}
-      />
-    </Page>
-  );
-};
+      });
+    }
+  }
 
-StripePayoutPageComponent.defaultProps = {
-  currentUser: null,
-  createStripeAccountError: null,
-  updateStripeAccountError: null,
-  fetchStripeAccountError: null,
-  getAccountLinkError: null,
-  stripeAccount: null,
-  params: {
-    returnURLType: null,
-  },
-};
+  handleEmbeddedSuccess() {
+    console.log('Embedded onboarding completed successfully');
+    this.setState({ showEmbeddedOnboarding: false });
+    // Refresh the page to update the account status
+    window.location.reload();
+  }
+
+  handleEmbeddedError(error) {
+    console.error('Embedded onboarding error:', error);
+    this.setState({ 
+      showEmbeddedOnboarding: false,
+      useEmbeddedFlow: false 
+    });
+    // Fallback to popup method
+    this.handleCreateStripeAccount();
+  }
+
+  handleEmbeddedExit() {
+    console.log('User exited embedded onboarding');
+    this.setState({ showEmbeddedOnboarding: false });
+  }
+
+  render() {
+    const {
+      currentUser,
+      getStripeConnectAccountLinkError,
+      getStripeConnectAccountLinkInProgress,
+      createStripeAccountError,
+      createStripeAccountInProgress,
+      stripeAccount,
+      stripeAccountFetched,
+      scrollingDisabled,
+      intl,
+    } = this.props;
+
+    const { showEmbeddedOnboarding } = this.state;
+
+    const ensuredCurrentUser = ensureCurrentUser(currentUser);
+    const currentUserLoaded = !!ensuredCurrentUser.id;
+    const stripeConnected = stripeAccount && stripeAccount.attributes.stripeAccountId;
+
+    const title = intl.formatMessage({ id: 'StripePayoutPage.title' });
+
+    const returnedNormallyFromStripe = window.location.search?.includes(
+      STRIPE_ONBOARDING_RETURN_URL_SUCCESS
+    );
+    const returnedAbnormallyFromStripe = window.location.search?.includes(
+      STRIPE_ONBOARDING_RETURN_URL_FAILURE
+    );
+    const showVerificationNeeded = stripeAccount && !stripeAccount.attributes.payoutsEnabled;
+
+    // Get first and last name of the current user and use it in the form later
+    const userName = ensuredCurrentUser.attributes.profile.displayName;
+    const { firstName, lastName } = userName || {};
+
+    const hasStripeOnboardingDataIfNeeded = returnedNormallyFromStripe
+      ? !!(firstName && lastName && stripeConnected)
+      : !!(firstName && lastName);
+
+    const accountId = stripeConnected ? stripeAccount.attributes.stripeAccountId : null;
+    const stripeAccountData = stripeConnected ? stripeAccount.attributes : null;
+
+    const requirementsMissing =
+      stripeAccount &&
+      (stripeAccount.attributes.requirements.currently_due.length > 0 ||
+        stripeAccount.attributes.requirements.past_due.length > 0);
+
+    const savedCountry = stripeAccountData ? stripeAccountData.country : null;
+
+    const handleGetStripeConnectAccountLinkFn = () => {
+      this.handleCreateStripeAccount();
+    };
+
+    const returnedFromStripe = returnedNormallyFromStripe || returnedAbnormallyFromStripe;
+
+    if (!currentUserLoaded) {
+      return (
+        <Page title={title} scrollingDisabled={scrollingDisabled}>
+          <LayoutSideNavigation
+            topbar={
+              <>
+                <TopbarContainer currentPage="StripePayoutPage" />
+                <UserNav currentPage="StripePayoutPage" />
+              </>
+            }
+            sideNav={null}
+            useAccountSettingsNav
+            currentPage="StripePayoutPage"
+          >
+            <div className={css.content}>
+              <IconSpinner />
+            </div>
+          </LayoutSideNavigation>
+        </Page>
+      );
+    }
+
+    const showContent = stripeAccountFetched && hasStripeOnboardingDataIfNeeded;
+    const showForm = !savedCountry && !stripeConnected;
+    const savedCountryMaybe = savedCountry ? (
+      <FormattedMessage id="StripePayoutPage.savedCountry" values={{ country: savedCountry }} />
+    ) : null;
+
+    const submitInProgress = createStripeAccountInProgress || getStripeConnectAccountLinkInProgress;
+    const submitDisabled = !this.state.countryCode || submitInProgress;
+
+    const {
+      getBankAccountLinkError,
+      getBankAccountLinkInProgress,
+      onGetBankAccountLink,
+      stripeBankAccountLastDigits,
+    } = this.props;
+
+    const accountOpened = !!(stripeAccount && stripeAccount.attributes.stripeAccountId);
+    const accountNotConnected = !accountOpened;
+    const bankAccountNotConnected = accountOpened && !stripeBankAccountLastDigits;
+    const bankAccountConnected = accountOpened && stripeBankAccountLastDigits;
+    const payoutsEnabled = stripeAccount && stripeAccount.attributes.payoutsEnabled;
+    const accountRejected = false;
+
+    return (
+      <Page title={title} scrollingDisabled={scrollingDisabled}>
+        <LayoutSideNavigation
+          topbar={
+            <>
+              <TopbarContainer currentPage="StripePayoutPage" />
+              <UserNav currentPage="StripePayoutPage" />
+            </>
+          }
+          sideNav={null}
+          useAccountSettingsNav
+          currentPage="StripePayoutPage"
+        >
+          <div className={css.content}>
+            <H3 as="h1" className={css.heading}>
+              <FormattedMessage id="StripePayoutPage.heading" />
+            </H3>
+            {showContent ? (
+              <div>
+                {accountNotConnected && (
+                  <div>
+                    <H3 className={css.subtitle}>
+                      <FormattedMessage id="StripePayoutPage.subtitle" />
+                    </H3>
+                    <p>
+                      <FormattedMessage id="StripePayoutPage.description" />
+                    </p>
+                    
+                    <InlineTextButton
+                      className={css.submitButton}
+                      inProgress={submitInProgress}
+                      disabled={submitDisabled}
+                      onClick={handleGetStripeConnectAccountLinkFn}
+                    >
+                      <FormattedMessage id="StripePayoutPage.submitButtonText" />
+                    </InlineTextButton>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <IconSpinner />
+            )}
+          </div>
+        </LayoutSideNavigation>
+
+        {/* Embedded Stripe Onboarding Modal */}
+        {showEmbeddedOnboarding && (
+          <Modal
+            id="StripeEmbeddedOnboardingModal"
+            isOpen={showEmbeddedOnboarding}
+            onClose={this.handleEmbeddedExit}
+            usePortal
+            onManageDisableScrolling={() => {}}
+          >
+            <div className={css.embeddedOnboardingModal}>
+              <div className={css.modalHeader}>
+                <h2>
+                  <FormattedMessage id="StripePayoutPage.embeddedOnboarding.title" />
+                </h2>
+                <p>
+                  <FormattedMessage id="StripePayoutPage.embeddedOnboarding.description" />
+                </p>
+              </div>
+                             <StripeEmbeddedOnboarding
+                 transactionId={ensuredCurrentUser.id?.uuid}
+                 countryCode={this.state.countryCode}
+                 onSuccess={this.handleEmbeddedSuccess}
+                 onError={this.handleEmbeddedError}
+                 onExit={this.handleEmbeddedExit}
+               />
+            </div>
+          </Modal>
+        )}
+      </Page>
+    );
+  }
+}
 
 StripePayoutPageComponent.propTypes = {
   currentUser: propTypes.currentUser,
   scrollingDisabled: bool.isRequired,
-  getAccountLinkInProgress: bool.isRequired,
-  payoutDetailsSaveInProgress: bool.isRequired,
+  getStripeConnectAccountLinkError: propTypes.error,
+  getStripeConnectAccountLinkInProgress: bool.isRequired,
   createStripeAccountError: propTypes.error,
-  getAccountLinkError: propTypes.error,
-  updateStripeAccountError: propTypes.error,
-  fetchStripeAccountError: propTypes.error,
+  createStripeAccountInProgress: bool.isRequired,
   stripeAccount: propTypes.stripeAccount,
   stripeAccountFetched: bool.isRequired,
-  payoutDetailsSaved: bool.isRequired,
-
-  onPayoutDetailsChange: func.isRequired,
-  onPayoutDetailsSubmit: func.isRequired,
+  onStripeAccountClearError: func.isRequired,
   onGetStripeConnectAccountLink: func.isRequired,
-  params: shape({
-    returnURLType: oneOf(STRIPE_ONBOARDING_RETURN_URL_TYPES),
-  }),
-
-  // from injectIntl
+  onGetBankAccountLink: func.isRequired,
+  onLoadData: func,
+  stripeBankAccountLastDigits: string,
+  getBankAccountLinkError: propTypes.error,
+  getBankAccountLinkInProgress: bool.isRequired,
   intl: intlShape.isRequired,
 };
 
 const mapStateToProps = state => {
   const {
-    getAccountLinkInProgress,
-    getAccountLinkError,
+    getAccountLinkError: getStripeConnectAccountLinkError,
+    getAccountLinkInProgress: getStripeConnectAccountLinkInProgress,
     createStripeAccountError,
-    updateStripeAccountError,
-    fetchStripeAccountError,
+    createStripeAccountInProgress,
     stripeAccount,
     stripeAccountFetched,
   } = state.stripeConnectAccount;
   const { currentUser } = state.user;
-  const { payoutDetailsSaveInProgress, payoutDetailsSaved } = state.StripePayoutPage;
   return {
     currentUser,
-    getAccountLinkInProgress,
-    getAccountLinkError,
+    getStripeConnectAccountLinkError,
+    getStripeConnectAccountLinkInProgress,
     createStripeAccountError,
-    updateStripeAccountError,
-    fetchStripeAccountError,
+    createStripeAccountInProgress,
     stripeAccount,
     stripeAccountFetched,
-    payoutDetailsSaveInProgress,
-    payoutDetailsSaved,
     scrollingDisabled: isScrollingDisabled(state),
+    // Add missing props that are used in the component
+    getBankAccountLinkError: null,
+    getBankAccountLinkInProgress: false,
+    stripeBankAccountLastDigits: null,
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  onPayoutDetailsChange: () => dispatch(stripeAccountClearError()),
-  onPayoutDetailsSubmit: (values, isUpdateCall) =>
-    dispatch(savePayoutDetails(values, isUpdateCall)),
-  onGetStripeConnectAccountLink: params => dispatch(getStripeConnectAccountLink(params)),
+  onStripeAccountClearError: () => dispatch(stripeAccountClearError()),
+  onGetStripeConnectAccountLink: () => dispatch(getStripeConnectAccountLink({
+    failureURL: window.location.href,
+    successURL: window.location.href,
+    type: 'account_onboarding'
+  })),
+  onGetBankAccountLink: () => {}, // Placeholder function since this isn't implemented
+  onLoadData: () => dispatch(loadData()),
 });
 
 const StripePayoutPage = compose(

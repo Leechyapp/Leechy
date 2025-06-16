@@ -1,0 +1,195 @@
+.root {
+  width: 100%;
+}
+
+.cardsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cardItem {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--colorGrey300);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--colorWhite);
+
+  &:hover {
+    border-color: var(--colorSuccess);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &.selected {
+    border-color: var(--colorSuccess);
+    background-color: var(--colorSuccess50);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.cardIcon {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardInfo {
+  flex: 1;
+}
+
+.cardNumber {
+  font-weight: var(--fontWeightMedium);
+  color: var(--colorGrey700);
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+.cardExpiry {
+  font-size: 14px;
+  color: var(--colorGrey500);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+.cardSelector {
+  margin-left: 16px;
+}
+
+.radioButton {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--colorGrey300);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+
+  &.checked {
+    border-color: var(--colorSuccess);
+    background-color: var(--colorSuccess);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--colorWhite);
+    }
+  }
+}
+
+.submitContainer {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--colorGrey200);
+}
+
+.submitButton {
+  width: 100%;
+  max-width: 300px;
+}
+
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: var(--colorGrey50);
+  border-radius: 8px;
+  border: 1px solid var(--colorGrey200);
+
+  p {
+    color: var(--colorGrey600);
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .cardItem {
+    padding: 12px;
+  }
+
+  .cardIcon {
+    margin-right: 12px;
+  }
+
+  .cardNumber {
+    font-size: 14px;
+  }
+
+  .cardExpiry {
+    font-size: 12px;
+  }
+
+  .radioButton {
+    width: 18px;
+    height: 18px;
+
+    &.checked::after {
+      width: 6px;
+      height: 6px;
+    }
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .cardItem {
+    background-color: var(--colorGrey800);
+    border-color: var(--colorGrey600);
+
+    &:hover {
+      border-color: var(--colorSuccess);
+    }
+
+    &.selected {
+      background-color: rgba(var(--colorSuccessRGB), 0.1);
+    }
+  }
+
+  .cardNumber {
+    color: var(--colorGrey200);
+  }
+
+  .cardExpiry {
+    color: var(--colorGrey400);
+  }
+
+  .submitContainer {
+    border-top-color: var(--colorGrey600);
+  }
+
+  .empty {
+    background-color: var(--colorGrey800);
+    border-color: var(--colorGrey600);
+
+    p {
+      color: var(--colorGrey300);
+    }
+  }
+}
+
+/* Focus states for accessibility */
+.cardItem:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--colorSuccessRGB), 0.3);
+}
+
+/* Animation for card selection */
+.cardItem {
+  transform: scale(1);
+  transition: transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+
+  &:active {
+    transform: scale(0.98);
+  }
+} 

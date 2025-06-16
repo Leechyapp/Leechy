@@ -238,6 +238,9 @@ export const retrieveStripeAccount = (body = {}) => {
 export const connectStripeAccount = (body = {}) => {
   return post('/api/stripe-account/connect-stripe-account', body);
 };
+export const createStripeAccountSession = (body = {}) => {
+  return post('/api/stripe-account/create-account-session', body);
+};
 export const createStripeDashboardLink = body => {
   return post('/api/stripe-account/create-stripe-account-dashboard-link', body);
 };

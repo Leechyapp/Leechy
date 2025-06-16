@@ -48,10 +48,18 @@ const defaultDirectives = {
     'sentry.io',
     '*.sentry.io',
     '*.stripe.com',
+    'connect-js.stripe.com',
+    'merchant-ui-api.stripe.com',
   ],
   fontSrc: [self, data, 'assets-sharetribecom.sharetribe.com', 'fonts.gstatic.com'],
   formAction: [self],
-  frameSrc: [self, '*.stripe.com', '*.youtube-nocookie.com'],
+  frameSrc: [
+    self, 
+    '*.stripe.com', 
+    'connect-js.stripe.com', 
+    'merchant-ui-api.stripe.com', 
+    '*.youtube-nocookie.com',
+  ],
   imgSrc: [
     self,
     data,
@@ -95,6 +103,8 @@ const defaultDirectives = {
     'www.googletagmanager.com',
     '*.google-analytics.com',
     'js.stripe.com',
+    'connect-js.stripe.com',
+    'merchant-ui-api.stripe.com',
     // Plausible analytics
     'plausible.io',
   ],

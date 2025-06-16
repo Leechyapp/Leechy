@@ -6,3 +6,69 @@ button.stripeConnectCtaButton {
     background-color: var(--marketplaceColorDark);
   }
 }
+
+// Embedded Onboarding Modal Styles
+.embeddedOnboardingModal {
+  max-width: 950px;
+  width: 95vw;
+  max-height: 90vh;
+  height: auto;
+  padding: 0;
+  border-radius: 12px;
+  overflow-y: auto;
+  overflow-x: visible;
+  margin: 20px auto;
+
+  @media (max-width: 768px) {
+    width: 98vw;
+    max-height: 95vh;
+    border-radius: 8px;
+    margin: 10px auto;
+  }
+}
+
+.embeddedOnboardingContent {
+  padding: 20px 24px 40px 24px;
+  min-height: 600px;
+  height: auto;
+  
+  @media (max-width: 768px) {
+    padding: 16px 16px 32px 16px;
+    min-height: 500px;
+  }
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--matterColorDark);
+  margin: 0 0 8px 0;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+}
+
+.modalDescription {
+  font-size: 14px;
+  color: var(--matterColor);
+  margin: 0 0 24px 0;
+  text-align: center;
+  line-height: 1.5;
+
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+}
+
+.embeddedOnboarding {
+  width: 100%;
+  border-radius: 8px;
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 600px;
+  height: auto;
+  flex: 1;
+}

@@ -47,6 +47,7 @@ import { InsuranceMethodEnum } from '../../enums/insurance-method.enum.js';
 
 import stripePaymentFormCSS from './StripePaymentForm/StripePaymentForm.module.css';
 import CustomStripePaymentForm from '../../components/CustomStripePaymentForm/CustomStripePaymentForm.js';
+import EnhancedPaymentMethodSelector from '../../components/EnhancedPaymentMethodSelector/EnhancedPaymentMethodSelector.js';
 import {
   createBookingRequest,
   createSetupIntent,
@@ -372,6 +373,7 @@ export const CheckoutPageWithPayment = props => {
   const [setupIntentLoading, setSetupIntentLoading] = useState(false);
   const [trxSubmitInProgress, setTrxSubmitInProgress] = useState(false);
   const [initialMessage, setInitialMessage] = useState();
+  const [useEnhancedPaymentSelector, setUseEnhancedPaymentSelector] = useState(true);
   const saveCardDetailsRef = useRef(null);
 
   const {
@@ -671,6 +673,109 @@ export const CheckoutPageWithPayment = props => {
       });
   };
 
+  // Enhanced payment handler for different payment methods (Apple Pay, Google Pay, Cards)
+  const handleEnhancedPaymentSubmit = async (paymentData) => {
+    const { booking, attributes } = speculatedTransaction;
+    const { lineItems, payinTotal, payoutTotal } = attributes;
+    const bookingStart = booking.attributes.start;
+    const bookingEnd = booking.attributes.end;
+    const displayStart = booking.attributes.displayStart;
+    const displayEnd = booking.attributes.displayEnd;
+
+    const insuranceMethod = pageData.orderData?.insuranceMethod;
+    const insuranceMethodMaybe = insuranceMethod ? { insuranceMethod } : {};
+    let securityDepositMaybe = {};
+    if (speculatedTransaction && insuranceMethod === InsuranceMethodEnum.SecurityDeposit) {
+      const {
+        securityDepositPercentageValue,
+        totalPlusSecurityDepositPrice,
+        securityDepositAmount,
+        securityDepositTransferAmount,
+      } = speculatedTransaction.attributes.protectedData;
+      securityDepositMaybe = {
+        securityDepositPercentageValue,
+        totalPlusSecurityDepositPrice,
+        securityDepositAmount,
+        securityDepositTransferAmount,
+      };
+    }
+
+    setTrxSubmitInProgress(true);
+
+    try {
+      // Extract Stripe payment method ID based on payment type
+      let stripePaymentMethodId;
+      
+      console.log('Processing payment data:', paymentData);
+      
+      if (paymentData.type === 'apple_pay' || paymentData.type === 'google_pay') {
+        // For Apple Pay and Google Pay, the payment method ID is provided directly
+        stripePaymentMethodId = paymentData.paymentMethodId || paymentData.paymentMethod?.id;
+        console.log('Digital wallet payment method ID:', stripePaymentMethodId);
+        
+        if (!stripePaymentMethodId) {
+          throw new Error(`Missing payment method ID for ${paymentData.type}`);
+        }
+      } else if (paymentData.type === 'saved_card') {
+        // For saved cards
+        stripePaymentMethodId = paymentData.paymentMethodId;
+        console.log('Saved card payment method ID:', stripePaymentMethodId);
+      } else if (paymentData.type === 'card') {
+        // For new card payments
+        stripePaymentMethodId = paymentData.paymentMethodId;
+        console.log('Card payment method ID:', stripePaymentMethodId);
+      } else {
+        throw new Error('Unsupported payment method type: ' + paymentData.type);
+      }
+
+      await createBookingRequest({
+        initialMessage,
+        orderParams: {
+          listingId: listing.id,
+          bookingStart,
+          bookingEnd,
+          displayStart,
+          displayEnd,
+          protectedData: {
+            stripePaymentMethodId,
+            paymentType: paymentData.type, // Track the payment method type
+            lineItems: parseLineItems(lineItems, PriceBreakdownFormatTypeEnum.Json),
+            payinTotal: parsePayTotal(payinTotal, PriceBreakdownFormatTypeEnum.Json),
+            payoutTotal: parsePayTotal(payoutTotal, PriceBreakdownFormatTypeEnum.Json),
+            emailData: parseSharetribeCompatibleEmailData({
+              bookingStart,
+              bookingEnd,
+              displayStart,
+              displayEnd,
+              lineItems,
+              payinTotal,
+              payoutTotal,
+              timeZone,
+            }),
+            ...insuranceMethodMaybe,
+            ...securityDepositMaybe,
+          },
+        },
+      }).then(({ transactionId }) => {
+        sendPushNotification({
+          pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
+          transactionId: transactionId.uuid,
+          params: {},
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.error(err);
+          });
+        redirectToOrderDetailsPage(transactionId);
+      });
+    } catch (err) {
+      setTrxSubmitInProgress(false);
+      console.error('Enhanced payment submission failed:', err);
+    }
+  };
+
   const redirectToOrderDetailsPage = transactionId => {
     const { routeConfiguration, history } = props;
     history.push(
@@ -783,54 +888,74 @@ export const CheckoutPageWithPayment = props => {
                 onChange={e => setInitialMessage(e.target.value)}
                 className={[stripePaymentFormCSS.message, css.initialMessageTextArea].join(' ')}
               />
-              <Heading as="h3" rootClassName={stripePaymentFormCSS.heading}>
-                <FormattedMessage id="StripePaymentForm.payWithHeading" />
-              </Heading>
-              {paymentMethodsLoading || setupIntentLoading ? (
-                <IconSpinner />
+              
+              {useEnhancedPaymentSelector ? (
+                <EnhancedPaymentMethodSelector
+                  savedCards={customPaymentMethodList}
+                  onPaymentSubmit={handleEnhancedPaymentSubmit}
+                  isLoading={paymentMethodsLoading || setupIntentLoading}
+                  inProgress={trxSubmitInProgress}
+                  totalAmount={totalPrice?.toString()}
+                  currency="USD"
+                  currentUser={currentUser}
+                  config={config}
+                  clientSecret={customClientSecret}
+                  stripePublishableKey={config.stripe.publishableKey}
+                  showSavedCards={true}
+                  showDigitalWallets={true}
+                />
               ) : (
                 <>
-                  {customDefaultPaymentMethod && customPaymentMethodList && (
+                  <Heading as="h3" rootClassName={stripePaymentFormCSS.heading}>
+                    <FormattedMessage id="StripePaymentForm.payWithHeading" />
+                  </Heading>
+                  {paymentMethodsLoading || setupIntentLoading ? (
+                    <IconSpinner />
+                  ) : (
                     <>
-                      <CustomSavedCardDetails
-                        onManageDisableScrolling={onManageDisableScrolling}
-                        customDefaultPaymentMethod={customDefaultPaymentMethod}
-                        customPaymentMethodList={customPaymentMethodList}
-                        onChange={getCustomClientSecretAndSetForm}
-                        onDeleteCardPaymentMethod={deleteCardPaymentMethod}
-                        changeCustomPaymentMethod={changeCustomPaymentMethod}
-                        ref={saveCardDetailsRef}
-                      />
-                      <br />
-                      {!showCustomPaymentForm && (
-                        <div className={stripePaymentFormCSS.submitContainer}>
-                          <PrimaryButton
-                            className={stripePaymentFormCSS.submitButton}
-                            type="button"
-                            inProgress={trxSubmitInProgress}
-                            onClick={() =>
-                              handleCustomPaymentSubmit({
-                                stripePaymentMethodId: customDefaultPaymentMethod.id,
-                                initialMessage,
-                              })
-                            }
-                          >
-                            <FormattedMessage id="StripePaymentForm.submitCustomStripePaymentInfo" />
-                          </PrimaryButton>
-                        </div>
+                      {customDefaultPaymentMethod && customPaymentMethodList && (
+                        <>
+                          <CustomSavedCardDetails
+                            onManageDisableScrolling={onManageDisableScrolling}
+                            customDefaultPaymentMethod={customDefaultPaymentMethod}
+                            customPaymentMethodList={customPaymentMethodList}
+                            onChange={getCustomClientSecretAndSetForm}
+                            onDeleteCardPaymentMethod={deleteCardPaymentMethod}
+                            changeCustomPaymentMethod={changeCustomPaymentMethod}
+                            ref={saveCardDetailsRef}
+                          />
+                          <br />
+                          {!showCustomPaymentForm && (
+                            <div className={stripePaymentFormCSS.submitContainer}>
+                              <PrimaryButton
+                                className={stripePaymentFormCSS.submitButton}
+                                type="button"
+                                inProgress={trxSubmitInProgress}
+                                onClick={() =>
+                                  handleCustomPaymentSubmit({
+                                    stripePaymentMethodId: customDefaultPaymentMethod.id,
+                                    initialMessage,
+                                  })
+                                }
+                              >
+                                <FormattedMessage id="StripePaymentForm.submitCustomStripePaymentInfo" />
+                              </PrimaryButton>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      {showCustomPaymentForm && customClientSecret && (
+                        <CustomStripePaymentForm
+                          authorDisplayName={authorDisplayName}
+                          clientSecret={customClientSecret}
+                          ctaButtonTxt="CustomStripePaymentForm.submitBookingRequest"
+                          handleCustomPaymentSubmit={handleCustomPaymentSubmit}
+                          currentUserEmail={currentUser.attributes.email}
+                          showInitialMessageInput={false}
+                          trxSubmitInProgress={trxSubmitInProgress}
+                        />
                       )}
                     </>
-                  )}
-                  {showCustomPaymentForm && customClientSecret && (
-                    <CustomStripePaymentForm
-                      authorDisplayName={authorDisplayName}
-                      clientSecret={customClientSecret}
-                      ctaButtonTxt="CustomStripePaymentForm.submitBookingRequest"
-                      handleCustomPaymentSubmit={handleCustomPaymentSubmit}
-                      currentUserEmail={currentUser.attributes.email}
-                      showInitialMessageInput={false}
-                      trxSubmitInProgress={trxSubmitInProgress}
-                    />
                   )}
                 </>
               )}
