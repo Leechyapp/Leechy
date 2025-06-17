@@ -73,11 +73,23 @@ const request = (path, options = {}) => {
     const contentType = contentTypeHeader ? contentTypeHeader.split(';')[0] : null;
 
     if (res.status >= 400) {
+      // Clone the response to avoid the "body stream already read" error
+      const responseClone = res.clone();
+      
       return res.json().then(data => {
+        console.error(`❌ API Error ${res.status} for ${path}:`, data);
+        console.error(`❌ API Error Headers:`, Array.from(res.headers.entries()));
         let e = new Error();
         e = Object.assign(e, data);
-
         throw e;
+      }).catch(jsonError => {
+        // If response isn't JSON, try to get text from the cloned response
+        return responseClone.text().then(text => {
+          console.error(`❌ API Error ${res.status} for ${path} (non-JSON):`, text);
+          let e = new Error(text || `HTTP ${res.status}`);
+          e.status = res.status;
+          throw e;
+        });
       });
     }
     if (contentType === 'application/transit+json') {
@@ -269,4 +281,63 @@ export const attachPaymentMethod = body => {
 };
 export const detachPaymentMethod = body => {
   return post('/api/payment-method/detach', body);
+};
+
+// PayPal payment methods
+export const createPayPalOrder = body => {
+  return post('/api/paypal/create-order', body);
+};
+
+export const authorizePayPalOrder = (orderId, authorizePayload = {}) => {
+  return request(`/api/paypal/authorize-order/${orderId}`, {
+    method: 'POST',
+    body: authorizePayload,
+  });
+};
+
+export const capturePayPalOrder = (orderId, capturePayload = {}) => {
+  return request(`/api/paypal/capture-order/${orderId}`, {
+    method: 'POST',
+    body: capturePayload,
+  });
+};
+
+export const capturePayPalAuthorization = (authorizationId, capturePayload = {}) => {
+  return request(`/api/paypal/capture-authorization/${authorizationId}`, {
+    method: 'POST',
+    body: capturePayload,
+  });
+};
+
+export const voidPayPalAuthorization = (authorizationId) => {
+  return request(`/api/paypal/void-authorization/${authorizationId}`, {
+    method: 'POST',
+  });
+};
+
+export const voidPayPalBookingAuthorization = (transactionId) => {
+  return request(`/api/paypal/void-booking-authorization/${transactionId}`, {
+    method: 'POST',
+  });
+};
+
+export const getPayPalOrder = orderId => {
+  return request(`/api/paypal/order/${orderId}`, {
+    method: 'GET',
+  });
+};
+
+export const getPayPalConfigStatus = () => {
+  return request('/api/paypal/config-status', {
+    method: 'GET',
+  });
+};
+
+// NEW: Unified payout endpoints for multi-payment-method earnings
+export const getUnifiedEarnings = () => {
+  return post('/api/earnings/unified-balance', {});
+};
+
+export const createUnifiedPayout = () => {
+  return post('/api/earnings/create-unified-payout', {});
 };

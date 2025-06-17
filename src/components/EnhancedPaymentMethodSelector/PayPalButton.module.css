@@ -1,0 +1,224 @@
+/* PayPal Button Component Styles */
+
+.root {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.paypalButton {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0070ba 0%, #003087 100%);
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 48, 135, 0.2);
+}
+
+.paypalButton:hover {
+  background: linear-gradient(135deg, #005a9e 0%, #002970 100%);
+  box-shadow: 0 4px 8px rgba(0, 48, 135, 0.3);
+  transform: translateY(-1px);
+}
+
+.paypalButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 48, 135, 0.2);
+}
+
+.paypalButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.paypalButton:disabled:hover {
+  background: #ccc;
+  transform: none;
+  box-shadow: none;
+}
+
+.paypalLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.paypalLogo svg {
+  width: 100%;
+  height: 100%;
+}
+
+.paypalText {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  color: #c33;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.error p {
+  margin: 0;
+}
+
+.unavailable {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.unavailable p {
+  margin: 0;
+}
+
+.securityInfo {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.securityInfo p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.paymentOptions {
+  margin-top: 4px !important;
+  font-size: 11px !important;
+  color: #0070ba !important;
+  font-weight: 500 !important;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .paypalButton {
+    height: 48px;
+    font-size: 15px;
+  }
+  
+  .paypalLogo {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .paypalText {
+    font-size: 15px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .unavailable {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #ccc;
+  }
+  
+  .securityInfo p {
+    color: #999;
+  }
+  
+  .error {
+    background-color: #2d1a1a;
+    border-color: #4a2a2a;
+    color: #ff6b6b;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .paypalButton {
+    border: 2px solid #000;
+  }
+  
+  .paypalButton:hover {
+    border-color: #fff;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .paypalButton {
+    transition: none;
+  }
+  
+  .paypalButton:hover {
+    transform: none;
+  }
+  
+  .paypalButton:active {
+    transform: none;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+}
+
+/* Focus Styles for Accessibility */
+.paypalButton:focus {
+  outline: 2px solid #0070ba;
+  outline-offset: 2px;
+}
+
+.paypalButton:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.paypalButton:focus-visible {
+  outline: 2px solid #0070ba;
+  outline-offset: 2px;
+} 

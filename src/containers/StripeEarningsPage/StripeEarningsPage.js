@@ -19,6 +19,8 @@ import {
   createStripeAccountPayout,
   createStripeDashboardLink,
   updateStripeAccountPayoutInterval,
+  createUnifiedPayout,
+  getUnifiedEarnings,
 } from '../../util/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchStripeAccountBalance, loadData } from './StripeEarningsPage.duck';
@@ -59,54 +61,97 @@ export const StripeEarningsPage = injectIntl(props => {
   const payouts_enabled = stripeExpress?.payouts_enabled;
   const payoutInterval = stripeExpress?.settings?.payouts?.schedule?.interval;
 
-  const { stripeBalance, stripeBalanceLoading, stripeBalanceError } = state.StripeEarningsPage;
-  const [pendingAmount, setPendingAmount] = useState();
-  const [availableAmount, setAvailableAmount] = useState();
-  const [stripeAccountPayoutInProgress, setStripeAccountPayoutInProgress] = useState(null);
+  const [unifiedBalance, setUnifiedBalance] = useState(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  const [balanceError, setBalanceError] = useState(null);
+  
+  const [totalAvailableAmount, setTotalAvailableAmount] = useState();
+  const [totalPendingAmount, setTotalPendingAmount] = useState();
+  const [stripeAvailableAmount, setStripeAvailableAmount] = useState();
+  const [paypalPendingAmount, setPaypalPendingAmount] = useState();
+  
+  const [unifiedPayoutInProgress, setUnifiedPayoutInProgress] = useState(false);
   const [dashboardLinkInProgress, setDashboardLinkInProgress] = useState(false);
   const [payoutIntervalModalOpen, setPayoutIntervalModalOpen] = useState(false);
   const [selectedPayoutInterval, setSelectedPayoutInterval] = useState();
   const [updatePayoutIntervalInProgress, setUpdatePayoutIntervalInProgress] = useState(false);
 
+  const loadUnifiedBalance = async () => {
+    setBalanceLoading(true);
+    setBalanceError(null);
+    
+    try {
+      const result = await getUnifiedEarnings();
+      console.log('💰 Unified balance received:', result);
+      
+      if (result.success && result.balance) {
+        setUnifiedBalance(result.balance);
+        
+        if (result.balance.totalAvailable) {
+          setTotalAvailableAmount(onFormatMoney(result.balance.totalAvailable.amount, result.balance.totalAvailable.currency));
+        }
+        if (result.balance.totalPending) {
+          setTotalPendingAmount(onFormatMoney(result.balance.totalPending.amount, result.balance.totalPending.currency));
+      }
+        if (result.balance.stripeAvailable) {
+          setStripeAvailableAmount(onFormatMoney(result.balance.stripeAvailable.amount, result.balance.stripeAvailable.currency));
+        }
+        if (result.balance.paypalPending) {
+          setPaypalPendingAmount(onFormatMoney(result.balance.paypalPending.amount, result.balance.paypalPending.currency));
+        }
+      }
+    } catch (error) {
+      console.error('❌ Failed to load unified balance:', error);
+      setBalanceError(error);
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (stripeBalance) {
-      const { pendingAmount, availableAmount } = stripeBalance;
-      if (pendingAmount) {
-        const formattedAmount = onFormatMoney(pendingAmount.amount, pendingAmount.currency);
-        setPendingAmount(formattedAmount);
-      }
-      if (availableAmount) {
-        const formattedAmount = onFormatMoney(availableAmount.amount, availableAmount.currency);
-        setAvailableAmount(formattedAmount);
-      }
-    } else {
+    if (!unifiedBalance) {
       dispatch(fetchStripeExpress());
-      dispatch(loadData());
+      loadUnifiedBalance();
     }
     if (payoutInterval) {
       setSelectedPayoutInterval(payoutInterval);
     }
-  }, [stripeBalance, payoutInterval]);
+  }, [payoutInterval]);
 
-  const onCreateStripeAccountPayout = transactionId => {
-    setStripeAccountPayoutInProgress(true);
-    createStripeAccountPayout({ transactionId })
-      .then(() => {
-        dispatch(loadData());
-        setStripeAccountPayoutInProgress(false);
-      })
-      .catch(error => {
-        console.error(error);
-        setStripeAccountPayoutInProgress(false);
-      });
+  const onCreateUnifiedPayout = async () => {
+    setUnifiedPayoutInProgress(true);
+    
+    try {
+      const result = await createUnifiedPayout();
+      console.log('✅ Unified payout result:', result);
+      
+      if (result.success) {
+        await loadUnifiedBalance();
+        
+        console.log('💰 Total payout:', result.totalPayout?.amount);
+        console.log('📊 Payout breakdown:', result.breakdown);
+      }
+    } catch (error) {
+      console.error('❌ Unified payout failed:', error);
+      
+      // Check if error is related to missing PayPal email
+      if (error.message && error.message.includes('PayPal email')) {
+        alert('⚠️ PayPal Email Required\n\nTo cash out PayPal earnings, you must add your PayPal email address to your profile first.\n\nGo to: Account Settings → Contact Details → Add your PayPal email for receiving payouts.\n\nIMPORTANT: Use the PayPal email where you want to RECEIVE money, not the one you used to pay.');
+      } else {
+        alert('Payout failed. Please try again or contact support.');
+      }
+    } finally {
+      setUnifiedPayoutInProgress(false);
+    }
   };
 
   const onFormatMoney = (amount, currency) => {
     if (amount && currency) {
-      const formattedAmount = formatMoney(intl, new Money(amount, currency));
+      // Ensure currency is uppercase for Money class
+      const formattedAmount = formatMoney(intl, new Money(amount, currency.toUpperCase()));
       return formattedAmount;
     } else {
-      const formattedAmount = formatMoney(intl, new Money(0, currency));
+      const formattedAmount = formatMoney(intl, new Money(0, currency?.toUpperCase() || 'USD'));
       return formattedAmount;
     }
   };
@@ -147,7 +192,7 @@ export const StripeEarningsPage = injectIntl(props => {
   };
 
   const refreshData = () => {
-    dispatch(fetchStripeAccountBalance());
+    loadUnifiedBalance();
   };
 
   return (
@@ -168,12 +213,12 @@ export const StripeEarningsPage = injectIntl(props => {
           currentPage="StripeEarningsPage"
           footer={<FooterContainer />}
         >
-          <PullToRefresh refreshData={refreshData}>
+          <PullToRefresh onRefresh={refreshData}>
             <div className={css.content}>
               <H3 as="h1" className={css.heading}>
                 <FormattedMessage id="StripeEarningsPage.heading" />
               </H3>
-              {stripeBalanceLoading ? (
+              {balanceLoading ? (
                 <div className={css.rowUnsetMarginLR}>
                   <div className={css.col12}>
                     <IconSpinner />
@@ -206,19 +251,23 @@ export const StripeEarningsPage = injectIntl(props => {
                       </div>
                     </div>
                     <br />
-                    <div className={css.rowUnsetMarginLR}>
+                    
+                    <div className={css.balanceBreakdown}>
+                      {/* Row 1: Total Available (highlighted) */}
+                      <div className={css.colBalance}>
+                        <label className={css.colBalanceTitle}>
+                          Total Available
+                        </label>
+                        <span className={css.totalAvailable}>{totalAvailableAmount || emptyDash}</span>
+                      </div>
+                      
                       <div className={css.colBalance}>
                         <label className={css.colBalanceTitle}>
                           <FormattedMessage id="StripeEarningsPage.balance.pending.title" />
                         </label>
-                        <span>{pendingAmount ? pendingAmount : emptyDash}</span>
+                        <span>{totalPendingAmount || emptyDash}</span>
                       </div>
-                      <div className={css.colBalance}>
-                        <label className={css.colBalanceTitle}>
-                          <FormattedMessage id="StripeEarningsPage.balance.available.title" />
-                        </label>
-                        <span>{availableAmount ? availableAmount : emptyDash}</span>
-                      </div>
+                      
                       <div className={css.colBalance}>
                         <label className={css.colBalanceTitle}>
                           <FormattedMessage id="StripeEarningsPage.payoutInterval.title" />
@@ -240,23 +289,41 @@ export const StripeEarningsPage = injectIntl(props => {
                           )}
                         </span>
                       </div>
-                      {payoutInterval === PayoutIntervalEnum.Manual && (
+                      
+                      {/* Row 2: Payment Method Breakdown */}
+                      <div className={css.colBalance}>
+                        <label className={css.colBalanceTitle}>
+                          Stripe Earnings
+                        </label>
+                        <span>{stripeAvailableAmount || emptyDash}</span>
+                      </div>
+                      
+                      <div className={css.colBalance}>
+                        <label className={css.colBalanceTitle}>
+                          PayPal Earnings
+                        </label>
+                        <span>{paypalPendingAmount || emptyDash}</span>
+                      </div>
+                      
+                      {/* Empty third column for consistent grid layout */}
+                      <div className={css.colBalance}>
+                      </div>
+                      
                         <div className={css.col12}>
                           <Button
                             className={css.payoutButton}
-                            onClick={() => onCreateStripeAccountPayout()}
-                            inProgress={stripeAccountPayoutInProgress}
+                          onClick={() => onCreateUnifiedPayout()}
+                          inProgress={unifiedPayoutInProgress}
                             disabled={
-                              !availableAmount ||
-                              availableAmount === emptyDash ||
-                              stripeBalance?.availableAmount?.amount === 0
+                            !totalAvailableAmount ||
+                            totalAvailableAmount === emptyDash ||
+                            unifiedBalance?.totalAvailable?.amount === 0
                             }
                             type="button"
                           >
                             <FormattedMessage id="StripeEarningsPage.payoutButton" />
                           </Button>
                         </div>
-                      )}
                     </div>
                   </div>
                 </>
@@ -265,54 +332,49 @@ export const StripeEarningsPage = injectIntl(props => {
           </PullToRefresh>
         </LayoutSideNavigation>
         <NativeBottomNavbar />
+        
         <Modal
-          id="StripeEarningsPage.payoutIntervalModal"
+          id="payoutIntervalModal"
           isOpen={payoutIntervalModalOpen}
           onClose={() => setPayoutIntervalModalOpen(false)}
           usePortal
           onManageDisableScrolling={onManageDisableScrolling}
         >
           <FinalForm
-            {...props}
-            onSubmit={() => null}
-            render={() => {
-              return (
-                <Form className={css.payoutIntervalForm}>
-                  <h5>
+            onSubmit={onUpdatePayoutInterval}
+            render={({ handleSubmit, submitting, invalid, pristine }) => (
+              <Form onSubmit={handleSubmit} className={css.payoutIntervalForm}>
+                <H3 as="h1">
                     <FormattedMessage id="StripeEarningsPage.payoutIntervalModal.title" />
-                  </h5>
+                </H3>
                   <FieldRadioButton
-                    id={PayoutIntervalEnum.Daily}
-                    rootClassName={css.cancelTypeFields}
-                    label={intl.formatMessage({
-                      id: `StripeEarningsPage.payoutInterval.${PayoutIntervalEnum.Daily}`,
-                    })}
+                  className={css.payoutIntervalRadio}
+                  id="daily"
+                  name="payoutInterval"
+                  label={intl.formatMessage({ id: 'StripeEarningsPage.payoutInterval.daily' })}
                     value={PayoutIntervalEnum.Daily}
+                  checked={selectedPayoutInterval === PayoutIntervalEnum.Daily}
                     onChange={e => setSelectedPayoutInterval(e.target.value)}
-                    checked={selectedPayoutInterval === PayoutIntervalEnum.Daily}
                   />
                   <FieldRadioButton
-                    id={PayoutIntervalEnum.Manual}
-                    rootClassName={css.cancelTypeFields}
-                    label={intl.formatMessage({
-                      id: `StripeEarningsPage.payoutInterval.${PayoutIntervalEnum.Manual}`,
-                    })}
+                  className={css.payoutIntervalRadio}
+                  id="manual"
+                  name="payoutInterval"
+                  label={intl.formatMessage({ id: 'StripeEarningsPage.payoutInterval.manual' })}
                     value={PayoutIntervalEnum.Manual}
+                  checked={selectedPayoutInterval === PayoutIntervalEnum.Manual}
                     onChange={e => setSelectedPayoutInterval(e.target.value)}
-                    checked={selectedPayoutInterval === PayoutIntervalEnum.Manual}
                   />
                   <Button
                     className={css.updatePayoutIntervalButton}
-                    onClick={() => onUpdatePayoutInterval()}
+                  type="submit"
                     inProgress={updatePayoutIntervalInProgress}
-                    disabled={!payoutInterval || payoutInterval === selectedPayoutInterval}
-                    type="button"
+                  disabled={pristine || invalid || updatePayoutIntervalInProgress}
                   >
                     <FormattedMessage id="StripeEarningsPage.updatePayoutIntervalButton" />
                   </Button>
                 </Form>
-              );
-            }}
+            )}
           />
         </Modal>
       </Page>

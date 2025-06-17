@@ -68,6 +68,7 @@ class ContactDetailsFormComponent extends Component {
             className,
             saveEmailError,
             savePhoneNumberError,
+            savePayPalEmailError,
             currentUser,
             formId,
             handleSubmit,
@@ -79,7 +80,7 @@ class ContactDetailsFormComponent extends Component {
             resetPasswordInProgress,
             values,
           } = fieldRenderProps;
-          const { email, phoneNumber } = values;
+          const { email, phoneNumber, paypalEmail } = values;
 
           const user = ensureCurrentUser(currentUser);
 
@@ -204,6 +205,27 @@ class ContactDetailsFormComponent extends Component {
           });
           const phoneLabel = intl.formatMessage({ id: 'ContactDetailsForm.phoneLabel' });
 
+          // PayPal email
+          const currentPayPalEmail = protectedData.paypalEmail;
+
+          // has the PayPal email changed
+          const paypalEmailChanged =
+            currentPayPalEmail !== paypalEmail &&
+            !(typeof currentPayPalEmail === 'undefined' && paypalEmail === '');
+
+          const paypalEmailLabel = intl.formatMessage({
+            id: 'ContactDetailsForm.paypalEmailLabel',
+          });
+          
+          const paypalEmailPlaceholder = intl.formatMessage({
+            id: 'ContactDetailsForm.paypalEmailPlaceholder',
+          });
+
+          const paypalEmailInvalidMessage = intl.formatMessage({
+            id: 'ContactDetailsForm.paypalEmailInvalid',
+          });
+          const paypalEmailValid = validators.emailFormatValid(paypalEmailInvalidMessage);
+
           // password
           const passwordLabel = intl.formatMessage({
             id: 'ContactDetailsForm.passwordLabel',
@@ -252,7 +274,25 @@ class ContactDetailsFormComponent extends Component {
 
           let genericError = null;
 
-          if (isGenericEmailError && savePhoneNumberError) {
+          if (isGenericEmailError && savePhoneNumberError && savePayPalEmailError) {
+            genericError = (
+              <span className={css.error}>
+                <FormattedMessage id="ContactDetailsForm.genericFailure" />
+              </span>
+            );
+          } else if (isGenericEmailError && savePhoneNumberError) {
+            genericError = (
+              <span className={css.error}>
+                <FormattedMessage id="ContactDetailsForm.genericFailure" />
+              </span>
+            );
+          } else if (isGenericEmailError && savePayPalEmailError) {
+            genericError = (
+              <span className={css.error}>
+                <FormattedMessage id="ContactDetailsForm.genericFailure" />
+              </span>
+            );
+          } else if (savePhoneNumberError && savePayPalEmailError) {
             genericError = (
               <span className={css.error}>
                 <FormattedMessage id="ContactDetailsForm.genericFailure" />
@@ -268,6 +308,12 @@ class ContactDetailsFormComponent extends Component {
             genericError = (
               <span className={css.error}>
                 <FormattedMessage id="ContactDetailsForm.genericPhoneNumberFailure" />
+              </span>
+            );
+          } else if (savePayPalEmailError) {
+            genericError = (
+              <span className={css.error}>
+                <FormattedMessage id="ContactDetailsForm.genericPayPalEmailFailure" />
               </span>
             );
           }
@@ -306,7 +352,7 @@ class ContactDetailsFormComponent extends Component {
             invalid ||
             pristineSinceLastSubmit ||
             inProgress ||
-            !(emailChanged || phoneNumberChanged);
+            !(emailChanged || phoneNumberChanged || paypalEmailChanged);
 
           return (
             <Form
@@ -334,40 +380,52 @@ class ContactDetailsFormComponent extends Component {
                   label={phoneLabel}
                   placeholder={phonePlaceholder}
                 />
+                
+                {/* PayPal Email Field for Payouts */}
+                <div className={css.paypalEmailSection}>
+                  <FieldTextInput
+                    type="email"
+                    name="paypalEmail"
+                    id={formId ? `${formId}.paypalEmail` : 'paypalEmail'}
+                    label={paypalEmailLabel}
+                    placeholder={paypalEmailPlaceholder}
+                    validate={paypalEmail ? paypalEmailValid : null}
+                  />
+                  <div className={css.paypalEmailInfo}>
+                    <FormattedMessage id="ContactDetailsForm.paypalEmailInfo" />
+                  </div>
+                </div>
               </div>
 
               <div className={confirmClasses}>
                 <H4 as="h3" className={css.confirmChangesTitle}>
                   <FormattedMessage id="ContactDetailsForm.confirmChangesTitle" />
                 </H4>
-                <p className={css.confirmChangesInfo}>
-                  <FormattedMessage id="ContactDetailsForm.confirmChangesInfo" />
-                  <br />
-                  <FormattedMessage
-                    id="ContactDetailsForm.resetPasswordInfo"
-                    values={{ resetPasswordLink }}
-                  />
-                </p>
-
                 <FieldTextInput
                   className={css.password}
                   type="password"
                   name="currentPassword"
                   id={formId ? `${formId}.currentPassword` : 'currentPassword'}
-                  autoComplete="current-password"
                   label={passwordLabel}
                   placeholder={passwordPlaceholder}
                   validate={passwordValidators}
                   customErrorText={passwordTouched ? null : passwordErrorText}
                 />
+                <div className={css.resetPasswordInfo}>
+                  <FormattedMessage
+                    id="ContactDetailsForm.resetPasswordInfo"
+                    values={{ resetPasswordLink }}
+                  />
+                </div>
               </div>
+              {genericError}
+
               <div className={css.bottomWrapper}>
-                {genericError}
                 <PrimaryButton
                   type="submit"
                   inProgress={inProgress}
-                  ready={pristineSinceLastSubmit}
                   disabled={submitDisabled}
+                  className={css.submitButton}
                 >
                   <FormattedMessage id="ContactDetailsForm.saveChanges" />
                 </PrimaryButton>
@@ -386,11 +444,13 @@ ContactDetailsFormComponent.defaultProps = {
   formId: null,
   saveEmailError: null,
   savePhoneNumberError: null,
+  savePayPalEmailError: null,
   inProgress: false,
   sendVerificationEmailError: null,
   sendVerificationEmailInProgress: false,
   email: null,
   phoneNumber: null,
+  paypalEmail: null,
   resetPasswordInProgress: false,
   resetPasswordError: null,
 };
@@ -403,6 +463,7 @@ ContactDetailsFormComponent.propTypes = {
   formId: string,
   saveEmailError: propTypes.error,
   savePhoneNumberError: propTypes.error,
+  savePayPalEmailError: propTypes.error,
   inProgress: bool,
   intl: intlShape.isRequired,
   onResendVerificationEmail: func.isRequired,

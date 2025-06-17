@@ -7,6 +7,11 @@ import * as layout from './configLayout';
 import * as analytics from './configAnalytics';
 import * as user from './configUser';
 
+// PayPal configuration
+const paypal = {
+  clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID,
+};
+
 // NOTE: only expose configuration that should be visible in the
 // client side, don't add any server secrets to this file.
 const defaultConfig = {
@@ -42,6 +47,10 @@ const defaultConfig = {
   // - defaultMCC: sets Default Merchant Category Code
   // - supportedCountries
   stripe,
+
+  // PayPal configuration
+  // - picks REACT_APP_PAYPAL_CLIENT_ID from environment variables
+  paypal,
 
   // Modify listing extended data and listing type in configListing.js
   listing,
@@ -119,7 +128,7 @@ const defaultConfig = {
 
   // Optional
   // This creates meta tag for Google Search Console verification
-  // I.e. <meta name=“google-site-verification” content=“GOOGLE_SITE_VERIFICATION_TOKEN”/>
+  // I.e. <meta name="google-site-verification" content="GOOGLE_SITE_VERIFICATION_TOKEN"/>
   // Note: The googleSearchConsole comes from googleSearchConsole asset nowadays by default.
   //       To use this built-in configuration, you need to remove the overwrite from configHelper.js (mergeConfig func)
   googleSearchConsole: {

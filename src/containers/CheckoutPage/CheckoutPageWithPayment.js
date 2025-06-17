@@ -673,6 +673,18 @@ export const CheckoutPageWithPayment = props => {
       });
   };
 
+  // Handler for when payment method is selected in EnhancedPaymentMethodSelector
+  const handlePaymentMethodSelect = (method) => {
+    console.log('Payment method selected:', method);
+    
+    // If card payment method is selected and we don't have a client secret,
+    // create one for the new card payment form
+    if (method.id === 'card' && !customClientSecret) {
+      console.log('Creating client secret for new card payment...');
+      getCustomClientSecretAndSetForm();
+    }
+  };
+
   // Enhanced payment handler for different payment methods (Apple Pay, Google Pay, Cards)
   const handleEnhancedPaymentSubmit = async (paymentData) => {
     const { booking, attributes } = speculatedTransaction;
@@ -708,24 +720,109 @@ export const CheckoutPageWithPayment = props => {
       
       console.log('Processing payment data:', paymentData);
       
-      if (paymentData.type === 'apple_pay' || paymentData.type === 'google_pay') {
+      // Extract data based on payment structure
+      const paymentMethodData = paymentData.data || paymentData;
+      const paymentType = paymentMethodData.type || paymentData.method?.id;
+      
+      if (paymentType === 'paypal' || paymentType === 'venmo') {
+        // For PayPal/Venmo payments, the payment has been authorized (not captured yet)
+        // We need to create the booking with the authorization information
+        console.log(`Processing ${paymentType} payment:`, paymentMethodData);
+        
+        if (!paymentMethodData.backendProcessed) {
+          throw new Error(`${paymentType} payment was not processed by backend`);
+        }
+        
+        // For PayPal/Venmo, we don't use Stripe payment method ID
+        stripePaymentMethodId = null;
+        
+        // Create booking with PayPal/Venmo authorization data (not captured payment)
+        console.log(`🔄 Creating booking request for ${paymentType} payment...`);
+        console.log('📋 Booking request payload:', {
+          listingId: listing.id?.uuid || listing.id,
+          bookingStart,
+          bookingEnd,
+          displayStart,
+          displayEnd,
+          paymentType,
+          hasOrderId: !!paymentMethodData.orderId,
+          hasAuthorizationId: !!paymentMethodData.authorizationId,
+          captured: paymentMethodData.captured || false
+        });
+        
+        await createBookingRequest({
+          initialMessage,
+          orderParams: {
+            listingId: listing.id,
+            bookingStart,
+            bookingEnd,
+            displayStart,
+            displayEnd,
+            protectedData: {
+              paymentType: paymentType,
+              paypalOrderId: paymentMethodData.orderId,
+              paypalAuthorizationId: paymentMethodData.authorizationId,
+              paypalPayer: paymentMethodData.payerInfo,
+              paypalOrder: paymentMethodData.order,
+              paypalCaptured: paymentMethodData.captured || false, // Track if captured
+              lineItems: parseLineItems(lineItems, PriceBreakdownFormatTypeEnum.Json),
+              payinTotal: parsePayTotal(payinTotal, PriceBreakdownFormatTypeEnum.Json),
+              payoutTotal: parsePayTotal(payoutTotal, PriceBreakdownFormatTypeEnum.Json),
+              emailData: parseSharetribeCompatibleEmailData({
+                bookingStart,
+                bookingEnd,
+                displayStart,
+                displayEnd,
+                lineItems,
+                payinTotal,
+                payoutTotal,
+                timeZone,
+              }),
+              ...insuranceMethodMaybe,
+              ...securityDepositMaybe,
+            },
+          },
+                  }).then(({ transactionId }) => {
+            console.log(`✅ ${paymentType} booking request created successfully:`, transactionId);
+          
+          sendPushNotification({
+            pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
+            transactionId: transactionId.uuid,
+            params: {},
+          })
+            .then(res => {
+              console.log('✅ Push notification sent:', res);
+            })
+            .catch(err => {
+              console.error('❌ Push notification failed (non-critical):', err);
+            });
+          
+          console.log(`🔄 Redirecting to order details page...`);
+          redirectToOrderDetailsPage(transactionId);
+                  }).catch(bookingError => {
+            console.error(`❌ ${paymentType} booking request failed:`, bookingError);
+            setTrxSubmitInProgress(false);
+            throw bookingError;
+          });
+        
+        // Return early for PayPal/Venmo since we handled the full flow
+        setTrxSubmitInProgress(false);
+        return;
+      } else if (paymentType === 'apple_pay' || paymentType === 'google_pay') {
         // For Apple Pay and Google Pay, the payment method ID is provided directly
-        stripePaymentMethodId = paymentData.paymentMethodId || paymentData.paymentMethod?.id;
-        console.log('Digital wallet payment method ID:', stripePaymentMethodId);
+        stripePaymentMethodId = paymentMethodData.paymentMethodId || paymentMethodData.paymentMethod?.id;
         
         if (!stripePaymentMethodId) {
-          throw new Error(`Missing payment method ID for ${paymentData.type}`);
+          throw new Error(`Missing payment method ID for ${paymentType}`);
         }
-      } else if (paymentData.type === 'saved_card') {
+      } else if (paymentType === 'saved_card') {
         // For saved cards
-        stripePaymentMethodId = paymentData.paymentMethodId;
-        console.log('Saved card payment method ID:', stripePaymentMethodId);
-      } else if (paymentData.type === 'card') {
+        stripePaymentMethodId = paymentMethodData.paymentMethodId;
+      } else if (paymentType === 'card') {
         // For new card payments
-        stripePaymentMethodId = paymentData.paymentMethodId;
-        console.log('Card payment method ID:', stripePaymentMethodId);
+        stripePaymentMethodId = paymentMethodData.paymentMethodId || paymentMethodData.stripePaymentMethodId;
       } else {
-        throw new Error('Unsupported payment method type: ' + paymentData.type);
+        throw new Error('Unsupported payment method type: ' + paymentType);
       }
 
       await createBookingRequest({
@@ -738,7 +835,7 @@ export const CheckoutPageWithPayment = props => {
           displayEnd,
           protectedData: {
             stripePaymentMethodId,
-            paymentType: paymentData.type, // Track the payment method type
+            paymentType: paymentType, // Track the payment method type
             lineItems: parseLineItems(lineItems, PriceBreakdownFormatTypeEnum.Json),
             payinTotal: parsePayTotal(payinTotal, PriceBreakdownFormatTypeEnum.Json),
             payoutTotal: parsePayTotal(payoutTotal, PriceBreakdownFormatTypeEnum.Json),
@@ -771,8 +868,16 @@ export const CheckoutPageWithPayment = props => {
         redirectToOrderDetailsPage(transactionId);
       });
     } catch (err) {
+      console.error('❌ Enhanced payment submission failed:', err);
+      console.error('❌ Error details:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name
+      });
       setTrxSubmitInProgress(false);
-      console.error('Enhanced payment submission failed:', err);
+      
+      // Show user-friendly error message
+      // You might want to set an error state here to display to the user
     }
   };
 
@@ -878,7 +983,7 @@ export const CheckoutPageWithPayment = props => {
               <Heading as="h3" rootClassName={stripePaymentFormCSS.heading}>
                 <FormattedMessage id="StripePaymentForm.messageHeading" />
               </Heading>
-              <label for="CheckoutPagePaymentForm-message">{initialMessageLabel}</label>
+              <label htmlFor="CheckoutPagePaymentForm-message">{initialMessageLabel}</label>
               <textarea
                 id="CheckoutPagePaymentForm-message"
                 type="textarea"
@@ -893,16 +998,22 @@ export const CheckoutPageWithPayment = props => {
                 <EnhancedPaymentMethodSelector
                   savedCards={customPaymentMethodList}
                   onPaymentSubmit={handleEnhancedPaymentSubmit}
+                  onPaymentMethodSelect={handlePaymentMethodSelect}
                   isLoading={paymentMethodsLoading || setupIntentLoading}
                   inProgress={trxSubmitInProgress}
-                  totalAmount={totalPrice?.toString()}
+                  totalAmount={totalPrice?.toString() || '0'}
                   currency="USD"
                   currentUser={currentUser}
                   config={config}
                   clientSecret={customClientSecret}
                   stripePublishableKey={config.stripe.publishableKey}
+                  paypalClientId={config.paypal?.clientId}
+                  transactionLineItems={speculatedTransaction?.attributes?.lineItems}
+                  providerId={listing?.author?.id?.uuid}
+                  customerId={currentUser?.id?.uuid}
                   showSavedCards={true}
                   showDigitalWallets={true}
+                  showAlternativePayments={true}
                 />
               ) : (
                 <>
@@ -975,6 +1086,8 @@ export const CheckoutPageWithPayment = props => {
           breakdown={breakdown}
           intl={intl}
         />
+
+
       </div>
     </Page>
   );

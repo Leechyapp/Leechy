@@ -1,6 +1,10 @@
 @import '../../../styles/customMediaQueries.css';
 
 .root {
+  /* min-height: 100vh; */
+  /* display: flex; */
+  /* @apply --layoutComposerContent; */
+  /* margin-bottom: 200px; */
 }
 
 /* Shared styles for infoText variants */
@@ -142,5 +146,87 @@
 
   @media (--viewportMedium) {
     margin: 24px 0;
+  }
+}
+
+.paypalEmailSection {
+  margin-top: 20px;
+  padding: 16px;
+  background-color: var(--matterColorLight);
+  border: 1px solid var(--matterColorNegative);
+  border-radius: 4px;
+}
+
+.paypalEmailInfo {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--matterColorAnti);
+  line-height: 1.4;
+}
+
+.password {
+  margin: 0 0 16px 0;
+
+  @media (--viewportMedium) {
+    margin: 0 0 24px 0;
+  }
+}
+
+.resetPasswordInfo {
+  composes: h5 from global;
+  color: var(--matterColorAnti);
+  margin: 16px 0 0 0;
+
+  @media (--viewportMedium) {
+    margin: 24px 0 0 0;
+  }
+}
+
+.submitButton {
+  /* Styles for submit button */
+}
+
+.emailUnverified {
+  composes: h5 from global;
+  color: var(--failColor);
+  margin: 5px 0 0 0;
+}
+
+.emailVerified {
+  composes: h5 from global;
+  color: var(--successColor);
+  margin: 5px 0 0 0;
+}
+
+.pendingEmailUnverified {
+  composes: h5 from global;
+  color: var(--attentionColor);
+  margin: 5px 0 0 0;
+}
+
+.emailSent,
+.tooMany {
+  composes: h5 from global;
+  color: var(--matterColorAnti);
+  margin: 0;
+}
+
+.checkInbox {
+  composes: h5 from global;
+  margin: 0;
+}
+
+.emailStyle {
+  composes: h5 from global;
+  font-weight: var(--fontWeightSemiBold);
+}
+
+.error {
+  composes: h5 from global;
+  color: var(--failColor);
+  margin: 24px 0 0 0;
+
+  @media (--viewportMedium) {
+    margin: 32px 0 0 0;
   }
 }

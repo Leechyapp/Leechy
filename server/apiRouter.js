@@ -32,10 +32,19 @@ const SetupIntentRoute = require('./api/routes/setup-intent.route');
 const PaymentMethodRoute = require('./api/routes/payment-method.route');
 const BookingRoute = require('./api/routes/booking.route');
 const StripeCheckoutRoute = require('./api/routes/stripe-checkout.route');
+const PayPalRoute = require('./api/routes/paypal.route');
+const EarningsRoute = require('./api/routes/earnings.route');
 
 const router = express.Router();
 
 // ================ API router middleware: ================ //
+
+// Parse JSON body for application/json requests (e.g., PayPal API)
+router.use(
+  bodyParser.json({
+    type: 'application/json',
+  })
+);
 
 // Parse Transit body first to a string
 router.use(
@@ -106,5 +115,11 @@ new PaymentMethodRoute(router);
 
 // Add Stripe Checkout routes for Google Pay fallback
 router.use('/stripe-checkout', StripeCheckoutRoute);
+
+// Add PayPal routes for PayPal and Venmo payments
+router.use('/paypal', PayPalRoute);
+
+// Add unified earnings routes for multi-payment-method payouts
+router.use('/earnings', EarningsRoute);
 
 module.exports = router;

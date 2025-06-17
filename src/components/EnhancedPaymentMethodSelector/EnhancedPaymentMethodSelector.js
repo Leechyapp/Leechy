@@ -30,20 +30,50 @@ import {
 
 import ApplePayButton from './ApplePayButton';
 import GooglePayButton from './GooglePayButton';
+import PayPalButton from './PayPalButton';
 import CardPaymentSection from './CardPaymentSection';
 import SavedCardsList from './SavedCardsList';
-// PayPal and Venmo components removed - not compatible with Stripe-only setup
 
 import css from './EnhancedPaymentMethodSelector.module.css';
 import { loadStripe } from '@stripe/stripe-js';
 
-// Payment method types (Stripe-compatible only)
+// Payment method types
 export const PAYMENT_METHODS = {
   CARD: 'card',
   SAVED_CARD: 'saved_card',
   APPLE_PAY: 'apple_pay',
-  GOOGLE_PAY: 'google_pay'
-  // PayPal, Venmo, and Bank Transfer removed - not compatible with Stripe-only setup
+  GOOGLE_PAY: 'google_pay',
+  PAYPAL: 'paypal'
+};
+
+// Utility function to calculate base product price before commission
+const calculateBaseProductPrice = (lineItems) => {
+  if (!lineItems || !Array.isArray(lineItems)) {
+    return 0;
+  }
+
+  // Find the base product line item (line-item/item, line-item/day, line-item/night, line-item/hour)
+  const baseLineItem = lineItems.find(item => {
+    const isBaseItem = ['line-item/item', 'line-item/day', 'line-item/night', 'line-item/hour'].includes(item.code);
+    const isNotReversal = !item.reversal;
+    return isBaseItem && isNotReversal;
+  });
+
+  if (!baseLineItem || !baseLineItem.lineTotal) {
+    return 0;
+  }
+
+  // Convert from subunits (cents) to main units (dollars)
+  // lineTotal.amount is in cents, so divide by 100 for USD
+  const basePrice = baseLineItem.lineTotal.amount / 100;
+  
+  console.log('💰 Base product price calculation:', {
+    lineItem: baseLineItem,
+    basePriceInCents: baseLineItem.lineTotal.amount,
+    basePriceInDollars: basePrice
+  });
+
+  return basePrice;
 };
 
 const EnhancedPaymentMethodSelector = props => {
@@ -63,27 +93,48 @@ const EnhancedPaymentMethodSelector = props => {
     inProgress,
     showSavedCards = true,
     showDigitalWallets = true,
-    stripePublishableKey
-    // paypalClientId removed - not needed for Stripe-only setup
+    showAlternativePayments = true,
+    stripePublishableKey,
+    paypalClientId,
+    transactionLineItems,
+    providerId,
+    customerId
   } = props;
 
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [availableMethods, setAvailableMethods] = useState([]);
   const [isApplePayAvailable, setIsApplePayAvailable] = useState(false);
   const [isGooglePayAvailable, setIsGooglePayAvailable] = useState(false);
+  const [isPayPalAvailable, setIsPayPalAvailable] = useState(false);
+  const [payPalDisabledDueToPrice, setPayPalDisabledDueToPrice] = useState(false);
+  const [baseProductPrice, setBaseProductPrice] = useState(0);
+
   const [showCardForm, setShowCardForm] = useState(false);
+
+  // Debug environment variables once on mount
+  useEffect(() => {
+    console.log('🔧 EnhancedPaymentMethodSelector DEBUG INFO:');
+    console.log('  📊 Environment:', process.env.NODE_ENV);
+    console.log('  💳 Stripe Key from config:', config?.stripe?.publishableKey ? '✅ Available' : '❌ Missing');
+    console.log('  💳 Stripe Key from props:', stripePublishableKey ? '✅ Available' : '❌ Missing');
+    console.log('  🏦 PayPal Client ID from props:', paypalClientId ? '✅ Available' : '❌ Missing');
+    console.log('  🏦 PayPal from config object:', config?.paypal);
+    console.log('  🔧 PayPal Client ID raw value:', paypalClientId ? paypalClientId.substring(0, 20) + '...' : 'null/undefined');
+    console.log('  🌍 Environment variables available:', typeof process !== 'undefined' && process.env ? 'Yes' : 'No');
+    console.log('  📦 Process object:', typeof process);
+    console.log('  🔧 Raw process.env.REACT_APP_PAYPAL_CLIENT_ID:', process.env.REACT_APP_PAYPAL_CLIENT_ID ? '✅ Available' : '❌ Missing');
+    console.log('  ⚙️  Show settings:', { showSavedCards, showDigitalWallets, showAlternativePayments });
+  }, []); // Empty dependency array means this runs only once
 
   useEffect(() => {
     // Check device capabilities for payment methods
-    if (stripePublishableKey) {
-      checkPaymentMethodAvailability();
-    }
-  }, [stripePublishableKey]);
+    checkPaymentMethodAvailability();
+  }, [stripePublishableKey, paypalClientId]);
 
   useEffect(() => {
     // Update available methods based on props and device capabilities
     updateAvailableMethods();
-  }, [savedCards, isApplePayAvailable, isGooglePayAvailable, showSavedCards, showDigitalWallets]);
+  }, [savedCards, isApplePayAvailable, isGooglePayAvailable, isPayPalAvailable, showSavedCards, showDigitalWallets, showAlternativePayments, transactionLineItems]);
 
   const checkPaymentMethodAvailability = async () => {
     console.log('🔍 Checking payment method availability...');
@@ -100,37 +151,50 @@ const EnhancedPaymentMethodSelector = props => {
     console.log('🔍 Checking Google Pay availability via Stripe...');
     
     if (stripePublishableKey) {
-      try {
-        const stripeInstance = await loadStripe(stripePublishableKey);
-        if (stripeInstance) {
-          // Create a test payment request to check Google Pay availability
-          const testPaymentRequest = stripeInstance.paymentRequest({
-            country: 'US',
-            currency: 'usd',
-            total: {
-              label: 'Test',
-              amount: 100, // $1.00 test amount
-            },
-            requestPayerName: false,
-            requestPayerEmail: false,
-          });
+              try {
+          const stripeInstance = await loadStripe(stripePublishableKey);
+          if (stripeInstance) {
+            // Create a test payment request to check Google Pay availability
+            const testPaymentRequest = stripeInstance.paymentRequest({
+              country: 'US',
+              currency: 'usd',
+              total: {
+                label: 'Test',
+                amount: 100, // $1.00 test amount
+              },
+              requestPayerName: false,
+              requestPayerEmail: false,
+            });
 
-          const result = await testPaymentRequest.canMakePayment();
-          if (result && result.googlePay) {
-            console.log('✅ Google Pay is available via Stripe Payment Request');
-            setIsGooglePayAvailable(true);
+            const result = await testPaymentRequest.canMakePayment();
+            
+            if (result && result.googlePay) {
+              console.log('✅ Google Pay is available via Stripe Payment Request');
+              setIsGooglePayAvailable(true);
+            } else {
+              console.log('❌ Google Pay not available via Stripe Payment Request');
+              setIsGooglePayAvailable(false);
+            }
           } else {
-            console.log('❌ Google Pay not available via Stripe Payment Request');
+            console.log('❌ Failed to load Stripe instance');
             setIsGooglePayAvailable(false);
           }
-        }
       } catch (error) {
         console.log('❌ Error checking Google Pay availability:', error);
         setIsGooglePayAvailable(false);
       }
     } else {
-      console.log('❌ No Stripe publishable key available');
+      console.log('❌ No Stripe publishable key available for Google Pay');
       setIsGooglePayAvailable(false);
+    }
+
+    // Check PayPal availability
+    if (paypalClientId) {
+      console.log('✅ PayPal Client ID provided - PayPal is available');
+      setIsPayPalAvailable(true);
+    } else {
+      console.log('❌ PayPal Client ID not provided');
+      setIsPayPalAvailable(false);
     }
   };
 
@@ -141,11 +205,43 @@ const EnhancedPaymentMethodSelector = props => {
     console.log('Settings:', {
       showSavedCards,
       showDigitalWallets,
+      showAlternativePayments,
       isApplePayAvailable,
       isGooglePayAvailable,
+      isPayPalAvailable,
       savedCardsCount: savedCards?.length || 0,
       isDevelopment: process.env.NODE_ENV === 'development'
     });
+
+    // Calculate base product price to determine PayPal availability
+    let baseProductPrice = 0;
+    let isPayPalAllowedForPrice = true;
+    
+    if (transactionLineItems) {
+      try {
+        // Parse lineItems if it's a string
+        const lineItems = typeof transactionLineItems === 'string' 
+          ? JSON.parse(transactionLineItems) 
+          : transactionLineItems;
+        
+        baseProductPrice = calculateBaseProductPrice(lineItems);
+        isPayPalAllowedForPrice = baseProductPrice >= 4.99;
+        
+        console.log('💰 PayPal price check:', {
+          baseProductPrice,
+          isPayPalAllowedForPrice,
+          threshold: 4.99
+        });
+      } catch (error) {
+        console.error('❌ Error parsing transaction line items:', error);
+        // Default to allowing PayPal if we can't parse the price
+        isPayPalAllowedForPrice = true;
+      }
+    }
+
+    // Store PayPal availability info for UI display
+    setPayPalDisabledDueToPrice(!isPayPalAllowedForPrice && isPayPalAvailable);
+    setBaseProductPrice(baseProductPrice);
 
     // Add saved cards if available
     if (showSavedCards && savedCards && savedCards.length > 0) {
@@ -193,6 +289,23 @@ const EnhancedPaymentMethodSelector = props => {
           category: 'wallet'
         });
         console.log('✅ Added Google Pay');
+      }
+    }
+
+    // Add alternative payment methods if available and enabled
+    if (showAlternativePayments) {
+      // PayPal - only show if price is $4.99 or higher
+      if (isPayPalAvailable && isPayPalAllowedForPrice) {
+        methods.push({
+          id: PAYMENT_METHODS.PAYPAL,
+          name: 'PayPal & Venmo',
+          icon: faPaypal,
+          description: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.paypalVenmoDescription' }),
+          category: 'alternative'
+        });
+        console.log('✅ Added PayPal (price check passed)');
+      } else if (isPayPalAvailable && !isPayPalAllowedForPrice) {
+        console.log('❌ PayPal disabled - product price ($' + baseProductPrice.toFixed(2) + ') is below $4.99 minimum');
       }
     }
 
@@ -255,8 +368,8 @@ const EnhancedPaymentMethodSelector = props => {
     const categories = [
       { id: 'saved', name: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.savedMethods' }) },
       { id: 'wallet', name: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.digitalWallets' }) },
-      { id: 'card', name: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.cards' }) }
-      // Alternative methods category removed - focusing on Stripe-compatible methods only
+      { id: 'card', name: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.cards' }) },
+      { id: 'alternative', name: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.alternativePayments' }) }
     ];
 
     return categories.map(category => {
@@ -320,7 +433,19 @@ const EnhancedPaymentMethodSelector = props => {
           />
         );
 
-      // PayPal, Venmo, and Bank Transfer cases removed - not compatible with Stripe-only setup
+      case PAYMENT_METHODS.PAYPAL:
+        return (
+          <PayPalButton
+            totalAmount={totalAmount}
+            currency={currency}
+            onPaymentSubmit={handlePaymentSubmit}
+            inProgress={inProgress}
+            paypalClientId={paypalClientId}
+            transactionLineItems={transactionLineItems}
+            providerId={providerId}
+            customerId={customerId}
+          />
+        );
 
       default:
         return null;
@@ -372,13 +497,14 @@ EnhancedPaymentMethodSelector.defaultProps = {
   inProgress: false,
   showSavedCards: true,
   showDigitalWallets: true,
+  showAlternativePayments: true,
   onPaymentMethodSelect: null,
   onPaymentSubmit: null,
   totalAmount: null,
   currency: 'USD',
   clientSecret: null,
   stripePublishableKey: null,
-  // paypalClientId removed - not needed for Stripe-only setup
+  paypalClientId: null
 };
 
 EnhancedPaymentMethodSelector.propTypes = {
@@ -397,8 +523,12 @@ EnhancedPaymentMethodSelector.propTypes = {
   inProgress: bool,
   showSavedCards: bool,
   showDigitalWallets: bool,
+  showAlternativePayments: bool,
   stripePublishableKey: string,
-  // paypalClientId removed - not needed for Stripe-only setup
+  paypalClientId: string,
+  transactionLineItems: string,
+  providerId: string,
+  customerId: string
 };
 
 export default injectIntl(EnhancedPaymentMethodSelector); 

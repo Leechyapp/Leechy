@@ -19,28 +19,93 @@ const ApplePayButton = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [stripe, setStripe] = useState(null);
+  const [paymentRequest, setPaymentRequest] = useState(null);
 
   useEffect(() => {
-    const initializeStripe = async () => {
-      if (stripePublishableKey) {
+    const initializeApplePay = async () => {
+      if (!stripePublishableKey) return;
+
+      try {
+        // Initialize Stripe
         const stripeInstance = await loadStripe(stripePublishableKey);
         setStripe(stripeInstance);
-      }
-    };
 
-    const checkApplePayAvailability = () => {
-      if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
+        // Check Apple Pay availability
+        if (!window.ApplePaySession || !ApplePaySession.canMakePayments()) {
+          console.log('❌ Apple Pay not available on this device');
+          return;
+        }
+
+        // Convert amount to cents if it's in dollars
+        const amountInCents = typeof totalAmount === 'string' 
+          ? Math.round(parseFloat(totalAmount.replace(/[^0-9.-]+/g, '')) * 100)
+          : totalAmount;
+
+        // Create payment request
+        const pr = stripeInstance.paymentRequest({
+          country: 'US',
+          currency: currency.toLowerCase(),
+          total: {
+            label: 'Total',
+            amount: amountInCents,
+          },
+          requestPayerName: true,
+          requestPayerEmail: true,
+        });
+
+        // Check if payment request is available
+        const result = await pr.canMakePayment();
+        if (!result || !result.applePay) {
+          console.log('❌ Apple Pay not available via Payment Request API');
+          return;
+        }
+
+        // Set up event handlers
+        pr.on('paymentmethod', async (ev) => {
+          try {
+            console.log('🍎 Apple Pay payment method received');
+            // Submit payment data to parent component
+            await onPaymentSubmit({
+              type: 'apple_pay',
+              paymentMethodId: ev.paymentMethod.id,
+              paymentMethod: ev.paymentMethod
+            });
+
+            // Complete the payment
+            ev.complete('success');
+            console.log('✅ Apple Pay payment completed successfully');
+          } catch (error) {
+            console.error('❌ Apple Pay payment failed:', error);
+            ev.complete('fail');
+            setError(error.message || 'Payment failed');
+          } finally {
+            setIsLoading(false);
+          }
+        });
+
+        // Handle cancel event
+        pr.on('cancel', () => {
+          console.log('🍎 Apple Pay cancelled by user');
+          setIsLoading(false);
+        });
+
+        // Store payment request and mark as available
+        setPaymentRequest(pr);
         setIsAvailable(true);
+        console.log('✅ Apple Pay initialized and ready');
+
+      } catch (error) {
+        console.error('❌ Failed to initialize Apple Pay:', error);
+        setError('Failed to initialize Apple Pay');
       }
     };
 
-    initializeStripe();
-    checkApplePayAvailability();
-  }, [stripePublishableKey]);
+    initializeApplePay();
+  }, [stripePublishableKey, totalAmount, currency, onPaymentSubmit]);
 
-  const handleApplePayClick = async () => {
-    if (!stripe || !isAvailable) {
-      setError('Apple Pay is not available on this device');
+  const handleApplePayClick = () => {
+    if (!paymentRequest || !isAvailable || isLoading || inProgress) {
+      setError('Apple Pay is not available');
       return;
     }
 
@@ -48,55 +113,12 @@ const ApplePayButton = ({
     setError(null);
 
     try {
-      // Convert amount to cents if it's in dollars
-      const amountInCents = typeof totalAmount === 'string' 
-        ? Math.round(parseFloat(totalAmount.replace(/[^0-9.-]+/g, '')) * 100)
-        : totalAmount;
-
-      // Create payment request
-      const paymentRequest = stripe.paymentRequest({
-        country: 'US',
-        currency: currency.toLowerCase(),
-        total: {
-          label: 'Total',
-          amount: amountInCents,
-        },
-        requestPayerName: true,
-        requestPayerEmail: true,
-      });
-
-      // Check if payment request is available
-      const result = await paymentRequest.canMakePayment();
-      if (!result) {
-        throw new Error('Apple Pay is not available on this device or browser');
-      }
-
-      // Handle payment method
-      paymentRequest.on('paymentmethod', async (ev) => {
-        try {
-          // Submit payment data to parent component
-          await onPaymentSubmit({
-            type: 'apple_pay',
-            paymentMethodId: ev.paymentMethod.id,
-            paymentMethod: ev.paymentMethod
-          });
-
-          // Complete the payment
-          ev.complete('success');
-        } catch (error) {
-          console.error('Apple Pay payment failed:', error);
-          ev.complete('fail');
-          setError(error.message || 'Payment failed');
-        }
-      });
-
-      // Show payment sheet
+      // Show payment sheet synchronously - this MUST be called directly in the user gesture
+      console.log('🍎 Showing Apple Pay payment sheet...');
       paymentRequest.show();
-
     } catch (error) {
-      console.error('Apple Pay error:', error);
-      setError(error.message || 'Failed to initialize Apple Pay');
-    } finally {
+      console.error('❌ Apple Pay error:', error);
+      setError(error.message || 'Failed to show Apple Pay');
       setIsLoading(false);
     }
   };

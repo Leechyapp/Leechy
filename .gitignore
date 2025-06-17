@@ -36,3 +36,6 @@ android/debug.keystore
 ios/App/App/Firebase/Debug/GoogleService-Info.plist
 ios/App/App/Firebase/Release/GoogleService-Info.plist
 ios/App/GoogleService-Info.plist
+
+# Apple Pay domain verification (auto-generated)
+public/.well-known/apple-developer-merchantid-domain-association.txt

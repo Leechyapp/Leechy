@@ -28,6 +28,7 @@ export const ContactDetailsPageComponent = props => {
   const {
     saveEmailError,
     savePhoneNumberError,
+    savePayPalEmailError,
     saveContactDetailsInProgress,
     currentUser,
     contactDetailsChanged,
@@ -47,16 +48,28 @@ export const ContactDetailsPageComponent = props => {
   const currentEmail = user.attributes.email || '';
   const protectedData = user.attributes.profile.protectedData || {};
   const currentPhoneNumber = protectedData.phoneNumber || '';
+  const currentPayPalEmail = protectedData.paypalEmail || '';
+  
   const contactInfoForm = user.id ? (
     <ContactDetailsForm
       className={css.form}
-      initialValues={{ email: currentEmail, phoneNumber: currentPhoneNumber }}
+      initialValues={{ 
+        email: currentEmail, 
+        phoneNumber: currentPhoneNumber,
+        paypalEmail: currentPayPalEmail 
+      }}
       saveEmailError={saveEmailError}
       savePhoneNumberError={savePhoneNumberError}
+      savePayPalEmailError={savePayPalEmailError}
       currentUser={currentUser}
       onResendVerificationEmail={onResendVerificationEmail}
       onResetPassword={onResetPassword}
-      onSubmit={values => onSubmitContactDetails({ ...values, currentEmail, currentPhoneNumber })}
+      onSubmit={values => onSubmitContactDetails({ 
+        ...values, 
+        currentEmail, 
+        currentPhoneNumber,
+        currentPayPalEmail 
+      })}
       onChange={onChange}
       inProgress={saveContactDetailsInProgress}
       ready={contactDetailsChanged}
@@ -87,7 +100,7 @@ export const ContactDetailsPageComponent = props => {
         footer={<FooterContainer />}
       >
         <div className={css.content}>
-          <H3 as="h1">
+          <H3 as="h1" className={css.title}>
             <FormattedMessage id="ContactDetailsPage.heading" />
           </H3>
           {contactInfoForm}
@@ -101,6 +114,7 @@ export const ContactDetailsPageComponent = props => {
 ContactDetailsPageComponent.defaultProps = {
   saveEmailError: null,
   savePhoneNumberError: null,
+  savePayPalEmailError: null,
   currentUser: null,
   sendVerificationEmailError: null,
   resetPasswordInProgress: false,
@@ -112,6 +126,7 @@ const { bool, func } = PropTypes;
 ContactDetailsPageComponent.propTypes = {
   saveEmailError: propTypes.error,
   savePhoneNumberError: propTypes.error,
+  savePayPalEmailError: propTypes.error,
   saveContactDetailsInProgress: bool.isRequired,
   currentUser: propTypes.currentUser,
   contactDetailsChanged: bool.isRequired,
@@ -134,6 +149,7 @@ const mapStateToProps = state => {
   const {
     saveEmailError,
     savePhoneNumberError,
+    savePayPalEmailError,
     saveContactDetailsInProgress,
     contactDetailsChanged,
     resetPasswordInProgress,
@@ -142,6 +158,7 @@ const mapStateToProps = state => {
   return {
     saveEmailError,
     savePhoneNumberError,
+    savePayPalEmailError,
     saveContactDetailsInProgress,
     currentUser,
     contactDetailsChanged,
@@ -161,8 +178,13 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const ContactDetailsPage = compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
   injectIntl
 )(ContactDetailsPageComponent);
+
+ContactDetailsPage.displayName = 'ContactDetailsPage';
 
 export default ContactDetailsPage;

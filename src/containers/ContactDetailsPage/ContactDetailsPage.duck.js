@@ -9,6 +9,7 @@ export const SAVE_CONTACT_DETAILS_REQUEST = 'app/ContactDetailsPage/SAVE_CONTACT
 export const SAVE_CONTACT_DETAILS_SUCCESS = 'app/ContactDetailsPage/SAVE_CONTACT_DETAILS_SUCCESS';
 export const SAVE_EMAIL_ERROR = 'app/ContactDetailsPage/SAVE_EMAIL_ERROR';
 export const SAVE_PHONE_NUMBER_ERROR = 'app/ContactDetailsPage/SAVE_PHONE_NUMBER_ERROR';
+export const SAVE_PAYPAL_EMAIL_ERROR = 'app/ContactDetailsPage/SAVE_PAYPAL_EMAIL_ERROR';
 
 export const SAVE_CONTACT_DETAILS_CLEAR = 'app/ContactDetailsPage/SAVE_CONTACT_DETAILS_CLEAR';
 
@@ -21,6 +22,7 @@ export const RESET_PASSWORD_ERROR = 'app/ContactDetailsPage/RESET_PASSWORD_ERROR
 const initialState = {
   saveEmailError: null,
   savePhoneNumberError: null,
+  savePayPalEmailError: null,
   saveContactDetailsInProgress: false,
   contactDetailsChanged: false,
   resetPasswordInProgress: false,
@@ -36,6 +38,7 @@ export default function reducer(state = initialState, action = {}) {
         saveContactDetailsInProgress: true,
         saveEmailError: null,
         savePhoneNumberError: null,
+        savePayPalEmailError: null,
         contactDetailsChanged: false,
       };
     case SAVE_CONTACT_DETAILS_SUCCESS:
@@ -44,6 +47,8 @@ export default function reducer(state = initialState, action = {}) {
       return { ...state, saveContactDetailsInProgress: false, saveEmailError: payload };
     case SAVE_PHONE_NUMBER_ERROR:
       return { ...state, saveContactDetailsInProgress: false, savePhoneNumberError: payload };
+    case SAVE_PAYPAL_EMAIL_ERROR:
+      return { ...state, saveContactDetailsInProgress: false, savePayPalEmailError: payload };
 
     case SAVE_CONTACT_DETAILS_CLEAR:
       return {
@@ -51,6 +56,7 @@ export default function reducer(state = initialState, action = {}) {
         saveContactDetailsInProgress: false,
         saveEmailError: null,
         savePhoneNumberError: null,
+        savePayPalEmailError: null,
         contactDetailsChanged: false,
       };
 
@@ -78,6 +84,11 @@ export const saveEmailError = error => ({
 });
 export const savePhoneNumberError = error => ({
   type: SAVE_PHONE_NUMBER_ERROR,
+  payload: error,
+  error: true,
+});
+export const savePayPalEmailError = error => ({
+  type: SAVE_PAYPAL_EMAIL_ERROR,
   payload: error,
   error: true,
 });
@@ -122,6 +133,38 @@ const requestSavePhoneNumber = params => (dispatch, getState, sdk) => {
     })
     .catch(e => {
       dispatch(savePhoneNumberError(storableError(e)));
+      // pass the same error so that the SAVE_CONTACT_DETAILS_SUCCESS
+      // action will not be fired
+      throw e;
+    });
+};
+
+/**
+ * Make a PayPal email update request to the API and return the current user.
+ */
+const requestSavePayPalEmail = params => (dispatch, getState, sdk) => {
+  const paypalEmail = params.paypalEmail;
+
+  return sdk.currentUser
+    .updateProfile(
+      { protectedData: { paypalEmail } },
+      {
+        expand: true,
+        include: ['profileImage'],
+        'fields.image': ['variants.square-small', 'variants.square-small2x'],
+      }
+    )
+    .then(response => {
+      const entities = denormalisedResponseEntities(response);
+      if (entities.length !== 1) {
+        throw new Error('Expected a resource in the sdk.currentUser.updateProfile response');
+      }
+
+      const currentUser = entities[0];
+      return currentUser;
+    })
+    .catch(e => {
+      dispatch(savePayPalEmailError(storableError(e)));
       // pass the same error so that the SAVE_CONTACT_DETAILS_SUCCESS
       // action will not be fired
       throw e;
@@ -191,6 +234,21 @@ const savePhoneNumber = params => (dispatch, getState, sdk) => {
 };
 
 /**
+ * Save PayPal email and update the current user.
+ */
+const savePayPalEmail = params => (dispatch, getState, sdk) => {
+  return (
+    dispatch(requestSavePayPalEmail(params))
+      .then(user => {
+        dispatch(currentUserShowSuccess(user));
+        dispatch(saveContactDetailsSuccess());
+      })
+      // error action dispatched in requestSavePayPalEmail
+      .catch(e => null)
+  );
+};
+
+/**
  * Save email and phone number and update the current user.
  */
 const saveEmailAndPhoneNumber = params => (dispatch, getState, sdk) => {
@@ -224,21 +282,133 @@ const saveEmailAndPhoneNumber = params => (dispatch, getState, sdk) => {
 };
 
 /**
+ * Save email and PayPal email and update the current user.
+ */
+const saveEmailAndPayPalEmail = params => (dispatch, getState, sdk) => {
+  const { email, paypalEmail, currentPassword } = params;
+
+  // order of promises: 1. email, 2. PayPal email
+  const promises = [
+    dispatch(requestSaveEmail({ email, currentPassword })),
+    dispatch(requestSavePayPalEmail({ paypalEmail })),
+  ];
+
+  return Promise.all(promises)
+    .then(values => {
+      const saveEmailUser = values[0];
+      const savePayPalEmailUser = values[1];
+
+      // merge the protected data from the user object returned by the PayPal email update operation
+      const protectedData = savePayPalEmailUser.attributes.profile.protectedData;
+      const paypalEmailMergeSource = { attributes: { profile: { protectedData } } };
+
+      const currentUser = merge(saveEmailUser, paypalEmailMergeSource);
+      dispatch(currentUserShowSuccess(currentUser));
+      dispatch(saveContactDetailsSuccess());
+    })
+    .catch(e => null);
+};
+
+/**
+ * Save phone number and PayPal email and update the current user.
+ */
+const savePhoneNumberAndPayPalEmail = params => (dispatch, getState, sdk) => {
+  const { phoneNumber, paypalEmail } = params;
+
+  // order of promises: 1. phone number, 2. PayPal email
+  const promises = [
+    dispatch(requestSavePhoneNumber({ phoneNumber })),
+    dispatch(requestSavePayPalEmail({ paypalEmail })),
+  ];
+
+  return Promise.all(promises)
+    .then(values => {
+      const savePhoneNumberUser = values[0];
+      const savePayPalEmailUser = values[1];
+
+      // merge the protected data from both user objects
+      const phoneProtectedData = savePhoneNumberUser.attributes.profile.protectedData;
+      const paypalProtectedData = savePayPalEmailUser.attributes.profile.protectedData;
+      const mergedProtectedData = { ...phoneProtectedData, ...paypalProtectedData };
+      const mergeSource = { attributes: { profile: { protectedData: mergedProtectedData } } };
+
+      const currentUser = merge(savePhoneNumberUser, mergeSource);
+      dispatch(currentUserShowSuccess(currentUser));
+      dispatch(saveContactDetailsSuccess());
+    })
+    .catch(e => null);
+};
+
+/**
+ * Save email, phone number and PayPal email and update the current user.
+ */
+const saveEmailPhoneNumberAndPayPalEmail = params => (dispatch, getState, sdk) => {
+  const { email, phoneNumber, paypalEmail, currentPassword } = params;
+
+  // order of promises: 1. email, 2. phone number, 3. PayPal email
+  const promises = [
+    dispatch(requestSaveEmail({ email, currentPassword })),
+    dispatch(requestSavePhoneNumber({ phoneNumber })),
+    dispatch(requestSavePayPalEmail({ paypalEmail })),
+  ];
+
+  return Promise.all(promises)
+    .then(values => {
+      const saveEmailUser = values[0];
+      const savePhoneNumberUser = values[1];
+      const savePayPalEmailUser = values[2];
+
+      // merge the protected data from all user objects
+      const phoneProtectedData = savePhoneNumberUser.attributes.profile.protectedData;
+      const paypalProtectedData = savePayPalEmailUser.attributes.profile.protectedData;
+      const mergedProtectedData = { ...phoneProtectedData, ...paypalProtectedData };
+      const mergeSource = { attributes: { profile: { protectedData: mergedProtectedData } } };
+
+      const currentUser = merge(saveEmailUser, mergeSource);
+      dispatch(currentUserShowSuccess(currentUser));
+      dispatch(saveContactDetailsSuccess());
+    })
+    .catch(e => null);
+};
+
+/**
  * Update contact details, actions depend on which data has changed
  */
 export const saveContactDetails = params => (dispatch, getState, sdk) => {
   dispatch(saveContactDetailsRequest());
 
-  const { email, currentEmail, phoneNumber, currentPhoneNumber, currentPassword } = params;
+  const { 
+    email, 
+    currentEmail, 
+    phoneNumber, 
+    currentPhoneNumber, 
+    paypalEmail, 
+    currentPayPalEmail, 
+    currentPassword 
+  } = params;
+  
   const emailChanged = email !== currentEmail;
   const phoneNumberChanged = phoneNumber !== currentPhoneNumber;
+  const paypalEmailChanged = paypalEmail !== currentPayPalEmail;
 
-  if (emailChanged && phoneNumberChanged) {
+  if (emailChanged && phoneNumberChanged && paypalEmailChanged) {
+    return dispatch(saveEmailPhoneNumberAndPayPalEmail({ email, currentPassword, phoneNumber, paypalEmail }));
+  } else if (emailChanged && phoneNumberChanged) {
     return dispatch(saveEmailAndPhoneNumber({ email, currentPassword, phoneNumber }));
+  } else if (emailChanged && paypalEmailChanged) {
+    return dispatch(saveEmailAndPayPalEmail({ email, currentPassword, paypalEmail }));
+  } else if (phoneNumberChanged && paypalEmailChanged) {
+    return dispatch(savePhoneNumberAndPayPalEmail({ phoneNumber, paypalEmail }));
   } else if (emailChanged) {
     return dispatch(saveEmail({ email, currentPassword }));
   } else if (phoneNumberChanged) {
     return dispatch(savePhoneNumber({ phoneNumber }));
+  } else if (paypalEmailChanged) {
+    return dispatch(savePayPalEmail({ paypalEmail }));
+  } else {
+    // No changes made, dispatch success immediately
+    dispatch(saveContactDetailsSuccess());
+    return Promise.resolve();
   }
 };
 
@@ -250,7 +420,7 @@ export const resetPassword = email => (dispatch, getState, sdk) => {
     .catch(e => dispatch(resetPasswordError(storableError(e))));
 };
 
-export const loadData = () => {
-  // Since verify email happens in separate tab, current user's data might be updated
-  return fetchCurrentUser();
+export const loadData = () => (dispatch) => {
+  // ContactDetailsPage doesn't need data from backend
+  return Promise.resolve({});
 };

@@ -587,6 +587,25 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
           onSendPushNotification(PushNotificationCodeEnum.BookingPayoutDetails, txId.uuid);
         } else if (transitionName === transitions.DECLINE) {
           onSendPushNotification(PushNotificationCodeEnum.BookingDeclined, txId.uuid);
+          
+          // Void PayPal authorization if it's a PayPal payment
+          import('../../util/api').then(({ voidPayPalBookingAuthorization }) => {
+            voidPayPalBookingAuthorization(txId.uuid)
+              .then(result => {
+                if (result.voided) {
+                  console.log('✅ PayPal authorization voided on decline:', result);
+                } else if (result.skipped) {
+                  console.log('ℹ️ PayPal void skipped:', result.reason);
+                } else {
+                  console.warn('⚠️ PayPal void failed:', result.error);
+                }
+              })
+              .catch(error => {
+                console.error('❌ PayPal void error (non-critical):', error);
+              });
+          }).catch(error => {
+            console.error('❌ Failed to import PayPal void handler:', error);
+          });
         }
 
         return response;
@@ -618,14 +637,33 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
         return onChargeSecurityDeposit();
       })
       .catch(error => {
+        console.log('🔧 makeTransition error caught:', error);
+        console.log('🔧 makeTransition error.message:', error?.message);
+        console.log('🔧 makeTransition error type:', typeof error?.message);
+        
+        // Check if it's a direct message or stringified JSON
+        let errorMessage = error?.message;
+        if (typeof errorMessage === 'string' && errorMessage.startsWith('{')) {
+          try {
+            const parsed = JSON.parse(errorMessage);
+            errorMessage = parsed.message;
+          } catch (e) {
+            // If parsing fails, keep original message
+          }
+        }
+        
+        console.log('🔧 makeTransition processed error message:', errorMessage);
+        
         if (
-          error?.message === 'stripe_account_not_found' ||
-          error?.message === 'stripe_payouts_disabled'
+          errorMessage === 'stripe_account_not_found' ||
+          errorMessage === 'stripe_payouts_disabled'
         ) {
+          console.log('✅ makeTransition detected Stripe payout error - triggering modal');
           dispatch(transitionPause());
           dispatch(setStripePayoutsDisabled(true));
           return null;
         } else {
+          console.log('❌ makeTransition unhandled error - passing through');
           dispatch(transitionError(storableError(error)));
           log.error(error, `${transitionName}-failed`, {
             txId,

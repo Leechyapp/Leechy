@@ -50,6 +50,11 @@ const defaultDirectives = {
     '*.stripe.com',
     'connect-js.stripe.com',
     'merchant-ui-api.stripe.com',
+
+    // PayPal
+    '*.paypal.com',
+    '*.sandbox.paypal.com',
+    '*.paypalobjects.com',
   ],
   fontSrc: [self, data, 'assets-sharetribecom.sharetribe.com', 'fonts.gstatic.com'],
   formAction: [self],
@@ -59,6 +64,9 @@ const defaultDirectives = {
     'connect-js.stripe.com', 
     'merchant-ui-api.stripe.com', 
     '*.youtube-nocookie.com',
+    // PayPal
+    '*.paypal.com',
+    '*.sandbox.paypal.com',
   ],
   imgSrc: [
     self,
@@ -92,6 +100,11 @@ const defaultDirectives = {
 
     // Stripe
     '*.stripe.com',
+
+    // PayPal
+    '*.paypal.com',
+    '*.sandbox.paypal.com',
+    '*.paypalobjects.com',
   ],
   scriptSrc: [
     self,
@@ -107,6 +120,9 @@ const defaultDirectives = {
     'merchant-ui-api.stripe.com',
     // Plausible analytics
     'plausible.io',
+    // PayPal
+    '*.paypal.com',
+    '*.sandbox.paypal.com',
   ],
   styleSrc: [self, unsafeInline, 'fonts.googleapis.com', 'api.mapbox.com'],
 };
