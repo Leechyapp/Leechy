@@ -11,43 +11,80 @@
 
 .mobileNav {
   @extend .baseMobileNav;
-  height: 55px;
+  height: 50px;
+  padding: 5px 0;
 }
 
 .mobileNavIOS {
   @extend .baseMobileNav;
-  height: 65px;
+  height: 60px;
+  padding: 5px 0 10px 0;
 }
 
-.blocIcon {
-  display: table;
+.navButton {
+  display: flex;
   justify-content: center;
-  text-align: center;
   align-items: center;
-  padding: 10px 0 0 0;
+  padding: 0;
+  position: relative;
 
-  .icon {
-    font-size: 18px;
-  }
-
-  .text {
-    margin-top: -8px;
-    font-size: 9px;
-    font-weight: 500;
-    display: block;
-  }
-
-  .notificationDot {
-    background-color: var(--colorFail);
-    color: var(--colorWhite);
-    font-size: 11px;
+  .floatingButton {
+    position: relative;
+    box-shadow: none;
     border-radius: 50%;
-    height: 8px;
-    width: 8px;
-    position: absolute;
-    top: 8px;
-    margin-left: 13px;
-    text-align: center;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(0.95);
+    }
+  }
+
+  .navIcon {
+    font-size: 24px;
+    color: var(--colorSuccess);
+  }
+
+  // Special styling for the plus button
+  &:nth-child(3) {
+    .floatingButton {
+      position: relative;
+      bottom: 2px;
+      width: 36px;
+      height: 36px;
+      background-color: var(--colorSuccess);
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background-color: var(--colorSuccess);
+        transform: translateY(-2px);
+        bottom: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 6px 12px rgba(0, 0, 0, 0.25);
+      }
+
+      &:active {
+        background-color: var(--colorSuccess);
+        transform: translateY(0);
+        bottom: 2px;
+        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.25), 0 3px 6px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    .navIcon {
+      font-size: 20px;
+      color: var(--colorWhite);
+    }
   }
 }
 
@@ -55,42 +92,10 @@ p {
   margin: unset;
 }
 
+// Legacy styles - can be removed after testing
+.blocIcon,
 .addListingButton {
-  display: table;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-  padding: 10px 0 0 0;
-  position: relative;
-
-  .floatingButton {
-    position: relative;
-    bottom: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--colorSuccess);
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    &:active {
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
-    }
-  }
-
-  .plusIcon {
-    font-size: 20px;
-    color: var(--colorWhite);
-  }
+  display: none;
 }
 
 .scrollLayerClassName {
