@@ -18,7 +18,9 @@ import {
   LinkedLogo,
   Modal,
   ModalMissingInformation,
+  NamedLink,
 } from '../../../components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import MenuIcon from './MenuIcon';
 import SearchIcon from './SearchIcon';
@@ -330,13 +332,15 @@ class TopbarComponent extends Component {
           {hideMobileSearchIcon ? (
             <div className={css.searchMenu}></div>
           ) : (
-            <Button
-              rootClassName={css.searchMenu}
-              onClick={this.handleMobileSearchOpen}
-              title={intl.formatMessage({ id: 'Topbar.searchIcon' })}
+            <NamedLink
+              name="InboxPage"
+              params={{ tab: currentUserHasListings ? 'sales' : 'orders' }}
+              className={css.searchMenu}
+              title={intl.formatMessage({ id: 'Topbar.inboxIcon' })}
             >
-              <SearchIcon className={css.searchMenuIcon} />
-            </Button>
+              <FontAwesomeIcon className={css.searchMenuIcon} icon={'fa fa-fw fa-envelope-open'} style={{ fontSize: '20px' }} />
+              {notificationDot}
+            </NamedLink>
           )}
         </div>
         <div className={css.desktop}>

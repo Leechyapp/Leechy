@@ -99,16 +99,10 @@ const NativeBottomNavbar = injectIntl(props => {
           <FormattedMessage id="NativeBottomNavbar.menuItem.search" />
         </p>
       </NamedLink>
-      <NamedLink
-        name="InboxPage"
-        params={{ tab: currentUserHasListings ? 'sales' : 'orders' }}
-        className={css.blocIcon}
-      >
-        <FontAwesomeIcon className={css.icon} icon={'fa fa-fw fa-envelope-open'} />
-        <p className={css.text}>
-          <FormattedMessage id="NativeBottomNavbar.menuItem.inbox" />
-        </p>
-        {notificationDot}
+      <NamedLink name="NewListingPage" className={css.addListingButton}>
+        <div className={css.floatingButton}>
+          <FontAwesomeIcon className={css.plusIcon} icon={'fas fa-plus'} />
+        </div>
       </NamedLink>
       {isAuthenticated && currentUser?.id?.uuid ? (
         <NamedLink name="ProfilePage" params={{ id: currentUser.id.uuid }} className={css.blocIcon}>
