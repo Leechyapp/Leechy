@@ -4,7 +4,7 @@
  */
 exports.up = function(knex) {
   return knex.raw(`
-        CREATE TABLE TransactionLedger (
+        CREATE TABLE IF NOT EXISTS TransactionLedger (
             id int NOT NULL AUTO_INCREMENT,
             paymentMethod varchar(50) NOT NULL,
             transactionId varchar(255) NOT NULL,
@@ -42,5 +42,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-  return knex.schema.dropTable('TransactionLedger');
+  return knex.schema.dropTableIfExists('TransactionLedger');
 }; 
