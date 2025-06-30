@@ -87,49 +87,38 @@ const NativeBottomNavbar = injectIntl(props => {
 
   return (
     <nav className={rootClasses}>
-      <NamedLink name="LandingPage" className={css.blocIcon}>
-        <FontAwesomeIcon className={css.icon} icon={'fas fa-home'} />
-        <p className={css.text}>
-          <FormattedMessage id="NativeBottomNavbar.menuItem.home" />
-        </p>
+      <NamedLink name="LandingPage" className={css.navButton}>
+        <div className={css.floatingButton}>
+          <FontAwesomeIcon className={css.navIcon} icon={'fas fa-home'} />
+        </div>
       </NamedLink>
-      <NamedLink name="SearchPage" className={css.blocIcon}>
-        <FontAwesomeIcon className={css.icon} icon={'fas fa-search'} />
-        <p className={css.text}>
-          <FormattedMessage id="NativeBottomNavbar.menuItem.search" />
-        </p>
+      <NamedLink name="SearchPage" className={css.navButton}>
+        <div className={css.floatingButton}>
+          <FontAwesomeIcon className={css.navIcon} icon={'fas fa-search'} />
+        </div>
       </NamedLink>
-      <NamedLink
-        name="InboxPage"
-        params={{ tab: currentUserHasListings ? 'sales' : 'orders' }}
-        className={css.blocIcon}
-      >
-        <FontAwesomeIcon className={css.icon} icon={'fa fa-fw fa-envelope-open'} />
-        <p className={css.text}>
-          <FormattedMessage id="NativeBottomNavbar.menuItem.inbox" />
-        </p>
-        {notificationDot}
+      <NamedLink name="NewListingPage" className={css.navButton}>
+        <div className={css.floatingButton}>
+          <FontAwesomeIcon className={css.navIcon} icon={'fas fa-plus'} />
+        </div>
       </NamedLink>
       {isAuthenticated && currentUser?.id?.uuid ? (
-        <NamedLink name="ProfilePage" params={{ id: currentUser.id.uuid }} className={css.blocIcon}>
-          <FontAwesomeIcon className={css.icon} icon={'fas fa-user-circle'} />
-          <p className={css.text}>
-            <FormattedMessage id="NativeBottomNavbar.menuItem.profile" />
-          </p>
+        <NamedLink name="ProfilePage" params={{ id: currentUser.id.uuid }} className={css.navButton}>
+          <div className={css.floatingButton}>
+            <FontAwesomeIcon className={css.navIcon} icon={'fas fa-user-circle'} />
+          </div>
         </NamedLink>
       ) : (
-        <NamedLink name="LoginPage" className={css.blocIcon}>
-          <FontAwesomeIcon className={css.icon} icon={'fas fa-user-circle'} />
-          <p className={css.text}>
-            <FormattedMessage id="NativeBottomNavbar.menuItem.profile" />
-          </p>
+        <NamedLink name="LoginPage" className={css.navButton}>
+          <div className={css.floatingButton}>
+            <FontAwesomeIcon className={css.navIcon} icon={'fas fa-user-circle'} />
+          </div>
         </NamedLink>
       )}
-      <a onClick={() => setIsMobileMenuOpen(true)} className={css.blocIcon}>
-        <FontAwesomeIcon className={css.icon} icon="fa-solid fa-bars" />
-        <p className={css.text}>
-          <FormattedMessage id="NativeBottomNavbar.menuItem.more" />
-        </p>
+      <a onClick={() => setIsMobileMenuOpen(true)} className={css.navButton}>
+        <div className={css.floatingButton}>
+          <FontAwesomeIcon className={css.navIcon} icon="fa-solid fa-bars" />
+        </div>
       </a>
 
       <Modal

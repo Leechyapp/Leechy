@@ -13,8 +13,8 @@ switch (ENV_MOBILE) {
     serverConfig = {
       // url: 'http://127.0.0.1:3020',
       // allowNavigation: ['127.0.0.1:3020'],
-      url: 'http://localhost:3020',
-      allowNavigation: ['localhost:3020'],
+      url: 'http://localhost:3000',
+      allowNavigation: ['localhost:3000'],
       // url: 'http://localhost:4000',
       // allowNavigation: ['localhost:4000'],
       // allowNavigation: ['*'],

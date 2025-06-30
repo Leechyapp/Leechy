@@ -11,48 +11,89 @@
 
 .mobileNav {
   @extend .baseMobileNav;
-  height: 55px;
+  height: 70px;
+  padding: 8px 0 0 0;
+  align-items: flex-start;
 }
 
 .mobileNavIOS {
   @extend .baseMobileNav;
-  height: 65px;
+  height: 85px;
+  padding: 8px 0 0 0;
+  align-items: flex-start;
 }
 
-.blocIcon {
-  display: table;
+.navButton {
+  display: flex;
   justify-content: center;
-  text-align: center;
   align-items: center;
-  padding: 10px 0 0 0;
+  padding: 0;
+  position: relative;
 
-  .icon {
-    font-size: 18px;
-  }
-
-  .text {
-    margin-top: -8px;
-    font-size: 9px;
-    font-weight: 500;
-    display: block;
-  }
-
-  .notificationDot {
-    background-color: var(--colorFail);
-    color: var(--colorWhite);
-    font-size: 11px;
+  .floatingButton {
+    position: relative;
+    top: -4px;
+    box-shadow: none;
     border-radius: 50%;
-    height: 8px;
-    width: 8px;
-    position: absolute;
-    top: 8px;
-    margin-left: 13px;
-    text-align: center;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(0.95);
+    }
+  }
+
+  .navIcon {
+    font-size: 22px;
+    color: var(--colorGrey700);
+  }
+
+  // Special styling for the plus button - Instagram style
+  &:nth-child(3) {
+    .floatingButton {
+      top: 0;
+      background-color: var(--colorWhite);
+      border: 2px solid var(--colorGrey700);
+      border-radius: 12px;
+      width: 36px;
+      height: 36px;
+
+      &:hover {
+        background-color: var(--colorGrey100);
+        border-color: var(--colorGrey800);
+      }
+
+      &:active {
+        transform: scale(0.95);
+        background-color: var(--colorGrey200);
+      }
+    }
+
+    .navIcon {
+      font-size: 22px;
+      color: var(--colorGrey700);
+    }
   }
 }
 
 p {
   margin: unset;
+}
+
+// Legacy styles - can be removed after testing
+.blocIcon,
+.addListingButton {
+  display: none;
 }
 
 .scrollLayerClassName {
