@@ -22,19 +22,14 @@ if (!fs.existsSync(wellKnownDir)) {
 let sourceFile;
 if (isProduction) {
   sourceFile = productionFile;
-  console.log('🍎 Setting up Apple Pay for PRODUCTION environment');
 } else {
   sourceFile = stagingFile;
-  console.log('🍎 Setting up Apple Pay for STAGING environment');
 }
 
 if (fs.existsSync(sourceFile)) {
   fs.copyFileSync(sourceFile, targetFile);
-  console.log(`✅ Apple Pay domain verification file copied successfully`);
-  console.log(`   Source: ${path.basename(sourceFile)}`);
-  console.log(`   Target: apple-developer-merchantid-domain-association.txt`);
 } else {
-  console.error(`❌ Error: Source file not found: ${sourceFile}`);
-  console.error('   Make sure both apple-pay-production.txt and apple-pay-staging.txt exist');
+  console.error(`Error: Source file not found: ${sourceFile}`);
+  console.error('Make sure both apple-pay-production.txt and apple-pay-staging.txt exist');
   process.exit(1);
-} 
+}

@@ -718,8 +718,6 @@ export const CheckoutPageWithPayment = props => {
       // Extract Stripe payment method ID based on payment type
       let stripePaymentMethodId;
       
-      console.log('Processing payment data:', paymentData);
-      
       // Extract data based on payment structure
       const paymentMethodData = paymentData.data || paymentData;
       const paymentType = paymentMethodData.type || paymentData.method?.id;
@@ -727,7 +725,6 @@ export const CheckoutPageWithPayment = props => {
       if (paymentType === 'paypal' || paymentType === 'venmo') {
         // For PayPal/Venmo payments, the payment has been authorized (not captured yet)
         // We need to create the booking with the authorization information
-        console.log(`Processing ${paymentType} payment:`, paymentMethodData);
         
         if (!paymentMethodData.backendProcessed) {
           throw new Error(`${paymentType} payment was not processed by backend`);
@@ -737,19 +734,6 @@ export const CheckoutPageWithPayment = props => {
         stripePaymentMethodId = null;
         
         // Create booking with PayPal/Venmo authorization data (not captured payment)
-        console.log(`🔄 Creating booking request for ${paymentType} payment...`);
-        console.log('📋 Booking request payload:', {
-          listingId: listing.id?.uuid || listing.id,
-          bookingStart,
-          bookingEnd,
-          displayStart,
-          displayEnd,
-          paymentType,
-          hasOrderId: !!paymentMethodData.orderId,
-          hasAuthorizationId: !!paymentMethodData.authorizationId,
-          captured: paymentMethodData.captured || false
-        });
-        
         await createBookingRequest({
           initialMessage,
           orderParams: {
@@ -782,28 +766,19 @@ export const CheckoutPageWithPayment = props => {
               ...securityDepositMaybe,
             },
           },
-                  }).then(({ transactionId }) => {
-            console.log(`✅ ${paymentType} booking request created successfully:`, transactionId);
+        }).then(({ transactionId }) => {
           
           sendPushNotification({
             pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
             transactionId: transactionId.uuid,
             params: {},
-          })
-            .then(res => {
-              console.log('✅ Push notification sent:', res);
-            })
-            .catch(err => {
-              console.error('❌ Push notification failed (non-critical):', err);
-            });
-          
-          console.log(`🔄 Redirecting to order details page...`);
-          redirectToOrderDetailsPage(transactionId);
-                  }).catch(bookingError => {
-            console.error(`❌ ${paymentType} booking request failed:`, bookingError);
-            setTrxSubmitInProgress(false);
-            throw bookingError;
           });
+          
+          redirectToOrderDetailsPage(transactionId);
+        }).catch(bookingError => {
+          setTrxSubmitInProgress(false);
+          throw bookingError;
+        });
         
         // Return early for PayPal/Venmo since we handled the full flow
         setTrxSubmitInProgress(false);
@@ -868,8 +843,8 @@ export const CheckoutPageWithPayment = props => {
         redirectToOrderDetailsPage(transactionId);
       });
     } catch (err) {
-      console.error('❌ Enhanced payment submission failed:', err);
-      console.error('❌ Error details:', {
+      console.error('Enhanced payment submission failed:', err);
+      console.error('Error details:', {
         message: err.message,
         stack: err.stack,
         name: err.name

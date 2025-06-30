@@ -31,16 +31,12 @@ const GooglePayButton = ({
     
     const initializeGooglePay = async () => {
       if (!stripePublishableKey) {
-        console.log('❌ Stripe publishable key not provided');
         return;
       }
 
       try {
-        console.log(`🔄 Initializing Google Pay (${mobile ? 'Mobile' : 'Web'} mode)`);
-        
         // For mobile devices, always enable external flow immediately
         if (mobile) {
-          console.log('📱 Mobile device detected - enabling external Google Pay flow');
           setIsAvailable(true);
           setUseExternalFlow(true);
           return; // Skip Stripe Payment Request setup for mobile
@@ -54,7 +50,7 @@ const GooglePayButton = ({
           await setupPaymentRequest(stripeInstance);
         }
       } catch (error) {
-        console.error('❌ Failed to initialize Google Pay:', error);
+        console.error('Failed to initialize Google Pay:', error);
         setError('Failed to initialize payment system');
       }
     };
@@ -83,29 +79,23 @@ const GooglePayButton = ({
       // Check if Google Pay is available (web only)
       try {
         const result = await pr.canMakePayment();
-        console.log('Google Pay availability check result:', result);
         
         if (result && result.googlePay) {
-          console.log('✅ Google Pay is available via Stripe Payment Request');
           setIsAvailable(true);
           setPaymentRequest(pr);
           setUseExternalFlow(false);
           
           // Set up event handlers for web flow
           setupPaymentRequestHandlers(pr);
-        } else {
-          console.log('❌ Google Pay not available via Payment Request API on web');
         }
       } catch (availabilityError) {
-        console.error('❌ Error checking payment availability:', availabilityError);
+        console.error('Error checking payment availability:', availabilityError);
       }
     };
 
     const setupPaymentRequestHandlers = (pr) => {
       // Handle payment method
       pr.on('paymentmethod', async (ev) => {
-        console.log('Payment method received via Stripe:', ev);
-        
         try {
           // Submit payment data to parent component
           await onPaymentSubmit({
@@ -116,9 +106,8 @@ const GooglePayButton = ({
           
           // Complete the payment
           ev.complete('success');
-          console.log('✅ Payment completed successfully');
         } catch (error) {
-          console.error('❌ Payment processing failed:', error);
+          console.error('Payment processing failed:', error);
           ev.complete('fail');
           setError(error.message || 'Payment failed');
         }
@@ -126,7 +115,7 @@ const GooglePayButton = ({
 
       // Handle payment request errors
       pr.on('cancel', () => {
-        console.log('ℹ️ Payment cancelled by user');
+        // Payment cancelled by user
       });
     };
 
@@ -139,14 +128,12 @@ const GooglePayButton = ({
 
     try {
       if (useExternalFlow) {
-        console.log('🚀 Opening external Stripe Checkout for Google Pay...');
         await handleExternalGooglePay();
       } else {
-        console.log('🚀 Showing Google Pay via Stripe Payment Request...');
         await handleInAppGooglePay();
       }
     } catch (error) {
-      console.error('❌ Error with Google Pay:', error);
+      console.error('Error with Google Pay:', error);
       
       // Provide user-friendly error messages
       if (error.message && error.message.includes('not supported')) {
@@ -209,17 +196,15 @@ const GooglePayButton = ({
 
       // Note: Payment completion will be handled via the success_url redirect
       // The parent component should listen for app resume and check payment status
-      console.log('✅ External Google Pay flow initiated');
       
     } catch (error) {
-      console.error('❌ External Google Pay flow failed:', error);
+      console.error('External Google Pay flow failed:', error);
       throw error;
     }
   };
 
   // Don't render if not available
   if (!isAvailable) {
-    console.log('🔍 Google Pay button not rendering - isAvailable:', isAvailable, 'isMobile:', isMobile, 'useExternalFlow:', useExternalFlow);
     return null;
   }
 
@@ -287,4 +272,4 @@ GooglePayButton.propTypes = {
   stripePublishableKey: string,
 };
 
-export default injectIntl(GooglePayButton); 
+export default injectIntl(GooglePayButton);

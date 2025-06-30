@@ -82,7 +82,6 @@ export const StripeEarningsPage = injectIntl(props => {
     
     try {
       const result = await getUnifiedEarnings();
-      console.log('💰 Unified balance received:', result);
       
       if (result.success && result.balance) {
         setUnifiedBalance(result.balance);
@@ -101,7 +100,7 @@ export const StripeEarningsPage = injectIntl(props => {
         }
       }
     } catch (error) {
-      console.error('❌ Failed to load unified balance:', error);
+      console.error('Failed to load unified balance:', error);
       setBalanceError(error);
     } finally {
       setBalanceLoading(false);
@@ -123,20 +122,16 @@ export const StripeEarningsPage = injectIntl(props => {
     
     try {
       const result = await createUnifiedPayout();
-      console.log('✅ Unified payout result:', result);
       
       if (result.success) {
         await loadUnifiedBalance();
-        
-        console.log('💰 Total payout:', result.totalPayout?.amount);
-        console.log('📊 Payout breakdown:', result.breakdown);
       }
     } catch (error) {
-      console.error('❌ Unified payout failed:', error);
+      console.error('Unified payout failed:', error);
       
       // Check if error is related to missing PayPal email
       if (error.message && error.message.includes('PayPal email')) {
-        alert('⚠️ PayPal Email Required\n\nTo cash out PayPal earnings, you must add your PayPal email address to your profile first.\n\nGo to: Account Settings → Contact Details → Add your PayPal email for receiving payouts.\n\nIMPORTANT: Use the PayPal email where you want to RECEIVE money, not the one you used to pay.');
+        alert('PayPal Email Required\n\nTo cash out PayPal earnings, you must add your PayPal email address to your profile first.\n\nGo to: Account Settings → Contact Details → Add your PayPal email for receiving payouts.\n\nIMPORTANT: Use the PayPal email where you want to RECEIVE money, not the one you used to pay.');
       } else {
         alert('Payout failed. Please try again or contact support.');
       }

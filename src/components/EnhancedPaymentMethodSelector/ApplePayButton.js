@@ -32,7 +32,6 @@ const ApplePayButton = ({
 
         // Check Apple Pay availability
         if (!window.ApplePaySession || !ApplePaySession.canMakePayments()) {
-          console.log('❌ Apple Pay not available on this device');
           return;
         }
 
@@ -56,14 +55,12 @@ const ApplePayButton = ({
         // Check if payment request is available
         const result = await pr.canMakePayment();
         if (!result || !result.applePay) {
-          console.log('❌ Apple Pay not available via Payment Request API');
           return;
         }
 
         // Set up event handlers
         pr.on('paymentmethod', async (ev) => {
           try {
-            console.log('🍎 Apple Pay payment method received');
             // Submit payment data to parent component
             await onPaymentSubmit({
               type: 'apple_pay',
@@ -73,9 +70,8 @@ const ApplePayButton = ({
 
             // Complete the payment
             ev.complete('success');
-            console.log('✅ Apple Pay payment completed successfully');
           } catch (error) {
-            console.error('❌ Apple Pay payment failed:', error);
+            console.error('Apple Pay payment failed:', error);
             ev.complete('fail');
             setError(error.message || 'Payment failed');
           } finally {
@@ -85,17 +81,15 @@ const ApplePayButton = ({
 
         // Handle cancel event
         pr.on('cancel', () => {
-          console.log('🍎 Apple Pay cancelled by user');
           setIsLoading(false);
         });
 
         // Store payment request and mark as available
         setPaymentRequest(pr);
         setIsAvailable(true);
-        console.log('✅ Apple Pay initialized and ready');
 
       } catch (error) {
-        console.error('❌ Failed to initialize Apple Pay:', error);
+        console.error('Failed to initialize Apple Pay:', error);
         setError('Failed to initialize Apple Pay');
       }
     };
@@ -114,10 +108,9 @@ const ApplePayButton = ({
 
     try {
       // Show payment sheet synchronously - this MUST be called directly in the user gesture
-      console.log('🍎 Showing Apple Pay payment sheet...');
       paymentRequest.show();
     } catch (error) {
-      console.error('❌ Apple Pay error:', error);
+      console.error('Apple Pay error:', error);
       setError(error.message || 'Failed to show Apple Pay');
       setIsLoading(false);
     }
@@ -188,4 +181,4 @@ ApplePayButton.propTypes = {
   stripePublishableKey: string,
 };
 
-export default injectIntl(ApplePayButton); 
+export default injectIntl(ApplePayButton);

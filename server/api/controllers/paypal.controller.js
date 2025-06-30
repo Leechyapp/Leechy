@@ -8,16 +8,10 @@ class PayPalController {
    */
   static createOrder = async (req, res, next) => {
     try {
-      console.log('🔧 PayPal createOrder - Request body:', JSON.stringify(req.body, null, 2));
-      console.log('🔧 PayPal createOrder - Body type:', typeof req.body);
-      console.log('🔧 PayPal createOrder - Content-Type:', req.get('Content-Type'));
-      console.log('🔧 PayPal createOrder - User:', req.currentUser?.id?.uuid || 'Not authenticated');
-
       const { amount, currency, description, metadata } = req.body;
 
       // Validate required fields
       if (!amount) {
-        console.log('❌ PayPal createOrder - Missing amount field');
         return res.status(400).json({ 
           error: 'Missing required field: amount' 
         });
@@ -25,7 +19,6 @@ class PayPalController {
 
       // Check if PayPal is configured
       if (!PayPalService.isConfigured()) {
-        console.log('❌ PayPal createOrder - PayPal not configured');
         return res.status(503).json({
           error: 'PayPal is not configured on this server'
         });
@@ -42,8 +35,6 @@ class PayPalController {
         }
       };
 
-      console.log('🔧 PayPal createOrder - Order data:', JSON.stringify(orderData, null, 2));
-
       const order = await PayPalService.createOrder(orderData);
 
       res.json({
@@ -55,7 +46,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal create order error:', error);
+      console.error('PayPal create order error:', error);
       
       // Provide more specific error responses
       if (error.message.includes('Failed to authenticate with PayPal')) {
@@ -79,11 +70,6 @@ class PayPalController {
     try {
       const { orderId } = req.params;
       const { transactionLineItems, providerId, customerId } = req.body;
-      
-      console.log('🔧 PayPal authorizeOrder - Order ID:', orderId);
-      console.log('🔧 PayPal authorizeOrder - User:', req.currentUser?.id?.uuid || 'Not authenticated');
-      console.log('🔧 PayPal authorizeOrder - Transaction Line Items:', transactionLineItems);
-      console.log('🔧 PayPal authorizeOrder - Provider ID:', providerId);
 
       if (!orderId) {
         return res.status(400).json({ 
@@ -113,12 +99,6 @@ class PayPalController {
         captured: false // Important: money is NOT captured yet
       };
 
-      console.log('✅ PayPal order authorized (not captured):', authorizationInfo);
-      console.log('💡 Money will be captured when seller accepts the booking');
-
-      // Don't record in ledger yet - only when seller accepts and payment is captured
-      console.log('⏳ PayPal authorization stored - awaiting seller acceptance for capture');
-
       res.json({
         success: true,
         order: authorizedOrder,
@@ -128,7 +108,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal authorizeOrder error:', error);
+      console.error('PayPal authorizeOrder error:', error);
       res.status(500).json({
         error: 'Failed to authorize PayPal order',
         details: error.message
@@ -143,11 +123,6 @@ class PayPalController {
     try {
       const { orderId } = req.params;
       const { transactionLineItems, providerId, customerId } = req.body;
-      
-      console.log('🔧 PayPal captureOrder - Order ID:', orderId);
-      console.log('🔧 PayPal captureOrder - User:', req.currentUser?.id?.uuid || 'Not authenticated');
-      console.log('🔧 PayPal captureOrder - Transaction Line Items:', transactionLineItems);
-      console.log('🔧 PayPal captureOrder - Provider ID:', providerId);
 
       if (!orderId) {
         return res.status(400).json({ 
@@ -175,8 +150,6 @@ class PayPalController {
         order: capturedOrder
       };
 
-      console.log('✅ PayPal order captured successfully:', paymentInfo);
-
       // **NEW: Record transaction in ledger for future payouts**
       if (transactionLineItems && providerId) {
         try {
@@ -187,8 +160,6 @@ class PayPalController {
             customerId || req.currentUser?.id?.uuid
           );
           
-          console.log('📋 PayPal transaction recorded in ledger:', ledgerEntry);
-          
           // Include ledger info in response
           paymentInfo.ledgerEntry = {
             payoutTotal: ledgerEntry.payoutTotal,
@@ -197,11 +168,9 @@ class PayPalController {
           };
           
         } catch (ledgerError) {
-          console.error('❌ Failed to record PayPal transaction in ledger:', ledgerError);
+          console.error('Failed to record PayPal transaction in ledger:', ledgerError);
           // Don't fail the payment capture, just log the error
         }
-      } else {
-        console.warn('⚠️ PayPal transaction captured but not recorded in ledger - missing line items or provider ID');
       }
 
       res.json({
@@ -211,7 +180,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal captureOrder error:', error);
+      console.error('PayPal captureOrder error:', error);
       res.status(500).json({
         error: 'Failed to capture PayPal order',
         details: error.message
@@ -226,13 +195,6 @@ class PayPalController {
     try {
       const { authorizationId } = req.params;
       const { amount, transactionLineItems, providerId, customerId } = req.body;
-      
-      console.log('🔧 PayPal captureAuthorization - Authorization ID:', authorizationId);
-      console.log('🔧 PayPal captureAuthorization - User:', req.currentUser?.id?.uuid || 'Not authenticated');
-      console.log('🔧 PayPal captureAuthorization - Amount:', amount);
-      console.log('🔧 PayPal captureAuthorization - Full req.body:', JSON.stringify(req.body, null, 2));
-      console.log('🔧 PayPal captureAuthorization - Extracted providerId:', providerId);
-      console.log('🔧 PayPal captureAuthorization - Extracted customerId:', customerId);
 
       if (!authorizationId) {
         return res.status(400).json({ 
@@ -273,25 +235,15 @@ class PayPalController {
         }
       };
 
-      console.log('✅ PayPal authorization captured on seller acceptance:', paymentInfo);
-
       // Record in ledger now that payment is actually captured
       if (transactionLineItems && providerId) {
         try {
-          console.log('🔧 About to record PayPal transaction in ledger...');
-          console.log('🔧 Payment Info:', JSON.stringify(paymentInfo, null, 2));
-          console.log('🔧 Transaction Line Items:', JSON.stringify(transactionLineItems, null, 2));
-          console.log('🔧 Provider ID:', providerId);
-          console.log('🔧 Customer ID:', customerId || req.currentUser?.id?.uuid);
-          
           const ledgerEntry = await TransactionLedgerService.recordPayPalTransaction(
             paymentInfo,
             transactionLineItems,
             providerId,
             customerId || req.currentUser?.id?.uuid
           );
-          
-          console.log('📋 PayPal transaction recorded in ledger on acceptance:', ledgerEntry);
           
           // Include ledger info in response
           paymentInfo.ledgerEntry = {
@@ -301,16 +253,10 @@ class PayPalController {
           };
           
         } catch (ledgerError) {
-          console.error('❌ Failed to record PayPal transaction in ledger:', ledgerError);
-          console.error('❌ Ledger error stack:', ledgerError.stack);
+          console.error('Failed to record PayPal transaction in ledger:', ledgerError);
+          console.error('Ledger error stack:', ledgerError.stack);
           // Don't fail the payment capture, just log the error
         }
-      } else {
-        console.log('⚠️ PayPal transaction captured but not recorded in ledger:');
-        console.log('⚠️ - Has transaction line items:', !!transactionLineItems);
-        console.log('⚠️ - Has provider ID:', !!providerId);
-        console.log('⚠️ - Transaction line items:', transactionLineItems);
-        console.log('⚠️ - Provider ID:', providerId);
       }
 
       res.json({
@@ -321,7 +267,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal captureAuthorization error:', error);
+      console.error('PayPal captureAuthorization error:', error);
       res.status(500).json({
         error: 'Failed to capture PayPal authorization',
         details: error.message
@@ -335,9 +281,6 @@ class PayPalController {
   static voidAuthorization = async (req, res, next) => {
     try {
       const { authorizationId } = req.params;
-      
-      console.log('🔧 PayPal voidAuthorization - Authorization ID:', authorizationId);
-      console.log('🔧 PayPal voidAuthorization - User:', req.currentUser?.id?.uuid || 'Not authenticated');
 
       if (!authorizationId) {
         return res.status(400).json({ 
@@ -354,8 +297,6 @@ class PayPalController {
 
       const voidResult = await PayPalService.voidAuthorization(authorizationId);
 
-      console.log('✅ PayPal authorization voided on seller decline:', voidResult);
-
       res.json({
         success: true,
         void: voidResult,
@@ -363,7 +304,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal voidAuthorization error:', error);
+      console.error('PayPal voidAuthorization error:', error);
       res.status(500).json({
         error: 'Failed to void PayPal authorization',
         details: error.message
@@ -399,7 +340,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal get order error:', error);
+      console.error('PayPal get order error:', error);
       next(error);
     }
   };
@@ -442,7 +383,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal refund error:', error);
+      console.error('PayPal refund error:', error);
       next(error);
     }
   };
@@ -453,9 +394,6 @@ class PayPalController {
   static voidBookingAuthorization = async (req, res, next) => {
     try {
       const { transactionId } = req.params;
-      
-      console.log('🔧 PayPal voidBookingAuthorization - Transaction ID:', transactionId);
-      console.log('🔧 PayPal voidBookingAuthorization - User:', req.currentUser?.id?.uuid || 'Not authenticated');
 
       if (!transactionId) {
         return res.status(400).json({ 
@@ -472,15 +410,13 @@ class PayPalController {
 
       const voidResult = await PayPalTransactionHandlerService.handleBookingDecline(transactionId, req);
 
-      console.log('✅ PayPal booking authorization void result:', voidResult);
-
       res.json({
         success: true,
         ...voidResult
       });
 
     } catch (error) {
-      console.error('❌ PayPal voidBookingAuthorization error:', error);
+      console.error('PayPal voidBookingAuthorization error:', error);
       res.status(500).json({
         error: 'Failed to void PayPal booking authorization',
         details: error.message
@@ -507,34 +443,12 @@ class PayPalController {
 
       // Process webhook event
       const eventType = body.event_type;
-      console.log('📨 PayPal webhook received:', eventType);
-
-      switch (eventType) {
-        case 'CHECKOUT.ORDER.APPROVED':
-          console.log('✅ PayPal order approved:', body.resource.id);
-          break;
-        
-        case 'PAYMENT.CAPTURE.COMPLETED':
-          console.log('✅ PayPal payment captured:', body.resource.id);
-          break;
-        
-        case 'PAYMENT.CAPTURE.DENIED':
-          console.log('❌ PayPal payment denied:', body.resource.id);
-          break;
-        
-        case 'PAYMENT.CAPTURE.REFUNDED':
-          console.log('🔄 PayPal payment refunded:', body.resource.id);
-          break;
-        
-        default:
-          console.log('ℹ️ Unhandled PayPal webhook event:', eventType);
-      }
 
       // Respond to PayPal that webhook was received
       res.status(200).json({ success: true });
 
     } catch (error) {
-      console.error('❌ PayPal webhook error:', error);
+      console.error('PayPal webhook error:', error);
       res.status(500).json({ error: 'Webhook processing failed' });
     }
   };
@@ -553,7 +467,7 @@ class PayPalController {
       });
 
     } catch (error) {
-      console.error('❌ PayPal config status error:', error);
+      console.error('PayPal config status error:', error);
       next(error);
     }
   };

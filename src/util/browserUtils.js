@@ -59,7 +59,6 @@ export const openInAppBrowser = async (url, options = {}) => {
       // Listen for browser closure to handle callbacks
       if (onClose) {
         const listener = await Browser.addListener('browserFinished', () => {
-          console.log('Browser was closed - triggering callback');
           onClose();
           listener.remove();
         });
@@ -77,7 +76,6 @@ export const openInAppBrowser = async (url, options = {}) => {
           const checkClosed = setInterval(() => {
             if (popup.closed) {
               clearInterval(checkClosed);
-              console.log('Popup was closed - triggering callback');
               if (onClose) onClose();
             }
           }, 1000);

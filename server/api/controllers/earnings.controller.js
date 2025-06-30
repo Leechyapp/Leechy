@@ -14,8 +14,6 @@ class EarningsController {
       const providerId = currentUser.id.uuid;
       const stripeAccountId = currentUser.attributes.profile.privateData?.stripeAccountId;
       
-      console.log('💰 Getting unified balance for provider:', providerId);
-      
       // Get Stripe balance (existing functionality)
       let stripeBalance = { pendingAmount: null, availableAmount: null };
       if (stripeAccountId) {
@@ -30,7 +28,7 @@ class EarningsController {
             };
           }
         } catch (stripeError) {
-          console.warn('⚠️ Failed to get Stripe balance:', stripeError.message);
+          console.warn('Failed to get Stripe balance:', stripeError.message);
         }
       }
       
@@ -69,12 +67,6 @@ class EarningsController {
         }
       };
       
-      console.log('💰 Unified balance calculated:', {
-        stripeAvailable: unifiedBalance.stripeAvailable.amount,
-        paypalPending: unifiedBalance.paypalPending.amount,
-        totalAvailable: unifiedBalance.totalAvailable.amount
-      });
-      
       res.json({
         success: true,
         balance: unifiedBalance,
@@ -83,7 +75,7 @@ class EarningsController {
       });
       
     } catch (error) {
-      console.error('❌ Error getting unified balance:', error);
+      console.error('Error getting unified balance:', error);
       next(error);
     }
   };
@@ -103,8 +95,6 @@ class EarningsController {
         });
       }
       
-      console.log('🔄 Creating unified payout for provider:', providerId);
-      
       // Get current balances
       const stripeBalance = await StripeService.getBalance(stripeAccountId);
       const paypalPendingPayouts = await TransactionLedgerService.calculatePendingPayouts(providerId);
@@ -120,12 +110,6 @@ class EarningsController {
         });
       }
       
-      console.log('💰 Unified payout breakdown:', {
-        stripeAvailable,
-        paypalAvailable,
-        totalAvailable
-      });
-      
       // Create Stripe payout for Stripe earnings (if any)
       let stripePayoutResult = null;
       if (stripeAvailable > 0) {
@@ -135,9 +119,8 @@ class EarningsController {
             stripeAvailable,
             stripeBalance.available[0].currency
           );
-          console.log('✅ Stripe payout created:', stripePayoutResult.id);
         } catch (stripeError) {
-          console.error('❌ Failed to create Stripe payout:', stripeError);
+          console.error('Failed to create Stripe payout:', stripeError);
         }
       }
       
@@ -150,9 +133,8 @@ class EarningsController {
             providerId,
             stripeAccountId
           );
-          console.log('✅ Native payouts created for all payment methods');
         } catch (payoutError) {
-          console.error('❌ Failed to create native payouts:', payoutError);
+          console.error('Failed to create native payouts:', payoutError);
         }
       }
       
@@ -170,7 +152,7 @@ class EarningsController {
       });
       
     } catch (error) {
-      console.error('❌ Error creating unified payout:', error);
+      console.error('Error creating unified payout:', error);
       next(error);
     }
   };

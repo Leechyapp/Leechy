@@ -66,12 +66,6 @@ const calculateBaseProductPrice = (lineItems) => {
   // Convert from subunits (cents) to main units (dollars)
   // lineTotal.amount is in cents, so divide by 100 for USD
   const basePrice = baseLineItem.lineTotal.amount / 100;
-  
-  console.log('💰 Base product price calculation:', {
-    lineItem: baseLineItem,
-    basePriceInCents: baseLineItem.lineTotal.amount,
-    basePriceInDollars: basePrice
-  });
 
   return basePrice;
 };
@@ -111,21 +105,6 @@ const EnhancedPaymentMethodSelector = props => {
 
   const [showCardForm, setShowCardForm] = useState(false);
 
-  // Debug environment variables once on mount
-  useEffect(() => {
-    console.log('🔧 EnhancedPaymentMethodSelector DEBUG INFO:');
-    console.log('  📊 Environment:', process.env.NODE_ENV);
-    console.log('  💳 Stripe Key from config:', config?.stripe?.publishableKey ? '✅ Available' : '❌ Missing');
-    console.log('  💳 Stripe Key from props:', stripePublishableKey ? '✅ Available' : '❌ Missing');
-    console.log('  🏦 PayPal Client ID from props:', paypalClientId ? '✅ Available' : '❌ Missing');
-    console.log('  🏦 PayPal from config object:', config?.paypal);
-    console.log('  🔧 PayPal Client ID raw value:', paypalClientId ? paypalClientId.substring(0, 20) + '...' : 'null/undefined');
-    console.log('  🌍 Environment variables available:', typeof process !== 'undefined' && process.env ? 'Yes' : 'No');
-    console.log('  📦 Process object:', typeof process);
-    console.log('  🔧 Raw process.env.REACT_APP_PAYPAL_CLIENT_ID:', process.env.REACT_APP_PAYPAL_CLIENT_ID ? '✅ Available' : '❌ Missing');
-    console.log('  ⚙️  Show settings:', { showSavedCards, showDigitalWallets, showAlternativePayments });
-  }, []); // Empty dependency array means this runs only once
-
   useEffect(() => {
     // Check device capabilities for payment methods
     checkPaymentMethodAvailability();
@@ -137,81 +116,55 @@ const EnhancedPaymentMethodSelector = props => {
   }, [savedCards, isApplePayAvailable, isGooglePayAvailable, isPayPalAvailable, showSavedCards, showDigitalWallets, showAlternativePayments, transactionLineItems]);
 
   const checkPaymentMethodAvailability = async () => {
-    console.log('🔍 Checking payment method availability...');
-    
     // Check Apple Pay availability
     if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
-      console.log('✅ Apple Pay is available');
       setIsApplePayAvailable(true);
-    } else {
-      console.log('❌ Apple Pay not available');
     }
 
     // Check Google Pay availability using Stripe Payment Request API
-    console.log('🔍 Checking Google Pay availability via Stripe...');
-    
     if (stripePublishableKey) {
-              try {
-          const stripeInstance = await loadStripe(stripePublishableKey);
-          if (stripeInstance) {
-            // Create a test payment request to check Google Pay availability
-            const testPaymentRequest = stripeInstance.paymentRequest({
-              country: 'US',
-              currency: 'usd',
-              total: {
-                label: 'Test',
-                amount: 100, // $1.00 test amount
-              },
-              requestPayerName: false,
-              requestPayerEmail: false,
-            });
+      try {
+        const stripeInstance = await loadStripe(stripePublishableKey);
+        if (stripeInstance) {
+          // Create a test payment request to check Google Pay availability
+          const testPaymentRequest = stripeInstance.paymentRequest({
+            country: 'US',
+            currency: 'usd',
+            total: {
+              label: 'Test',
+              amount: 100, // $1.00 test amount
+            },
+            requestPayerName: false,
+            requestPayerEmail: false,
+          });
 
-            const result = await testPaymentRequest.canMakePayment();
-            
-            if (result && result.googlePay) {
-              console.log('✅ Google Pay is available via Stripe Payment Request');
-              setIsGooglePayAvailable(true);
-            } else {
-              console.log('❌ Google Pay not available via Stripe Payment Request');
-              setIsGooglePayAvailable(false);
-            }
+          const result = await testPaymentRequest.canMakePayment();
+          
+          if (result && result.googlePay) {
+            setIsGooglePayAvailable(true);
           } else {
-            console.log('❌ Failed to load Stripe instance');
             setIsGooglePayAvailable(false);
           }
+        } else {
+          setIsGooglePayAvailable(false);
+        }
       } catch (error) {
-        console.log('❌ Error checking Google Pay availability:', error);
         setIsGooglePayAvailable(false);
       }
     } else {
-      console.log('❌ No Stripe publishable key available for Google Pay');
       setIsGooglePayAvailable(false);
     }
 
     // Check PayPal availability
     if (paypalClientId) {
-      console.log('✅ PayPal Client ID provided - PayPal is available');
       setIsPayPalAvailable(true);
     } else {
-      console.log('❌ PayPal Client ID not provided');
       setIsPayPalAvailable(false);
     }
   };
 
   const updateAvailableMethods = () => {
     const methods = [];
-    
-    console.log('🔄 Updating available methods...');
-    console.log('Settings:', {
-      showSavedCards,
-      showDigitalWallets,
-      showAlternativePayments,
-      isApplePayAvailable,
-      isGooglePayAvailable,
-      isPayPalAvailable,
-      savedCardsCount: savedCards?.length || 0,
-      isDevelopment: process.env.NODE_ENV === 'development'
-    });
 
     // Calculate base product price to determine PayPal availability
     let baseProductPrice = 0;
@@ -226,14 +179,7 @@ const EnhancedPaymentMethodSelector = props => {
         
         baseProductPrice = calculateBaseProductPrice(lineItems);
         isPayPalAllowedForPrice = baseProductPrice >= 4.99;
-        
-        console.log('💰 PayPal price check:', {
-          baseProductPrice,
-          isPayPalAllowedForPrice,
-          threshold: 4.99
-        });
       } catch (error) {
-        console.error('❌ Error parsing transaction line items:', error);
         // Default to allowing PayPal if we can't parse the price
         isPayPalAllowedForPrice = true;
       }
@@ -252,7 +198,6 @@ const EnhancedPaymentMethodSelector = props => {
         description: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.savedCardDescription' }),
         category: 'saved'
       });
-      console.log('✅ Added saved cards option');
     }
 
     // Add new card option
@@ -263,7 +208,6 @@ const EnhancedPaymentMethodSelector = props => {
       description: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.cardDescription' }),
       category: 'card'
     });
-    console.log('✅ Added card option');
 
     // Add digital wallets if available and enabled (Stripe-compatible only)
     if (showDigitalWallets) {
@@ -276,7 +220,6 @@ const EnhancedPaymentMethodSelector = props => {
           description: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.applePayDescription' }),
           category: 'wallet'
         });
-        console.log('✅ Added Apple Pay');
       }
 
       // Google Pay  
@@ -288,7 +231,6 @@ const EnhancedPaymentMethodSelector = props => {
           description: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.googlePayDescription' }),
           category: 'wallet'
         });
-        console.log('✅ Added Google Pay');
       }
     }
 
@@ -303,13 +245,9 @@ const EnhancedPaymentMethodSelector = props => {
           description: intl.formatMessage({ id: 'EnhancedPaymentMethodSelector.paypalVenmoDescription' }),
           category: 'alternative'
         });
-        console.log('✅ Added PayPal (price check passed)');
-      } else if (isPayPalAvailable && !isPayPalAllowedForPrice) {
-        console.log('❌ PayPal disabled - product price ($' + baseProductPrice.toFixed(2) + ') is below $4.99 minimum');
       }
     }
 
-    console.log('📋 Final available methods:', methods.map(m => m.name));
     setAvailableMethods(methods);
   };
 
@@ -531,4 +469,4 @@ EnhancedPaymentMethodSelector.propTypes = {
   customerId: string
 };
 
-export default injectIntl(EnhancedPaymentMethodSelector); 
+export default injectIntl(EnhancedPaymentMethodSelector);

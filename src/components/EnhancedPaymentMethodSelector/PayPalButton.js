@@ -33,17 +33,12 @@ const PayPalButton = ({
     
     const initializePayPal = async () => {
       if (!paypalClientId) {
-        console.log('❌ PayPal Client ID not provided');
         return;
       }
 
       try {
-        console.log(`🔄 Initializing PayPal (${mobile ? 'Mobile' : 'Web'} mode)`);
-        
         // Load PayPal SDK
         await loadPayPalSDK();
-        
-        console.log('✅ PayPal SDK loaded successfully');
         
         // Test backend API availability
         const isBackendConfigured = await checkBackendConfig();
@@ -51,7 +46,6 @@ const PayPalButton = ({
         // Only set available if backend is configured
         setIsAvailable(isBackendConfigured);
       } catch (error) {
-        console.error('❌ Failed to initialize PayPal:', error);
         setError('Failed to initialize PayPal');
       }
     };
@@ -82,14 +76,11 @@ const PayPalButton = ({
 
     const checkBackendConfig = async () => {
       try {
-        console.log('🔧 Checking PayPal backend configuration...');
         const config = await getPayPalConfigStatus();
-        console.log('🔧 PayPal backend config:', config);
         const isConfigured = config.success && config.configured;
         setBackendConfigured(isConfigured);
         return isConfigured;
       } catch (error) {
-        console.error('❌ Failed to check PayPal backend config:', error);
         setBackendConfigured(false);
         return false;
       }
@@ -102,23 +93,13 @@ const PayPalButton = ({
     setIsLoading(true);
     setError(null);
 
-    console.log('🔄 PayPal click handler started');
-    console.log('📊 PayPal SDK available:', !!paypalSDK);
-    console.log('💰 Total amount:', totalAmount);
-    console.log('💱 Currency:', currency);
-
     try {
       if (isMobile) {
-        console.log('🚀 Opening PayPal mobile flow...');
         await handleMobilePayPal();
       } else {
-        console.log('🚀 Opening PayPal web flow...');
         await handleWebPayPal();
       }
-      console.log('✅ PayPal payment completed successfully');
     } catch (error) {
-      console.error('❌ Error with PayPal:', error);
-      
       // Provide user-friendly error messages
       if (error.message && error.message.includes('cancelled')) {
         setError('Payment was cancelled');
@@ -133,7 +114,6 @@ const PayPalButton = ({
       }
     } finally {
       setIsLoading(false);
-      console.log('🏁 PayPal click handler finished');
     }
   };
 
@@ -146,8 +126,6 @@ const PayPalButton = ({
     const amount = typeof totalAmount === 'string' 
       ? parseFloat(totalAmount.replace(/[^0-9.-]+/g, '')).toFixed(2)
       : (totalAmount / 100).toFixed(2); // Convert from cents if needed
-
-    console.log('💰 Processing PayPal payment for amount:', amount, currency);
 
     return new Promise((resolve, reject) => {
       // Create a unique container for this PayPal button
@@ -196,8 +174,6 @@ const PayPalButton = ({
         paypalSDK.Buttons({
           createOrder: async (data, actions) => {
             try {
-              console.log('🔄 Creating PayPal order via backend...');
-              
               const orderPayload = {
                 amount: amount,
                 currency: currency.toUpperCase(),
@@ -208,14 +184,10 @@ const PayPalButton = ({
                 }
               };
               
-              console.log('📦 PayPal order payload:', JSON.stringify(orderPayload, null, 2));
-              
               const orderData = await createPayPalOrder(orderPayload);
 
-              console.log('✅ PayPal order created via backend:', orderData.orderId);
               return orderData.orderId;
             } catch (error) {
-              console.error('❌ Failed to create PayPal order:', error);
               cleanup();
               reject(error);
               throw error;
@@ -223,18 +195,13 @@ const PayPalButton = ({
           },
           onApprove: async (data, actions) => {
             try {
-              console.log('🔄 Authorizing PayPal order via backend (not capturing yet)...');
-              
               const authorizePayload = {
                 transactionLineItems,
                 providerId,
                 customerId
               };
               
-              console.log('📋 PayPal authorize payload with transaction data:', authorizePayload);
-              
               const authorizeData = await authorizePayPalOrder(data.orderID, authorizePayload);
-              console.log('✅ PayPal order authorized (not captured):', authorizeData);
               
               await onPaymentSubmit({
                 type: 'paypal',
@@ -250,29 +217,24 @@ const PayPalButton = ({
               cleanup();
               resolve(authorizeData);
             } catch (error) {
-              console.error('❌ PayPal authorization failed:', error);
               cleanup();
               reject(error);
             }
           },
           onError: (error) => {
-            console.error('❌ PayPal error:', error);
             cleanup();
             reject(error);
           },
           onCancel: () => {
-            console.log('ℹ️ PayPal payment cancelled by user');
             cleanup();
             reject(new Error('Payment was cancelled'));
           }
         }).render(`#${containerId}`).catch((error) => {
-          console.error('❌ Failed to render PayPal buttons:', error);
           cleanup();
           reject(error);
         });
 
       } catch (error) {
-        console.error('❌ PayPal SDK error:', error);
         cleanup();
         reject(error);
       }
@@ -367,4 +329,4 @@ PayPalButton.propTypes = {
   customerId: string,
 };
 
-export default injectIntl(PayPalButton); 
+export default injectIntl(PayPalButton);

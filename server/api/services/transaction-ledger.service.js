@@ -14,34 +14,14 @@ class TransactionLedgerService {
    * @returns {Object} Ledger entry with payout calculations
    */
   static async recordPayPalTransaction(paypalOrderData, transactionLineItems, providerId, customerId) {
-    console.log('🔧 TransactionLedgerService.recordPayPalTransaction called with:');
-    console.log('🔧 - paypalOrderData:', JSON.stringify(paypalOrderData, null, 2));
-    console.log('🔧 - transactionLineItems:', JSON.stringify(transactionLineItems, null, 2));
-    console.log('🔧 - providerId:', providerId);
-    console.log('🔧 - customerId:', customerId);
-    
     // Extract amount and currency from the paymentInfo object (not from order.purchase_units)
     const amount = paypalOrderData.amount;
     const currency = paypalOrderData.currency || 'USD';
     
-    console.log('🔧 Extracted amount:', amount);
-    console.log('🔧 Extracted currency:', currency);
-    
     // Calculate payouts using existing line item logic
-    console.log('🔧 About to calculate payouts...');
     const payinTotal = TransactionUtil.calculatePayinTotal(transactionLineItems);
-    console.log('🔧 PayinTotal calculated:', payinTotal);
-    
     const payoutTotal = TransactionUtil.calculatePayoutTotal(transactionLineItems);
-    console.log('🔧 PayoutTotal calculated:', payoutTotal);
-    
     const platformFee = payinTotal.amount - payoutTotal.amount;
-    console.log('🔧 Platform fee calculated:', platformFee);
-    
-    console.log('💰 PayPal Transaction Ledger Entry:');
-    console.log('💰 PayIn Total (Customer Paid):', payinTotal);
-    console.log('💰 PayOut Total (Seller Earns):', payoutTotal);
-    console.log('💰 Platform Fee:', platformFee);
     
     const ledgerEntry = {
       paymentMethod: 'paypal',
@@ -88,9 +68,8 @@ class TransactionLedgerService {
       const [insertId] = await knexDB('TransactionLedger').insert(dbEntry);
       ledgerEntry.id = insertId;
       
-      console.log('✅ PayPal transaction stored in database with ID:', insertId);
     } catch (dbError) {
-      console.error('❌ Failed to store PayPal transaction in database:', dbError);
+      console.error('Failed to store PayPal transaction in database:', dbError);
       // Don't throw error here - payment succeeded, just logging failed
     }
     
@@ -154,9 +133,8 @@ class TransactionLedgerService {
       const [insertId] = await knexDB('TransactionLedger').insert(dbEntry);
       ledgerEntry.id = insertId;
       
-      console.log('✅ Stripe transaction stored in database with ID:', insertId);
     } catch (dbError) {
-      console.error('❌ Failed to store Stripe transaction in database:', dbError);
+      console.error('Failed to store Stripe transaction in database:', dbError);
       // Don't throw error here - payment succeeded, just logging failed
     }
     
@@ -201,7 +179,7 @@ class TransactionLedgerService {
         entries: pendingEntries,
       };
     } catch (error) {
-      console.error('❌ Error calculating pending payouts:', error);
+      console.error('Error calculating pending payouts:', error);
       return {
         totalPending: new Money(0, 'USD'),
         paypalPending: new Money(0, 'USD'),
@@ -231,19 +209,11 @@ class TransactionLedgerService {
       throw new Error('No pending payouts available');
     }
     
-    console.log('🔄 Creating native payouts:');
-    console.log('🔄 Provider ID:', providerId);
-    console.log('🔄 Total Pending:', pendingPayouts.totalPending);
-    console.log('🔄 PayPal Earnings:', pendingPayouts.paypalPending);
-    console.log('🔄 Stripe Earnings:', pendingPayouts.stripePending);
-    
     const payoutResults = [];
     
     // Handle Stripe earnings through Stripe Connect (existing flow)
     if (pendingPayouts.stripePending.amount > 0) {
       try {
-        console.log('💳 Processing Stripe earnings through Stripe Connect...');
-        
         // Validate no recent Stripe payouts to prevent double-spending
         await this.validateNoPendingPayouts(providerId, 'stripe');
         
@@ -278,10 +248,9 @@ class TransactionLedgerService {
             status: 'completed'
           });
           
-          console.log('✅ Stripe payout completed:', stripePayoutResult.id);
         }
       } catch (stripeError) {
-        console.error('❌ Stripe payout failed:', stripeError);
+        console.error('Stripe payout failed:', stripeError);
         payoutResults.push({
           method: 'stripe',
           status: 'failed',
@@ -293,8 +262,6 @@ class TransactionLedgerService {
     // Handle PayPal earnings through PayPal Payouts API (new native flow)
     if (pendingPayouts.paypalPending.amount > 0) {
       try {
-        console.log('💰 Processing PayPal earnings through PayPal native payouts...');
-        
         // Validate no recent PayPal payouts to prevent double-spending
         await this.validateNoPendingPayouts(providerId, 'paypal');
         
@@ -310,10 +277,11 @@ class TransactionLedgerService {
           recipientEmail: paypalEmail,
           amount: pendingPayouts.paypalPending.amount,
           currency: pendingPayouts.paypalPending.currency,
-          note: `Leechy marketplace earnings - Provider ${providerId}`
+          note: `Leechy marketplace earnings - Provider ${providerId}`,
+          senderBatchId: `leechy_payout_${Date.now()}_${Math.random().toString(36).substring(7)}`
         });
         
-                          // Mark PayPal transactions as paid with robust error handling
+        // Mark PayPal transactions as paid with robust error handling
         const payoutMarked = await this.markTransactionsPaid(
           providerId, 
           'paypal', 
@@ -322,7 +290,7 @@ class TransactionLedgerService {
         );
         
         if (!payoutMarked) {
-          console.warn('⚠️ Database update failed but PayPal payout was successful');
+          console.warn('Database update failed but PayPal payout was successful');
         }
         
         payoutResults.push({
@@ -333,10 +301,8 @@ class TransactionLedgerService {
           status: 'completed'
         });
         
-        console.log('✅ PayPal payout completed:', paypalPayoutResult.payout_batch_id);
-        
       } catch (paypalError) {
-        console.error('❌ PayPal payout failed:', paypalError);
+        console.error('PayPal payout failed:', paypalError);
         payoutResults.push({
           method: 'paypal',
           status: 'failed',
@@ -369,8 +335,6 @@ class TransactionLedgerService {
    */
   static async markTransactionsPaid(providerId, paymentMethod, payoutId, amount) {
     try {
-      console.log(`🔧 Marking ${paymentMethod} transactions as paid for provider ${providerId}`);
-      
       // First check if the required columns exist (handles migration issues)
       const payoutIdColumn = paymentMethod === 'paypal' ? 'paypalPayoutId' : 'stripePayoutId';
       
@@ -379,17 +343,15 @@ class TransactionLedgerService {
         const testQuery = await knexDB('TransactionLedger')
           .select(payoutIdColumn)
           .limit(1);
-        console.log(`✅ Column ${payoutIdColumn} exists and accessible`);
       } catch (columnError) {
         if (columnError.message.includes('Unknown column') || columnError.message.includes('does not exist')) {
-          console.warn(`⚠️ Column ${payoutIdColumn} doesn't exist, creating it...`);
+          console.warn(`Column ${payoutIdColumn} doesn't exist, creating it...`);
           
           try {
             // Try to add the missing column
             await knexDB.raw(`ALTER TABLE TransactionLedger ADD COLUMN ${payoutIdColumn} varchar(255) NULL`);
-            console.log(`✅ Successfully added column ${payoutIdColumn}`);
           } catch (alterError) {
-            console.error(`❌ Failed to add column ${payoutIdColumn}:`, alterError.message);
+            console.error(`Failed to add column ${payoutIdColumn}:`, alterError.message);
             throw new Error(`Database schema issue: ${payoutIdColumn} column missing and cannot be added`);
           }
         } else {
@@ -413,17 +375,14 @@ class TransactionLedgerService {
         })
         .update(updateData);
       
-      console.log(`✅ Successfully marked ${updatedRows} ${paymentMethod} transactions as paid`);
-      console.log(`✅ Payout ID ${payoutId} recorded for tracking`);
-      
       if (updatedRows === 0) {
-        console.warn(`⚠️ No pending ${paymentMethod} transactions found to update`);
+        console.warn(`No pending ${paymentMethod} transactions found to update`);
       }
       
       return true;
       
     } catch (error) {
-      console.error(`❌ Failed to mark ${paymentMethod} transactions as paid:`, error.message);
+      console.error(`Failed to mark ${paymentMethod} transactions as paid:`, error.message);
       
       // Fallback logging for manual tracking
       console.log(`📋 MANUAL PAYOUT TRACKING REQUIRED:`);
@@ -446,8 +405,6 @@ class TransactionLedgerService {
    */
   static async validateNoPendingPayouts(providerId, paymentMethod) {
     try {
-      console.log(`🔍 Validating no recent ${paymentMethod} payouts for provider ${providerId}`);
-      
       const payoutIdColumn = paymentMethod === 'paypal' ? 'paypalPayoutId' : 'stripePayoutId';
       
       try {
@@ -461,17 +418,15 @@ class TransactionLedgerService {
         const recentCount = parseInt(recentPayouts[0]?.count || 0);
         
         if (recentCount > 0) {
-          console.warn(`⚠️ Found ${recentCount} recent ${paymentMethod} payouts - preventing duplicate`);
+          console.warn(`Found ${recentCount} recent ${paymentMethod} payouts - preventing duplicate`);
           throw new Error(`Recent ${paymentMethod} payout already processed. Please wait 5 minutes before trying again.`);
         }
         
-        console.log(`✅ No recent ${paymentMethod} payouts found - safe to proceed`);
         return true;
         
       } catch (columnError) {
         if (columnError.message.includes('Unknown column') || columnError.message.includes('does not exist')) {
-          console.warn(`⚠️ Column ${payoutIdColumn} doesn't exist - skipping validation (database needs migration)`);
-          console.log(`✅ Proceeding with payout (first time setup)`);
+          console.warn(`Column ${payoutIdColumn} doesn't exist - skipping validation (database needs migration)`);
           return true;
         } else {
           throw columnError;
@@ -479,7 +434,7 @@ class TransactionLedgerService {
       }
       
     } catch (error) {
-      console.error(`❌ Payout validation failed:`, error.message);
+      console.error(`Payout validation failed:`, error.message);
       throw error;
     }
   }
@@ -493,8 +448,6 @@ class TransactionLedgerService {
    */
   static async getPayPalEmailFromUserProfile(req, providerId) {
     try {
-      console.log('🔍 Looking up seller\'s saved PayPal email for provider:', providerId);
-      
       // Check if the current user is the provider (most common case in payouts)
       const currentUser = req.currentUser;
       if (currentUser && currentUser.id.uuid === providerId) {
@@ -502,16 +455,8 @@ class TransactionLedgerService {
         const sellerPayPalEmail = protectedData.paypalEmail;
         
         if (!sellerPayPalEmail) {
-          console.log('❌ No PayPal email saved in seller profile for provider:', providerId);
-          console.log('💡 Seller needs to add PayPal email in Account Settings → Contact Details');
           return null;
         }
-        
-        console.log('✅ Seller\'s saved PayPal email found:', {
-          providerId,
-          hasPayPalEmail: !!sellerPayPalEmail,
-          paypalEmail: sellerPayPalEmail ? `${sellerPayPalEmail.substring(0, 3)}***${sellerPayPalEmail.substring(sellerPayPalEmail.length - 4)}` : 'None'
-        });
         
         return sellerPayPalEmail;
       }
@@ -530,7 +475,6 @@ class TransactionLedgerService {
         
         const user = userResponse.data.data;
         if (!user) {
-          console.log('❌ No user found for provider:', providerId);
           return null;
         }
         
@@ -538,26 +482,18 @@ class TransactionLedgerService {
         const sellerPayPalEmail = protectedData.paypalEmail;
         
         if (!sellerPayPalEmail) {
-          console.log('❌ No PayPal email saved in seller profile for provider:', providerId);
-          console.log('💡 Seller needs to add PayPal email in Account Settings → Contact Details');
           return null;
         }
-        
-        console.log('✅ Seller\'s saved PayPal email found via SDK:', {
-          providerId,
-          hasPayPalEmail: !!sellerPayPalEmail,
-          paypalEmail: sellerPayPalEmail ? `${sellerPayPalEmail.substring(0, 3)}***${sellerPayPalEmail.substring(sellerPayPalEmail.length - 4)}` : 'None'
-        });
         
         return sellerPayPalEmail;
         
       } catch (sdkError) {
-        console.error('❌ Failed to fetch user via SDK:', sdkError);
+        console.error('Failed to fetch user via SDK:', sdkError);
         return null;
       }
       
     } catch (error) {
-      console.error('❌ Failed to get seller\'s PayPal email from profile:', error);
+      console.error('Failed to get seller\'s PayPal email from profile:', error);
       return null;
     }
   }

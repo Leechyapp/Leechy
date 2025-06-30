@@ -10,15 +10,10 @@ class PayPalService {
     
     const isProduction = process.env.NODE_ENV === 'production';
     
-    console.log('🔧 PayPal Service Constructor:');
-    console.log('🔧 PAYPAL_CLIENT_ID:', this.clientId ? `${this.clientId.substring(0, 10)}...` : 'NOT SET');
-    console.log('🔧 PAYPAL_CLIENT_SECRET:', this.clientSecret ? `${this.clientSecret.substring(0, 10)}...` : 'NOT SET');
-    console.log('🔧 PayPal Base URL:', this.baseUrl);
-    console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
-    console.log('🔧 PayPal Environment:', isProduction ? 'PRODUCTION (REAL MONEY!)' : 'SANDBOX (TEST MODE)');
+    console.log('PayPal Environment:', isProduction ? 'PRODUCTION' : 'SANDBOX');
     
     if (isProduction) {
-      console.log('🚨🚨🚨 WARNING: PayPal is in PRODUCTION mode - REAL MONEY will be charged! 🚨🚨🚨');
+      console.log('WARNING: PayPal is in PRODUCTION mode - REAL MONEY will be charged!');
     }
     
     if (!this.clientId || !this.clientSecret) {
@@ -50,7 +45,7 @@ class PayPalService {
 
       return response.data.access_token;
     } catch (error) {
-      console.error('❌ Failed to get PayPal access token:', error.response?.data || error.message);
+      console.error('Failed to get PayPal access token:', error.response?.data || error.message);
       throw new Error('Failed to authenticate with PayPal');
     }
   }
@@ -63,15 +58,11 @@ class PayPalService {
     
     const { amount, currency = 'USD', description = 'Leechy Booking Payment', metadata = {} } = orderData;
 
-    console.log('🔄 PayPal createOrder received amount:', amount, typeof amount);
-
     // Convert amount to proper format (PayPal expects string with 2 decimal places)
     // Frontend sends amount in dollars (e.g., 0.01 for 1 cent)
     const formattedAmount = typeof amount === 'string' 
       ? parseFloat(amount.replace(/[^0-9.-]+/g, '')).toFixed(2)
       : parseFloat(amount).toFixed(2); // Amount is already in dollars
-
-    console.log('💰 PayPal formatted amount:', formattedAmount);
 
     const order = {
       intent: 'AUTHORIZE',
@@ -93,8 +84,6 @@ class PayPalService {
       }
     };
 
-    console.log('📝 PayPal order payload:', JSON.stringify(order, null, 2));
-
     try {
       const response = await axios.post(
         `${this.baseUrl}/v2/checkout/orders`,
@@ -108,12 +97,12 @@ class PayPalService {
         }
       );
 
-      console.log('✅ PayPal order created:', response.data.id);
+      console.log('PayPal order created:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to create PayPal order:', error.response?.data || error.message);
+      console.error('Failed to create PayPal order:', error.response?.data || error.message);
       if (error.response?.data) {
-        console.error('❌ PayPal API error details:', JSON.stringify(error.response.data, null, 2));
+        console.error('PayPal API error details:', JSON.stringify(error.response.data, null, 2));
       }
       throw new Error('Failed to create PayPal order');
     }
@@ -138,10 +127,10 @@ class PayPalService {
         }
       );
 
-      console.log('✅ PayPal order captured:', orderId);
+      console.log('PayPal order captured:', orderId);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to capture PayPal order:', error.response?.data || error.message);
+      console.error('Failed to capture PayPal order:', error.response?.data || error.message);
       throw new Error('Failed to capture PayPal order');
     }
   }
@@ -166,10 +155,10 @@ class PayPalService {
         }
       );
 
-      console.log('✅ PayPal order authorized (not captured):', orderId);
+      console.log('PayPal order authorized (not captured):', orderId);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to authorize PayPal order:', error.response?.data || error.message);
+      console.error('Failed to authorize PayPal order:', error.response?.data || error.message);
       throw new Error('Failed to authorize PayPal order');
     }
   }
@@ -204,10 +193,10 @@ class PayPalService {
         }
       );
 
-      console.log('✅ PayPal authorization captured:', authorizationId);
+      console.log('PayPal authorization captured:', authorizationId);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to capture PayPal authorization:', error.response?.data || error.message);
+      console.error('Failed to capture PayPal authorization:', error.response?.data || error.message);
       throw new Error('Failed to capture PayPal authorization');
     }
   }
@@ -232,10 +221,10 @@ class PayPalService {
         }
       );
 
-      console.log('✅ PayPal authorization voided:', authorizationId);
+      console.log('PayPal authorization voided:', authorizationId);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to void PayPal authorization:', error.response?.data || error.message);
+      console.error('Failed to void PayPal authorization:', error.response?.data || error.message);
       throw new Error('Failed to void PayPal authorization');
     }
   }
@@ -259,7 +248,7 @@ class PayPalService {
 
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to get PayPal order:', error.response?.data || error.message);
+      console.error('Failed to get PayPal order:', error.response?.data || error.message);
       throw new Error('Failed to retrieve PayPal order');
     }
   }
@@ -295,10 +284,10 @@ class PayPalService {
         }
       );
 
-      console.log('✅ PayPal refund processed:', response.data.id);
+      console.log('PayPal refund processed:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to process PayPal refund:', error.response?.data || error.message);
+      console.error('Failed to process PayPal refund:', error.response?.data || error.message);
       throw new Error('Failed to process PayPal refund');
     }
   }
@@ -333,7 +322,7 @@ class PayPalService {
 
       return response.data.verification_status === 'SUCCESS';
     } catch (error) {
-      console.error('❌ Failed to verify PayPal webhook:', error.response?.data || error.message);
+      console.error('Failed to verify PayPal webhook:', error.response?.data || error.message);
       return false;
     }
   }
@@ -349,12 +338,7 @@ class PayPalService {
    * Validate PayPal configuration
    */
   isConfigured() {
-    const configured = !!(this.clientId && this.clientSecret);
-    console.log('🔧 PayPal isConfigured check:');
-    console.log('🔧 clientId exists:', !!this.clientId);
-    console.log('🔧 clientSecret exists:', !!this.clientSecret);
-    console.log('🔧 configured result:', configured);
-    return configured;
+    return !!(this.clientId && this.clientSecret);
   }
 
   /**
@@ -396,12 +380,6 @@ class PayPalService {
         ]
       };
       
-      console.log('🔄 Creating PayPal payout:', {
-        recipient: recipientEmail,
-        amount: amountInDollars,
-        currency: currency
-      });
-      
       const response = await axios.post(
         `${this.baseUrl}/v1/payments/payouts`,
         payoutPayload,
@@ -414,7 +392,7 @@ class PayPalService {
         }
       );
       
-      console.log('✅ PayPal payout created successfully:', {
+      console.log('PayPal payout created successfully:', {
         batchId: response.data.batch_header?.payout_batch_id,
         status: response.data.batch_header?.batch_status
       });
@@ -430,7 +408,7 @@ class PayPalService {
       };
       
     } catch (error) {
-      console.error('❌ PayPal payout error:', error.response?.data || error.message);
+      console.error('PayPal payout error:', error.response?.data || error.message);
       throw new Error(`Failed to create PayPal payout: ${error.message}`);
     }
   }
@@ -462,10 +440,10 @@ class PayPalService {
       };
       
     } catch (error) {
-      console.error('❌ PayPal payout status check failed:', error.response?.data || error.message);
+      console.error('PayPal payout status check failed:', error.response?.data || error.message);
       throw error;
     }
   }
 }
 
-module.exports = new PayPalService(); 
+module.exports = new PayPalService();
