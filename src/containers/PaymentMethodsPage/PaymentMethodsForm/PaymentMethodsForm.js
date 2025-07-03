@@ -10,6 +10,7 @@ import classNames from 'classnames';
 
 import { useConfiguration } from '../../../context/configurationContext';
 import { FormattedMessage, useIntl, intlShape } from '../../../util/reactIntl';
+import { useCaptcha } from '../../../util/useCaptcha';
 
 import { Form, PrimaryButton, FieldTextInput, StripePaymentAddress, H4 } from '../../../components';
 
@@ -149,8 +150,8 @@ class PaymentMethodsForm extends Component {
       };
     });
   }
-  handleSubmit(values) {
-    const { onSubmit, inProgress, formId } = this.props;
+  async handleSubmit(values) {
+    const { onSubmit, inProgress, formId, captcha } = this.props;
     const cardInputNeedsAttention = !this.state.cardValueValid;
 
     if (inProgress || cardInputNeedsAttention) {
@@ -158,14 +159,33 @@ class PaymentMethodsForm extends Component {
       return;
     }
 
-    const params = {
-      stripe: this.stripe,
-      card: this.card,
-      formId,
-      formValues: values,
-    };
-
-    onSubmit(params);
+    // Verify CAPTCHA before processing payment method setup
+    if (captcha && captcha.isCaptchaReady) {
+      const captchaToken = await captcha.verifyCaptcha('add_payment_method');
+      if (!captchaToken) {
+        console.error('CAPTCHA verification failed');
+        return;
+      }
+      
+      const params = {
+        stripe: this.stripe,
+        card: this.card,
+        formId,
+        formValues: values,
+        captchaToken, // Include CAPTCHA token for server verification
+      };
+      onSubmit(params);
+    } else {
+      // Fallback for when CAPTCHA is not configured
+      console.warn('CAPTCHA not configured - payment method setup proceeding without verification');
+      const params = {
+        stripe: this.stripe,
+        card: this.card,
+        formId,
+        formValues: values,
+      };
+      onSubmit(params);
+    }
   }
 
   paymentForm(formRenderProps) {
@@ -186,8 +206,12 @@ class PaymentMethodsForm extends Component {
     } = formRenderProps;
 
     this.finalFormAPI = form;
+    const { captcha } = this.props;
+    const captchaLoading = captcha?.captchaLoading || false;
+    const captchaError = captcha?.captchaError;
+    
     const cardInputNeedsAttention = !this.state.cardValueValid;
-    const submitDisabled = invalid || cardInputNeedsAttention || submitInProgress;
+    const submitDisabled = invalid || cardInputNeedsAttention || submitInProgress || captchaLoading;
     const hasCardError = this.state.error && !submitInProgress;
     const classes = classNames(rootClassName || css.root, className);
     const cardClasses = classNames(css.card, {
@@ -199,9 +223,12 @@ class PaymentMethodsForm extends Component {
       addPaymentMethodError ||
       deletePaymentMethodError ||
       createStripeCustomerError ||
-      handleCardSetupError;
+      handleCardSetupError ||
+      captchaError;
 
-    const errorMessage = intl.formatMessage({ id: 'PaymentMethodsForm.genericError' });
+    const errorMessage = captchaError 
+      ? `Security verification failed: ${captchaError}`
+      : intl.formatMessage({ id: 'PaymentMethodsForm.genericError' });
 
     const billingDetailsNameLabel = intl.formatMessage({
       id: 'PaymentMethodsForm.billingDetailsNameLabel',
@@ -274,10 +301,14 @@ class PaymentMethodsForm extends Component {
           <PrimaryButton
             className={css.submitButton}
             type="submit"
-            inProgress={submitInProgress}
+            inProgress={submitInProgress || captchaLoading}
             disabled={submitDisabled}
           >
-            <FormattedMessage id="PaymentMethodsForm.submitPaymentInfo" />
+            {captchaLoading ? (
+              'Verifying security...'
+            ) : (
+              <FormattedMessage id="PaymentMethodsForm.submitPaymentInfo" />
+            )}
           </PrimaryButton>
         </div>
       </Form>
@@ -314,6 +345,7 @@ PaymentMethodsForm.propTypes = {
   createStripeCustomerError: object,
   handleCardSetupError: object,
   form: object,
+  captcha: object, // CAPTCHA hook object
 
   // from useIntl
   intl: intlShape.isRequired,
@@ -324,6 +356,7 @@ PaymentMethodsForm.propTypes = {
 const EnhancedPaymentMethodsForm = props => {
   const config = useConfiguration();
   const intl = useIntl();
-  return <PaymentMethodsForm config={config} intl={intl} {...props} />;
+  const captcha = useCaptcha();
+  return <PaymentMethodsForm config={config} intl={intl} captcha={captcha} {...props} />;
 };
 export default EnhancedPaymentMethodsForm;

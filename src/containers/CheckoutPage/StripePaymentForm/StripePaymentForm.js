@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import { FormattedMessage, injectIntl, intlShape } from '../../../util/reactIntl';
 import { propTypes } from '../../../util/types';
 import { ensurePaymentMethodCard } from '../../../util/data';
+import { useCaptcha } from '../../../util/useCaptcha';
 
 import {
   Heading,
@@ -383,13 +384,14 @@ class StripePaymentForm extends Component {
       };
     });
   }
-  handleSubmit(values) {
+  async handleSubmit(values) {
     const {
       onSubmit,
       inProgress,
       formId,
       hasHandledCardPayment,
       defaultPaymentMethod,
+      captcha,
     } = this.props;
     const { initialMessage } = values;
     const { cardValueValid, paymentMethod } = this.state;
@@ -407,17 +409,41 @@ class StripePaymentForm extends Component {
       return;
     }
 
-    const params = {
-      message: initialMessage ? initialMessage.trim() : null,
-      card: this.card,
-      formId,
-      formValues: values,
-      paymentMethod: getPaymentMethod(
-        paymentMethod,
-        ensurePaymentMethodCard(defaultPaymentMethod).id
-      ),
-    };
-    onSubmit(params);
+    // Verify CAPTCHA before processing payment
+    if (captcha && captcha.isCaptchaReady) {
+      const captchaToken = await captcha.verifyCaptcha('checkout_payment');
+      if (!captchaToken) {
+        console.error('CAPTCHA verification failed');
+        return;
+      }
+      
+      const params = {
+        message: initialMessage ? initialMessage.trim() : null,
+        card: this.card,
+        formId,
+        formValues: values,
+        paymentMethod: getPaymentMethod(
+          paymentMethod,
+          ensurePaymentMethodCard(defaultPaymentMethod).id
+        ),
+        captchaToken, // Include CAPTCHA token for server verification
+      };
+      onSubmit(params);
+    } else {
+      // Fallback for when CAPTCHA is not configured
+      console.warn('CAPTCHA not configured - payment proceeding without verification');
+      const params = {
+        message: initialMessage ? initialMessage.trim() : null,
+        card: this.card,
+        formId,
+        formValues: values,
+        paymentMethod: getPaymentMethod(
+          paymentMethod,
+          ensurePaymentMethodCard(defaultPaymentMethod).id
+        ),
+      };
+      onSubmit(params);
+    }
   }
 
   paymentForm(formRenderProps) {
@@ -466,9 +492,13 @@ class StripePaymentForm extends Component {
       hasHandledCardPayment
     );
 
-    const submitDisabled = invalid || onetimePaymentNeedsAttention || submitInProgress;
+    const { captcha } = this.props;
+    const captchaLoading = captcha?.captchaLoading || false;
+    const captchaError = captcha?.captchaError;
+    
+    const submitDisabled = invalid || onetimePaymentNeedsAttention || submitInProgress || captchaLoading;
     const hasCardError = this.state.error && !submitInProgress;
-    const hasPaymentErrors = confirmCardPaymentError || confirmPaymentError;
+    const hasPaymentErrors = confirmCardPaymentError || confirmPaymentError || captchaError;
     const classes = classNames(rootClassName || css.root, className);
     const cardClasses = classNames(css.card, {
       [css.cardSuccess]: this.state.cardValueValid,
@@ -484,7 +514,9 @@ class StripePaymentForm extends Component {
     // https://stripe.com/docs/error-codes
     const piAuthenticationFailure = 'payment_intent_authentication_failure';
     const paymentErrorMessage =
-      confirmCardPaymentError && confirmCardPaymentError.code === piAuthenticationFailure
+      captchaError
+        ? `Security verification failed: ${captchaError}`
+        : confirmCardPaymentError && confirmCardPaymentError.code === piAuthenticationFailure
         ? intl.formatMessage({ id: 'StripePaymentForm.confirmCardPaymentError' })
         : confirmCardPaymentError
         ? confirmCardPaymentError.message
@@ -646,10 +678,12 @@ class StripePaymentForm extends Component {
           <PrimaryButton
             className={css.submitButton}
             type="submit"
-            inProgress={submitInProgress}
+            inProgress={submitInProgress || captchaLoading}
             disabled={submitDisabled}
           >
-            {billingDetailsNeeded ? (
+            {captchaLoading ? (
+              'Verifying security...'
+            ) : billingDetailsNeeded ? (
               <FormattedMessage
                 id="StripePaymentForm.submitPaymentInfo"
                 values={{ totalPrice: totalPriceMaybe, isBooking: isBookingYesNo }}
@@ -726,9 +760,16 @@ StripePaymentForm.propTypes = {
   marketplaceName: string.isRequired,
   isBooking: bool.isRequired,
   isFuzzyLocation: bool,
+  captcha: object, // CAPTCHA hook object
 
   // from injectIntl
   intl: intlShape.isRequired,
 };
 
-export default injectIntl(StripePaymentForm);
+// Wrapper component to provide CAPTCHA functionality
+const StripePaymentFormWithCaptcha = (props) => {
+  const captcha = useCaptcha();
+  return <StripePaymentForm {...props} captcha={captcha} />;
+};
+
+export default injectIntl(StripePaymentFormWithCaptcha);

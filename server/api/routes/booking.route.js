@@ -1,6 +1,7 @@
 const BookingController = require('../controllers/booking.controller');
 const { authMiddleware } = require('../middlewares/auth.middleware');
 const { authTrxMiddleware } = require('../middlewares/authTrx.middleware');
+const { verifyCaptchaStrict } = require('../middlewares/captcha.middleware');
 const BaseRoute = require('./base.route');
 
 class BookingRoute extends BaseRoute {
@@ -9,6 +10,7 @@ class BookingRoute extends BaseRoute {
     router.post(
       this.ROOT_PATH + '/create-booking-request',
       authMiddleware,
+      verifyCaptchaStrict,
       BookingController.createBookingRequest
     );
     router.post(

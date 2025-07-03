@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { verifyCaptchaStrict } = require('../middlewares/captcha.middleware');
 
 // Create Stripe Checkout Session for Google Pay
-router.post('/create-checkout-session', async (req, res) => {
+router.post('/create-checkout-session', verifyCaptchaStrict, async (req, res) => {
   try {
     const { 
       amount, 

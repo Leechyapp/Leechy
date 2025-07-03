@@ -13,6 +13,7 @@ import loadable from '@loadable/component';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import moment from 'moment';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 // Configs and store setup
 import defaultConfig from './config/configDefault';
@@ -285,6 +286,8 @@ export const ClientApp = props => {
     initNativePlatform();
   }, []);
 
+  const recaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
+
   return (
     <Configurations appConfig={appConfig}>
       <IntlProvider
@@ -295,9 +298,17 @@ export const ClientApp = props => {
         <Provider store={store}>
           <HelmetProvider>
             <IncludeScripts config={appConfig} />
-            <BrowserRouter>
-              <Routes logLoadDataCalls={logLoadDataCalls} />
-            </BrowserRouter>
+            {recaptchaSiteKey ? (
+              <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+                <BrowserRouter>
+                  <Routes logLoadDataCalls={logLoadDataCalls} />
+                </BrowserRouter>
+              </GoogleReCaptchaProvider>
+            ) : (
+              <BrowserRouter>
+                <Routes logLoadDataCalls={logLoadDataCalls} />
+              </BrowserRouter>
+            )}
           </HelmetProvider>
         </Provider>
       </IntlProvider>
@@ -327,6 +338,8 @@ export const ServerApp = props => {
     initNativePlatform();
   }, []);
 
+  const recaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
+
   return (
     <Configurations appConfig={appConfig}>
       <IntlProvider
@@ -337,9 +350,17 @@ export const ServerApp = props => {
         <Provider store={store}>
           <HelmetProvider context={helmetContext}>
             <IncludeScripts config={appConfig} />
-            <StaticRouter location={url} context={context}>
-              <Routes />
-            </StaticRouter>
+            {recaptchaSiteKey ? (
+              <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+                <StaticRouter location={url} context={context}>
+                  <Routes />
+                </StaticRouter>
+              </GoogleReCaptchaProvider>
+            ) : (
+              <StaticRouter location={url} context={context}>
+                <Routes />
+              </StaticRouter>
+            )}
           </HelmetProvider>
         </Provider>
       </IntlProvider>

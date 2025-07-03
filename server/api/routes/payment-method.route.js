@@ -1,5 +1,6 @@
 const PaymentMethodController = require('../controllers/payment-method.controller');
 const { authMiddleware } = require('../middlewares/auth.middleware');
+const { verifyCaptcha } = require('../middlewares/captcha.middleware');
 const BaseRoute = require('./base.route');
 
 class PaymentMethodRoute extends BaseRoute {
@@ -18,6 +19,7 @@ class PaymentMethodRoute extends BaseRoute {
     router.post(
       this.ROOT_PATH + '/attach',
       authMiddleware,
+      verifyCaptcha,
       PaymentMethodController.attachPaymentMethod
     );
     router.post(

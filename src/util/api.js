@@ -237,8 +237,14 @@ export const updateFCMToken = body => {
   return post('/api/push-notification/update-fcm-token', body);
 };
 
-export const createBookingRequest = body => {
-  return post('/api/booking/create-booking-request', body);
+export const createBookingRequest = (body, captchaToken = null) => {
+  const options = captchaToken ? {
+    headers: {
+      'Content-Type': 'application/transit+json',
+      'x-captcha-token': captchaToken
+    }
+  } : {};
+  return post('/api/booking/create-booking-request', body, options);
 };
 export const acceptBookingRequest = body => {
   return post('/api/booking/accept-booking-request', body);

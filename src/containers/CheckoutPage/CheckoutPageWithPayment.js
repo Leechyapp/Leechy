@@ -65,6 +65,7 @@ import {
 } from '../../util/priceBreakdownParser.js';
 import PriceBreakdownFormatTypeEnum from '../../enums/price-breakdown-format-type.enum.js';
 import { PushNotificationCodeEnum } from '../../enums/push-notification-code.enum.js';
+import { useCaptcha } from '../../util/useCaptcha';
 
 // Stripe PaymentIntent statuses, where user actions are already completed
 // https://stripe.com/docs/payments/payment-intents/status
@@ -376,6 +377,9 @@ export const CheckoutPageWithPayment = props => {
   const [useEnhancedPaymentSelector, setUseEnhancedPaymentSelector] = useState(true);
   const saveCardDetailsRef = useRef(null);
 
+  // Initialize CAPTCHA functionality
+  const { verifyCaptcha } = useCaptcha();
+
   const {
     scrollingDisabled,
     speculateTransactionError,
@@ -597,7 +601,7 @@ export const CheckoutPageWithPayment = props => {
     }
   };
 
-  const handleCustomPaymentSubmit = params => {
+  const handleCustomPaymentSubmit = async params => {
     const { stripePaymentMethodId } = params;
     const { booking, attributes } = speculatedTransaction;
     const { lineItems, payinTotal, payoutTotal } = attributes;
@@ -625,6 +629,17 @@ export const CheckoutPageWithPayment = props => {
     }
 
     setTrxSubmitInProgress(true);
+    
+    // Get CAPTCHA token for security verification
+    let captchaToken = null;
+    try {
+      captchaToken = await verifyCaptcha('booking_request');
+      console.log('CAPTCHA verification result:', captchaToken ? 'success' : 'not configured');
+    } catch (error) {
+      console.warn('CAPTCHA verification failed:', error);
+      // Continue without CAPTCHA if it fails
+    }
+    
     createBookingRequest({
       initialMessage,
       orderParams: {
@@ -652,7 +667,7 @@ export const CheckoutPageWithPayment = props => {
           ...securityDepositMaybe,
         },
       },
-    })
+    }, captchaToken)
       .then(({ transactionId }) => {
         sendPushNotification({
           pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
@@ -733,6 +748,16 @@ export const CheckoutPageWithPayment = props => {
         // For PayPal/Venmo, we don't use Stripe payment method ID
         stripePaymentMethodId = null;
         
+        // Get CAPTCHA token for security verification
+        let captchaToken = null;
+        try {
+          captchaToken = await verifyCaptcha('booking_request');
+          console.log('CAPTCHA verification result (PayPal):', captchaToken ? 'success' : 'not configured');
+        } catch (error) {
+          console.warn('CAPTCHA verification failed (PayPal):', error);
+          // Continue without CAPTCHA if it fails
+        }
+        
         // Create booking with PayPal/Venmo authorization data (not captured payment)
         await createBookingRequest({
           initialMessage,
@@ -766,7 +791,7 @@ export const CheckoutPageWithPayment = props => {
               ...securityDepositMaybe,
             },
           },
-        }).then(({ transactionId }) => {
+        }, captchaToken).then(({ transactionId }) => {
           
           sendPushNotification({
             pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
@@ -800,6 +825,16 @@ export const CheckoutPageWithPayment = props => {
         throw new Error('Unsupported payment method type: ' + paymentType);
       }
 
+      // Get CAPTCHA token for security verification
+      let captchaTokenForCard = null;
+      try {
+        captchaTokenForCard = await verifyCaptcha('booking_request');
+        console.log('CAPTCHA verification result (Card):', captchaTokenForCard ? 'success' : 'not configured');
+      } catch (error) {
+        console.warn('CAPTCHA verification failed (Card):', error);
+        // Continue without CAPTCHA if it fails
+      }
+
       await createBookingRequest({
         initialMessage,
         orderParams: {
@@ -828,7 +863,7 @@ export const CheckoutPageWithPayment = props => {
             ...securityDepositMaybe,
           },
         },
-      }).then(({ transactionId }) => {
+      }, captchaTokenForCard).then(({ transactionId }) => {
         sendPushNotification({
           pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
           transactionId: transactionId.uuid,

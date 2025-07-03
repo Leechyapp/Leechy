@@ -39,6 +39,10 @@ const defaultDirectives = {
     '*.analytics.google.com',
     'stats.g.doubleclick.net',
 
+    // Google reCAPTCHA
+    'www.google.com',
+    'www.gstatic.com',
+
     // Plausible analytics
     'plausible.io',
     '*.plausible.io',
@@ -64,6 +68,8 @@ const defaultDirectives = {
     'connect-js.stripe.com', 
     'merchant-ui-api.stripe.com', 
     '*.youtube-nocookie.com',
+    // Google reCAPTCHA
+    'www.google.com',
     // PayPal
     '*.paypal.com',
     '*.sandbox.paypal.com',
@@ -115,6 +121,9 @@ const defaultDirectives = {
     'api.mapbox.com',
     'www.googletagmanager.com',
     '*.google-analytics.com',
+    // Google reCAPTCHA
+    'www.google.com',
+    'www.gstatic.com',
     'js.stripe.com',
     'connect-js.stripe.com',
     'merchant-ui-api.stripe.com',

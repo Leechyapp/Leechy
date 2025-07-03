@@ -7,6 +7,7 @@ import { Heading, PrimaryButton } from '../../components';
 import { string, func, bool } from 'prop-types';
 import stripePaymentFormCSS from '../../containers/CheckoutPage/StripePaymentForm/StripePaymentForm.module.css';
 import css from './CustomStripePaymentForm.module.scss';
+import { useCaptcha } from '../../util/useCaptcha';
 
 const ELEMENT_OPTIONS = {
   fields: {
@@ -36,6 +37,7 @@ const CheckoutForm = props => {
 
   const stripe = useStripe();
   const elements = useElements();
+  const captcha = useCaptcha();
 
   const getMessageInputPlaceholder = () => {
     if (showInitialMessageInput) {
@@ -76,7 +78,7 @@ const CheckoutForm = props => {
     }
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     // Block native form submission.
     event.preventDefault();
 
@@ -86,6 +88,15 @@ const CheckoutForm = props => {
       return;
     }
 
+    // Verify CAPTCHA before processing payment
+    if (captcha && captcha.isCaptchaReady) {
+      const captchaToken = await captcha.verifyCaptcha('custom_payment_form');
+      if (!captchaToken) {
+        setStatus('Security verification failed. Please try again.');
+        return;
+      }
+    }
+
     setLoading(true);
 
     if (stripeCustomerId && stripePaymentMethodId) {
@@ -93,6 +104,7 @@ const CheckoutForm = props => {
         stripeCustomerId,
         stripePaymentMethodId,
         initialMessage,
+        captchaToken: captcha ? await captcha.verifyCaptcha('custom_payment_form') : null,
       });
     } else {
       stripe
@@ -101,7 +113,7 @@ const CheckoutForm = props => {
           redirect: 'if_required',
           confirmParams: { return_url: window.location.href },
         })
-        .then(({ setupIntent, error }) => {
+        .then(async ({ setupIntent, error }) => {
           if (error) {
             setLoading(false);
             console.log(`setupIntent error`, error);
@@ -114,6 +126,7 @@ const CheckoutForm = props => {
               stripeCustomerId: setupIntent.customer,
               stripePaymentMethodId: setupIntent.payment_method,
               initialMessage,
+              captchaToken: captcha ? await captcha.verifyCaptcha('custom_payment_form') : null,
             });
           }
         });
@@ -139,12 +152,18 @@ const CheckoutForm = props => {
         <PrimaryButton
           className={stripePaymentFormCSS.submitButton}
           type="submit"
-          inProgress={loading || trxSubmitInProgress}
-          disabled={!stripe || loading || trxSubmitInProgress}
+          inProgress={loading || trxSubmitInProgress || captcha?.captchaLoading}
+          disabled={!stripe || loading || trxSubmitInProgress || captcha?.captchaLoading}
         >
-          <FormattedMessage id={ctaButtonTxt} />
+          {captcha?.captchaLoading ? (
+            'Verifying security...'
+          ) : (
+            <FormattedMessage id={ctaButtonTxt} />
+          )}
         </PrimaryButton>
-        {status && <p>{status}</p>}
+        {(status || captcha?.captchaError) && (
+          <p>{captcha?.captchaError ? `Security verification failed: ${captcha.captchaError}` : status}</p>
+        )}
       </div>
     </form>
   );
