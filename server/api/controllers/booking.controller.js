@@ -20,7 +20,7 @@ class BookingController {
       console.log('🔧 Booking request - Payment type:', paymentType);
       console.log('🔧 Booking request - Has Stripe Customer ID:', !!stripeCustomerId);
       
-      if (stripeCustomerId && (!paymentType || paymentType === 'card' || paymentType === 'apple_pay' || paymentType === 'google_pay')) {
+      if (stripeCustomerId && (!paymentType || paymentType === 'card' || paymentType === 'saved_card' || paymentType === 'apple_pay' || paymentType === 'google_pay')) {
         orderParams.protectedData.stripeCustomerId = stripeCustomerId;
         console.log('✅ Added Stripe Customer ID to booking request');
       } else if (paymentType === 'paypal' || paymentType === 'venmo') {
