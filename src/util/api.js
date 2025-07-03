@@ -78,7 +78,7 @@ const request = (path, options = {}) => {
       
       return res.json().then(data => {
         console.error(`❌ API Error ${res.status} for ${path}:`, data);
-        console.error(`❌ API Error Headers:`, Array.from(res.headers.entries()));
+        // Removed headers logging for security
         let e = new Error();
         e = Object.assign(e, data);
         throw e;
@@ -196,8 +196,14 @@ export const sendContactEmail = body => {
   return post('/api/contact/send-contact-email', body);
 };
 
-export const chargeSecurityDeposit = body => {
-  return post('/api/security-deposit/charge', body);
+export const chargeSecurityDeposit = (body, captchaToken = null) => {
+  const options = captchaToken ? {
+    headers: {
+      'Content-Type': 'application/transit+json',
+      'x-captcha-token': captchaToken
+    }
+  } : {};
+  return post('/api/security-deposit/charge', body, options);
 };
 export const saveSecurityDepositData = body => {
   return post('/api/security-deposit/save', body);
@@ -246,8 +252,14 @@ export const createBookingRequest = (body, captchaToken = null) => {
   } : {};
   return post('/api/booking/create-booking-request', body, options);
 };
-export const acceptBookingRequest = body => {
-  return post('/api/booking/accept-booking-request', body);
+export const acceptBookingRequest = (body, captchaToken = null) => {
+  const options = captchaToken ? {
+    headers: {
+      'Content-Type': 'application/transit+json',
+      'x-captcha-token': captchaToken
+    }
+  } : {};
+  return post('/api/booking/accept-booking-request', body, options);
 };
 
 export const retrieveStripeAccount = (body = {}) => {
@@ -272,8 +284,14 @@ export const updateStripeAccountPayoutInterval = body => {
   return post('/api/stripe-account/update-payout-interval', body);
 };
 
-export const createSetupIntent = (body = {}) => {
-  return post('/api/setup-intent/get-client-secret', body);
+export const createSetupIntent = (body = {}, captchaToken = null) => {
+  const options = captchaToken ? {
+    headers: {
+      'Content-Type': 'application/transit+json',
+      'x-captcha-token': captchaToken
+    }
+  } : {};
+  return post('/api/setup-intent/get-client-secret', body, options);
 };
 
 export const getPaymentMethodsList = (body = {}) => {
@@ -282,22 +300,36 @@ export const getPaymentMethodsList = (body = {}) => {
 export const retrievePaymentMethod = body => {
   return post('/api/payment-method/retrieve', body);
 };
-export const attachPaymentMethod = body => {
-  return post('/api/payment-method/attach', body);
+export const attachPaymentMethod = (body, captchaToken = null) => {
+  const options = captchaToken ? {
+    headers: {
+      'Content-Type': 'application/transit+json',
+      'x-captcha-token': captchaToken
+    }
+  } : {};
+  return post('/api/payment-method/attach', body, options);
 };
 export const detachPaymentMethod = body => {
   return post('/api/payment-method/detach', body);
 };
 
 // PayPal payment methods
-export const createPayPalOrder = body => {
-  return post('/api/paypal/create-order', body);
+export const createPayPalOrder = (body, captchaToken = null) => {
+  const options = captchaToken ? {
+    headers: {
+      'Content-Type': 'application/transit+json',
+      'x-captcha-token': captchaToken
+    }
+  } : {};
+  return post('/api/paypal/create-order', body, options);
 };
 
-export const authorizePayPalOrder = (orderId, authorizePayload = {}) => {
+export const authorizePayPalOrder = (orderId, authorizePayload = {}, captchaToken = null) => {
+  const headers = captchaToken ? { 'x-captcha-token': captchaToken } : {};
   return request(`/api/paypal/authorize-order/${orderId}`, {
     method: 'POST',
     body: authorizePayload,
+    headers,
   });
 };
 

@@ -15,6 +15,8 @@ const loginAs = require('./api/login-as');
 const transactionLineItems = require('./api/transaction-line-items');
 const initiatePrivileged = require('./api/initiate-privileged');
 const transitionPrivileged = require('./api/transition-privileged');
+const { verifyCaptchaStrict } = require('./api/middlewares/captcha.middleware');
+const { rateLimitPayments, emergencyIPBlock } = require('./api/middlewares/rate-limit.middleware');
 
 const createUserWithIdp = require('./api/auth/createUserWithIdp');
 
@@ -34,6 +36,7 @@ const BookingRoute = require('./api/routes/booking.route');
 const StripeCheckoutRoute = require('./api/routes/stripe-checkout.route');
 const PayPalRoute = require('./api/routes/paypal.route');
 const EarningsRoute = require('./api/routes/earnings.route');
+const SecurityMonitorRoute = require('./api/routes/security-monitor.route');
 
 const router = express.Router();
 
@@ -74,7 +77,7 @@ router.get('/initiate-login-as', initiateLoginAs);
 router.get('/login-as', loginAs);
 router.post('/transaction-line-items', transactionLineItems);
 router.post('/initiate-privileged', initiatePrivileged);
-router.post('/transition-privileged', transitionPrivileged);
+router.post('/transition-privileged', emergencyIPBlock, rateLimitPayments(3, 60000), verifyCaptchaStrict, transitionPrivileged);
 
 // Create user with identity provider (e.g. Facebook or Google)
 // This endpoint is called to create a new user after user has confirmed
@@ -121,5 +124,8 @@ router.use('/paypal', PayPalRoute);
 
 // Add unified earnings routes for multi-payment-method payouts
 router.use('/earnings', EarningsRoute);
+
+// Add security monitoring routes (EMERGENCY: Monitor bot attacks)
+router.use('/security', SecurityMonitorRoute);
 
 module.exports = router;

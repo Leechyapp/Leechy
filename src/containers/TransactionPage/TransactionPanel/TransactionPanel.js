@@ -181,7 +181,7 @@ export class TransactionPanelComponent extends Component {
       onManageDisableScrolling,
     } = this.props;
 
-    console.log(`TransactionPanel protectedData`, protectedData);
+    // Removed sensitive protectedData logging for security
 
     const isCustomer = transactionRole === 'customer';
     const isProvider = transactionRole === 'provider';
@@ -228,9 +228,7 @@ export class TransactionPanelComponent extends Component {
     const shippingStatus = metadata?.shippingStatus;
     const securityDepositStatus = metadata?.securityDepositStatus;
 
-    console.log(`deliveryMethod`, deliveryMethod);
-    console.log(`shippingStatus`, shippingStatus);
-    console.log(`securityDepositStatus`, securityDepositStatus);
+    // Removed detailed status logging to reduce console noise
 
     const classes = classNames(rootClassName || css.root, className);
 

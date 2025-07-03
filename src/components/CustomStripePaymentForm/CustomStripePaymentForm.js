@@ -158,7 +158,7 @@ const CheckoutForm = props => {
           {captcha?.captchaLoading ? (
             'Verifying security...'
           ) : (
-            <FormattedMessage id={ctaButtonTxt} />
+          <FormattedMessage id={ctaButtonTxt} />
           )}
         </PrimaryButton>
         {(status || captcha?.captchaError) && (

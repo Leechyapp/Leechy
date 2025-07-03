@@ -30,6 +30,7 @@ import { transitions } from '../../transactions/transactionProcessBooking';
 import { PushNotificationCodeEnum } from '../../enums/push-notification-code.enum';
 import PriceBreakdownFormatTypeEnum from '../../enums/price-breakdown-format-type.enum';
 import { parseLineItems, parsePayTotal } from '../../util/priceBreakdownParser';
+import { verifyCaptcha } from '../../util/useCaptcha';
 
 const { UUID } = sdkTypes;
 
@@ -562,7 +563,7 @@ export const onRefreshTransactionEntity = txId => (dispatch, getState, sdk) => {
   return refreshTransactionEntity(sdk, txId, dispatch);
 };
 
-export const makeTransition = (txId, transitionName, params) => (dispatch, getState, sdk) => {
+export const makeTransition = (txId, transitionName, params) => async (dispatch, getState, sdk) => {
   if (transitionInProgress(getState())) {
     return Promise.reject(new Error('Transition already in progress'));
   }
@@ -621,27 +622,62 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
   };
 
   if (transitionName === transitions.ACCEPT) {
-    const onChargeSecurityDeposit = () => {
-      return chargeSecurityDeposit({ transactionId: txId })
+    const onChargeSecurityDeposit = async () => {
+      // Get CAPTCHA token for security deposit charging
+      let captchaToken = null;
+      try {
+        captchaToken = await verifyCaptcha('security_deposit_charge');
+        // CAPTCHA verification completed for security deposit
+      } catch (error) {
+        console.warn('CAPTCHA verification failed for security deposit:', error);
+        // Continue without CAPTCHA if it fails
+      }
+
+      // If CAPTCHA is not available, try to proceed anyway
+      // This is a fallback since the booking is already accepted
+      if (!captchaToken) {
+        console.warn('⚠️ Proceeding with security deposit charge without CAPTCHA token');
+      }
+
+      return chargeSecurityDeposit({ transactionId: txId }, captchaToken)
         .then(() => {
+          // Security deposit charged successfully
           return onMakeTransition();
         })
         .catch(e => {
+          console.error('❌ Security deposit charge failed:', e);
           log.error(storableError(e), 'charge-security-deposit-failed');
-          return onMakeTransition();
+          
+          // If it's a CAPTCHA error, try again without CAPTCHA
+          if (e.message && e.message.includes('CAPTCHA token required')) {
+            console.log('🔄 Retrying security deposit charge without CAPTCHA...');
+            return chargeSecurityDeposit({ transactionId: txId }, null)
+              .then(() => {
+                // Security deposit charged successfully (retry without CAPTCHA)
+                return onMakeTransition();
+              })
+              .catch(retryError => {
+                console.error('❌ Security deposit charge failed on retry:', retryError);
+                log.error(storableError(retryError), 'charge-security-deposit-failed-retry');
+                return onMakeTransition(); // Continue anyway
+              });
+          }
+          
+          return onMakeTransition(); // Continue anyway
         });
     };
 
-    return acceptBookingRequest({ transactionId: txId.uuid })
+    // Get CAPTCHA token before making the booking acceptance request
+    const captchaToken = await verifyCaptcha('booking_acceptance');
+    
+    return acceptBookingRequest({ 
+      transactionId: txId.uuid
+    }, captchaToken)
       .then(() => {
         return onChargeSecurityDeposit();
       })
       .catch(error => {
-        console.log('🔧 makeTransition error caught:', error);
-        console.log('🔧 makeTransition error.message:', error?.message);
-        console.log('🔧 makeTransition error type:', typeof error?.message);
-        
-        // Check if it's a direct message or stringified JSON
+        // Process error and check for specific error types
         let errorMessage = error?.message;
         if (typeof errorMessage === 'string' && errorMessage.startsWith('{')) {
           try {
@@ -652,18 +688,16 @@ export const makeTransition = (txId, transitionName, params) => (dispatch, getSt
           }
         }
         
-        console.log('🔧 makeTransition processed error message:', errorMessage);
-        
         if (
           errorMessage === 'stripe_account_not_found' ||
           errorMessage === 'stripe_payouts_disabled'
         ) {
-          console.log('✅ makeTransition detected Stripe payout error - triggering modal');
+          // Detected Stripe payout error - showing setup modal
           dispatch(transitionPause());
           dispatch(setStripePayoutsDisabled(true));
           return null;
         } else {
-          console.log('❌ makeTransition unhandled error - passing through');
+          // Unhandled error - logging and rethrowing
           dispatch(transitionError(storableError(error)));
           log.error(error, `${transitionName}-failed`, {
             txId,
@@ -890,7 +924,7 @@ const onSendPushNotification = (pushNotificationCode, transactionId) => {
     params: {},
   })
     .then(pushNotificationRes => {
-      console.log(pushNotificationRes);
+      // Push notification sent successfully (removed logging for security)
     })
     .catch(err => {
       console.error(err);

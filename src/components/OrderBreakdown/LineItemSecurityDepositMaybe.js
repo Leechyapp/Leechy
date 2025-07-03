@@ -11,7 +11,7 @@ const { Money } = types;
 
 const LineItemSecurityDepositMaybe = props => {
   const { transaction, lineItems, isProvider, intl } = props;
-  console.log(`LineItemSecurityDepositMaybe transaction`, transaction);
+  // Removed transaction logging for security
 
   if (!transaction) return null;
 

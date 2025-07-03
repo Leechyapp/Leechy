@@ -39,6 +39,16 @@ class SetupIntentController {
         payment_method_types: ['card'],
       };
 
+      // Security logging for monitoring setup intent requests
+      console.log('🔒 SECURITY: SetupIntent creation attempt', {
+        userId: currentUser?.id?.uuid,
+        email: email,
+        customerId: stripeCustomerId,
+        timestamp: new Date().toISOString(),
+        userAgent: req.headers['user-agent'],
+        ip: req.ip || req.connection.remoteAddress
+      });
+
       const setupIntent = await StripeService.createSetupIntent(setupIntentObject);
 
       res.send(setupIntent.client_secret);

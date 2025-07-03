@@ -1,5 +1,34 @@
 const axios = require('axios');
 
+// Track used CAPTCHA tokens to prevent reuse attacks
+const usedTokens = new Map();
+
+// Clean up old tokens periodically (tokens are valid for max 2 minutes)
+setInterval(() => {
+  const now = Date.now();
+  const maxAge = 2 * 60 * 1000; // 2 minutes
+  
+  for (const [token, timestamp] of usedTokens.entries()) {
+    if (now - timestamp > maxAge) {
+      usedTokens.delete(token);
+    }
+  }
+}, 30000); // Clean every 30 seconds
+
+/**
+ * Check if a CAPTCHA token has been used before
+ */
+const isTokenUsed = (token) => {
+  return usedTokens.has(token);
+};
+
+/**
+ * Mark a CAPTCHA token as used
+ */
+const markTokenAsUsed = (token) => {
+  usedTokens.set(token, Date.now());
+};
+
 /**
  * Middleware to verify Google reCAPTCHA v3 tokens
  * Protects sensitive endpoints like payment processing from bot attacks
@@ -15,10 +44,22 @@ const verifyCaptcha = async (req, res, next) => {
     return next();
   }
 
-  // Skip if no CAPTCHA token provided (allows backward compatibility)
+  // STRICTER: If CAPTCHA is configured, require the token
   if (!captchaToken) {
-    console.warn('⚠️ CAPTCHA verification skipped - no captchaToken provided');
-    return next();
+    console.log('❌ CAPTCHA token required when CAPTCHA is configured');
+    return res.status(400).json({
+      error: 'Security verification required',
+      message: 'Security verification is required for this action. Please refresh and try again.',
+    });
+  }
+
+  // CRITICAL: Check for token reuse attacks
+  if (isTokenUsed(captchaToken)) {
+    console.log(`🚫 CAPTCHA REUSE ATTACK BLOCKED: Token already used - ${captchaToken.substring(0, 20)}...`);
+    return res.status(400).json({
+      error: 'CAPTCHA token already used',
+      message: 'Security verification failed. Please refresh the page and try again.',
+    });
   }
 
   try {
@@ -31,7 +72,7 @@ const verifyCaptcha = async (req, res, next) => {
       },
     });
 
-    const { success, score, action, hostname } = response.data;
+    const { success, score, action, hostname, challenge_ts } = response.data;
 
     if (!success) {
       console.log('❌ CAPTCHA verification failed:', response.data);
@@ -41,9 +82,34 @@ const verifyCaptcha = async (req, res, next) => {
       });
     }
 
+    // CRITICAL: Validate timestamp to prevent old token reuse
+    if (challenge_ts) {
+      const challengeTime = new Date(challenge_ts).getTime();
+      const now = Date.now();
+      const maxAge = 2 * 60 * 1000; // 2 minutes max age
+      
+      if (now - challengeTime > maxAge) {
+        console.log(`❌ CAPTCHA token too old: ${(now - challengeTime) / 1000}s old (max: ${maxAge / 1000}s)`);
+        return res.status(400).json({
+          error: 'CAPTCHA token expired',
+          message: 'Security verification expired. Please refresh and try again.',
+        });
+      }
+    }
+
+    // CRITICAL: Validate action to prevent action mismatch attacks
+    const expectedActions = ['booking_request', 'booking_acceptance', 'checkout_payment', 'add_payment_method', 'custom_payment_form', 'payment_form', 'security_deposit_charge', 'paypal_create_order', 'paypal_authorize_order', 'setup_intent', 'google_pay_checkout'];
+    if (action && !expectedActions.includes(action)) {
+      console.log(`❌ CAPTCHA action mismatch: got "${action}", expected one of: ${expectedActions.join(', ')}`);
+      return res.status(400).json({
+        error: 'CAPTCHA action mismatch',
+        message: 'Security verification failed. Please refresh and try again.',
+      });
+    }
+
     // Check CAPTCHA score (0.0 = bot, 1.0 = human)
     // For payment forms, we want a higher threshold
-    const minScore = process.env.RECAPTCHA_MIN_SCORE ? parseFloat(process.env.RECAPTCHA_MIN_SCORE) : 0.5;
+    const minScore = process.env.RECAPTCHA_MIN_SCORE ? parseFloat(process.env.RECAPTCHA_MIN_SCORE) : 0.6;
     
     if (score < minScore) {
       console.log(`❌ CAPTCHA score too low: ${score} (min: ${minScore})`);
@@ -53,8 +119,11 @@ const verifyCaptcha = async (req, res, next) => {
       });
     }
 
+    // CRITICAL: Mark token as used AFTER all validations pass
+    markTokenAsUsed(captchaToken);
+
     // Log successful verification for monitoring
-    console.log(`✅ CAPTCHA verified: score=${score}, action=${action}`);
+    console.log(`✅ CAPTCHA verified: score=${score}, action=${action}, ip=${req.ip}`);
     
     // Add CAPTCHA data to request for logging/analytics
     req.captcha = {
@@ -62,18 +131,18 @@ const verifyCaptcha = async (req, res, next) => {
       action,
       hostname,
       verified: true,
+      challenge_ts,
     };
 
     next();
   } catch (error) {
     console.error('❌ CAPTCHA verification error:', error.message);
     
-    // In case of verification service failure, allow through but log
-    // You might want to block in production for maximum security
-    const blockOnError = process.env.RECAPTCHA_BLOCK_ON_ERROR === 'true';
+    // STRICTER: Block requests on verification errors in production
+    const blockOnError = process.env.RECAPTCHA_BLOCK_ON_ERROR !== 'false'; // Default to blocking
     
     if (blockOnError) {
-      return res.status(500).json({
+      return res.status(503).json({
         error: 'Security verification unavailable',
         message: 'Security verification is temporarily unavailable. Please try again later.',
       });
@@ -121,9 +190,13 @@ const verifyCaptchaStrict = async (req, res, next) => {
     // Restore original settings
     if (originalMinScore) {
       process.env.RECAPTCHA_MIN_SCORE = originalMinScore;
+    } else {
+      delete process.env.RECAPTCHA_MIN_SCORE;
     }
     if (originalBlockOnError) {
       process.env.RECAPTCHA_BLOCK_ON_ERROR = originalBlockOnError;
+    } else {
+      delete process.env.RECAPTCHA_BLOCK_ON_ERROR;
     }
 
     if (error) {

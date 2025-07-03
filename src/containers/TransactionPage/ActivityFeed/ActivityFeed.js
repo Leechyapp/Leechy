@@ -212,7 +212,7 @@ export const ActivityFeedComponent = props => {
   const classes = classNames(rootClassName || css.root, className);
   const processName = stateData.processName;
   const { files } = useSelector(state => state.TransactionPage);
-  console.log(`files`, files);
+  // Removed files logging for security
 
   // If stateData doesn't have processName, full tx data has not been fetched.
   if (!processName) {

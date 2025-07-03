@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import classNames from 'classnames';
 import { createPayPalOrder, authorizePayPalOrder, getPayPalConfigStatus } from '../../util/api';
+import { verifyCaptcha } from '../../util/useCaptcha';
 
 import css from './PayPalButton.module.css';
 
@@ -174,6 +175,15 @@ const PayPalButton = ({
         paypalSDK.Buttons({
           createOrder: async (data, actions) => {
             try {
+              // Get CAPTCHA token for PayPal order creation
+              let captchaToken = null;
+              try {
+                captchaToken = await verifyCaptcha('paypal_create_order');
+              } catch (captchaError) {
+                console.warn('CAPTCHA verification failed for PayPal order:', captchaError);
+                // Continue without CAPTCHA if it fails
+              }
+
               const orderPayload = {
                 amount: amount,
                 currency: currency.toUpperCase(),
@@ -184,7 +194,7 @@ const PayPalButton = ({
                 }
               };
               
-              const orderData = await createPayPalOrder(orderPayload);
+              const orderData = await createPayPalOrder(orderPayload, captchaToken);
 
               return orderData.orderId;
             } catch (error) {
@@ -195,13 +205,22 @@ const PayPalButton = ({
           },
           onApprove: async (data, actions) => {
             try {
+              // Get CAPTCHA token for PayPal authorization
+              let captchaToken = null;
+              try {
+                captchaToken = await verifyCaptcha('paypal_authorize_order');
+              } catch (captchaError) {
+                console.warn('CAPTCHA verification failed for PayPal authorization:', captchaError);
+                // Continue without CAPTCHA if it fails
+              }
+
               const authorizePayload = {
                 transactionLineItems,
                 providerId,
                 customerId
               };
               
-              const authorizeData = await authorizePayPalOrder(data.orderID, authorizePayload);
+              const authorizeData = await authorizePayPalOrder(data.orderID, authorizePayload, captchaToken);
               
               await onPaymentSubmit({
                 type: 'paypal',

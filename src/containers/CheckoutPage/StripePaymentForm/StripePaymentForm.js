@@ -432,17 +432,17 @@ class StripePaymentForm extends Component {
     } else {
       // Fallback for when CAPTCHA is not configured
       console.warn('CAPTCHA not configured - payment proceeding without verification');
-      const params = {
-        message: initialMessage ? initialMessage.trim() : null,
-        card: this.card,
-        formId,
-        formValues: values,
-        paymentMethod: getPaymentMethod(
-          paymentMethod,
-          ensurePaymentMethodCard(defaultPaymentMethod).id
-        ),
-      };
-      onSubmit(params);
+    const params = {
+      message: initialMessage ? initialMessage.trim() : null,
+      card: this.card,
+      formId,
+      formValues: values,
+      paymentMethod: getPaymentMethod(
+        paymentMethod,
+        ensurePaymentMethodCard(defaultPaymentMethod).id
+      ),
+    };
+    onSubmit(params);
     }
   }
 

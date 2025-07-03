@@ -21,6 +21,7 @@ import {
   detachPaymentMethod,
   getPaymentMethodsList,
 } from '../../util/api.js';
+import { verifyCaptcha } from '../../util/useCaptcha';
 import NativeBottomNavbar from '../../components/NativeBottomNavbar/NativeBottomNavbar.js';
 import PullToRefresh from '../../components/PullToRefresh/PullToRefresh.js';
 
@@ -113,10 +114,20 @@ const PaymentMethodsPageComponent = props => {
     setCustomDefaultPaymentMethod(paymentMethod);
   };
 
-  const getCustomClientSecretAndSetForm = () => {
+  const getCustomClientSecretAndSetForm = async () => {
     if (!customClientSecret) {
       setSetupIntentLoading(true);
-      createSetupIntent({})
+      
+      // Get CAPTCHA token for setup intent creation
+      let captchaToken = null;
+      try {
+        captchaToken = await verifyCaptcha('setup_intent');
+      } catch (error) {
+        console.warn('CAPTCHA verification failed for setup intent:', error);
+        // Continue without CAPTCHA if it fails
+      }
+      
+      createSetupIntent({}, captchaToken)
         .then(setupIntentId => {
           setCustomClientSecret(setupIntentId);
           setCustomPaymentForm(true);
@@ -124,15 +135,24 @@ const PaymentMethodsPageComponent = props => {
         })
         .catch(error => {
           setSetupIntentLoading(false);
-          console.error(error);
+          console.error('Setup intent creation failed:', error);
         });
     } else {
       setCustomPaymentForm(true);
     }
   };
 
-  const handleCustomPaymentSubmit = params => {
-    attachPaymentMethod(params)
+  const handleCustomPaymentSubmit = async params => {
+    // Get CAPTCHA token for payment method attachment
+    let captchaToken = null;
+    try {
+      captchaToken = await verifyCaptcha('add_payment_method');
+    } catch (error) {
+      console.warn('CAPTCHA verification failed for payment method attachment:', error);
+      // Continue without CAPTCHA if it fails
+    }
+    
+    attachPaymentMethod(params, captchaToken)
       .then(() => {
         getPaymentMethodsList()
           .then(result => {
@@ -145,11 +165,11 @@ const PaymentMethodsPageComponent = props => {
             }
           })
           .catch(error => {
-            console.error(error);
+            console.error('Failed to get payment methods list:', error);
           });
       })
       .catch(error => {
-        console.error(error);
+        console.error('Failed to attach payment method:', error);
       });
   };
 

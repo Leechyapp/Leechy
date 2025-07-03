@@ -277,6 +277,18 @@ class BookingController {
       }
 
       console.log('🔄 Creating Stripe PaymentIntent for acceptance...');
+      
+      // Security logging for monitoring card testing attacks
+      console.log('🔒 SECURITY: PaymentIntent creation attempt', {
+        userId: req.currentUser?.id?.uuid,
+        transactionId,
+        paymentMethod: stripePaymentMethodId,
+        amount: payinTotal.amount,
+        timestamp: new Date().toISOString(),
+        userAgent: req.headers['user-agent'],
+        ip: req.ip || req.connection.remoteAddress
+      });
+      
       const paymentIntent = await StripeService.createPaymentIntent(paymentIntentObject);
 
       StripeUtil.checkIfPaymentIntentSucceeded(paymentIntent);

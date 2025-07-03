@@ -178,13 +178,13 @@ class PaymentMethodsForm extends Component {
     } else {
       // Fallback for when CAPTCHA is not configured
       console.warn('CAPTCHA not configured - payment method setup proceeding without verification');
-      const params = {
-        stripe: this.stripe,
-        card: this.card,
-        formId,
-        formValues: values,
-      };
-      onSubmit(params);
+    const params = {
+      stripe: this.stripe,
+      card: this.card,
+      formId,
+      formValues: values,
+    };
+    onSubmit(params);
     }
   }
 
@@ -307,7 +307,7 @@ class PaymentMethodsForm extends Component {
             {captchaLoading ? (
               'Verifying security...'
             ) : (
-              <FormattedMessage id="PaymentMethodsForm.submitPaymentInfo" />
+            <FormattedMessage id="PaymentMethodsForm.submitPaymentInfo" />
             )}
           </PrimaryButton>
         </div>

@@ -583,10 +583,20 @@ export const CheckoutPageWithPayment = props => {
     setCustomDefaultPaymentMethod(paymentMethod);
   };
 
-  const getCustomClientSecretAndSetForm = () => {
+  const getCustomClientSecretAndSetForm = async () => {
     if (!customClientSecret) {
       setSetupIntentLoading(true);
-      createSetupIntent({})
+      
+      // Get CAPTCHA token for setup intent creation
+      let captchaToken = null;
+      try {
+        captchaToken = await verifyCaptcha('setup_intent');
+      } catch (error) {
+        console.warn('CAPTCHA verification failed for setup intent:', error);
+        // Continue without CAPTCHA if it fails
+      }
+      
+      createSetupIntent({}, captchaToken)
         .then(setupIntentId => {
           setCustomClientSecret(setupIntentId);
           setCustomPaymentForm(true);
@@ -594,7 +604,7 @@ export const CheckoutPageWithPayment = props => {
         })
         .catch(error => {
           setSetupIntentLoading(false);
-          console.error(error);
+          console.error('Setup intent creation failed:', error);
         });
     } else {
       setCustomPaymentForm(true);
@@ -634,7 +644,7 @@ export const CheckoutPageWithPayment = props => {
     let captchaToken = null;
     try {
       captchaToken = await verifyCaptcha('booking_request');
-      console.log('CAPTCHA verification result:', captchaToken ? 'success' : 'not configured');
+      // CAPTCHA verification completed
     } catch (error) {
       console.warn('CAPTCHA verification failed:', error);
       // Continue without CAPTCHA if it fails
@@ -690,12 +700,12 @@ export const CheckoutPageWithPayment = props => {
 
   // Handler for when payment method is selected in EnhancedPaymentMethodSelector
   const handlePaymentMethodSelect = (method) => {
-    console.log('Payment method selected:', method);
+    // Payment method selected
     
     // If card payment method is selected and we don't have a client secret,
     // create one for the new card payment form
     if (method.id === 'card' && !customClientSecret) {
-      console.log('Creating client secret for new card payment...');
+      // Creating client secret for new card payment
       getCustomClientSecretAndSetForm();
     }
   };
@@ -752,7 +762,7 @@ export const CheckoutPageWithPayment = props => {
         let captchaToken = null;
         try {
           captchaToken = await verifyCaptcha('booking_request');
-          console.log('CAPTCHA verification result (PayPal):', captchaToken ? 'success' : 'not configured');
+          // CAPTCHA verification completed for PayPal
         } catch (error) {
           console.warn('CAPTCHA verification failed (PayPal):', error);
           // Continue without CAPTCHA if it fails
@@ -797,7 +807,13 @@ export const CheckoutPageWithPayment = props => {
             pushNotificationCode: PushNotificationCodeEnum.BookingRequested,
             transactionId: transactionId.uuid,
             params: {},
-          });
+          })
+            .then(() => {
+              // Push notification sent successfully for PayPal
+            })
+            .catch(err => {
+              console.error('Push notification failed (PayPal):', err);
+            });
           
           redirectToOrderDetailsPage(transactionId);
         }).catch(bookingError => {
@@ -829,7 +845,7 @@ export const CheckoutPageWithPayment = props => {
       let captchaTokenForCard = null;
       try {
         captchaTokenForCard = await verifyCaptcha('booking_request');
-        console.log('CAPTCHA verification result (Card):', captchaTokenForCard ? 'success' : 'not configured');
+        // CAPTCHA verification completed for card payment
       } catch (error) {
         console.warn('CAPTCHA verification failed (Card):', error);
         // Continue without CAPTCHA if it fails
@@ -869,11 +885,11 @@ export const CheckoutPageWithPayment = props => {
           transactionId: transactionId.uuid,
           params: {},
         })
-          .then(res => {
-            console.log(res);
+          .then(() => {
+            // Push notification sent successfully
           })
           .catch(err => {
-            console.error(err);
+            console.error('Push notification failed:', err);
           });
         redirectToOrderDetailsPage(transactionId);
       });

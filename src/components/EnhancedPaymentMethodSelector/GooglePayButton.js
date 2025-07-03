@@ -5,6 +5,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import classNames from 'classnames';
+import { verifyCaptcha } from '../../util/useCaptcha';
 
 import css from './GooglePayButton.module.css';
 
@@ -165,12 +166,27 @@ const GooglePayButton = ({
 
   const handleExternalGooglePay = async () => {
     try {
+      // Get CAPTCHA token for Google Pay checkout
+      let captchaToken = null;
+      try {
+        captchaToken = await verifyCaptcha('google_pay_checkout');
+      } catch (error) {
+        console.warn('CAPTCHA verification failed for Google Pay checkout:', error);
+        // Continue without CAPTCHA if it fails
+      }
+
       // Create a Stripe Checkout session for Google Pay
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (captchaToken) {
+        headers['x-captcha-token'] = captchaToken;
+      }
+
       const response = await fetch('/api/stripe-checkout/create-checkout-session', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           amount: totalAmount,
           currency: currency,

@@ -1,5 +1,6 @@
 const StripeAccountController = require('../controllers/stripe-account.controller');
 const { authMiddleware } = require('../middlewares/auth.middleware');
+const { rateLimitPayments } = require('../middlewares/rate-limit.middleware');
 const BaseRoute = require('./base.route');
 
 class StripeAccountRoute extends BaseRoute {
@@ -17,6 +18,7 @@ class StripeAccountRoute extends BaseRoute {
     );
     router.post(
       this.ROOT_PATH + '/create-account-session',
+      rateLimitPayments(5, 300000), // Max 5 account sessions per 5 minutes
       authMiddleware,
       StripeAccountController.createAccountSession
     );
