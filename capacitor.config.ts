@@ -60,7 +60,7 @@ const config: CapacitorConfig = {
       iosCustomScheme: true,
     },
     SplashScreen: {
-      launchShowDuration: 1500,
+      launchShowDuration: 3000,
       // launchAutoHide: true,
       launchFadeOutDuration: 500,
       backgroundColor: '#ffffffff',
